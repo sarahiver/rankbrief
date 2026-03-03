@@ -223,6 +223,28 @@ export default function Dashboard({ user }) {
     navigate('/');
   };
 
+  const handleConnectGoogle = () => {
+    const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+    const REDIRECT_URI = 'https://ubexqxxkqjzhsgidsseh.supabase.co/functions/v1/google-oauth-callback';
+    const SCOPES = [
+      'https://www.googleapis.com/auth/webmasters.readonly',
+      'https://www.googleapis.com/auth/analytics.readonly',
+    ].join(' ');
+
+    const state = encodeURIComponent(`${user.id}|Meine Website|`);
+
+    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
+    authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('scope', SCOPES);
+    authUrl.searchParams.set('access_type', 'offline');
+    authUrl.searchParams.set('prompt', 'consent');
+    authUrl.searchParams.set('state', state);
+
+    window.location.href = authUrl.toString();
+  };
+
   return (
     <Layout>
       <TopBar>
@@ -241,7 +263,7 @@ export default function Dashboard({ user }) {
           <WelcomeSub>
             You're in. The next step is connecting your Google Search Console so we can start generating your automated monthly reports.
           </WelcomeSub>
-          <BtnConnect disabled>
+          <BtnConnect onClick={handleConnectGoogle}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -250,9 +272,6 @@ export default function Dashboard({ user }) {
             </svg>
             Connect Google Search Console
           </BtnConnect>
-          <p style={{ marginTop: '0.75rem', fontSize: '0.8125rem', color: '#55556A' }}>
-            Coming soon – Google OAuth integration is being built (Week 1–2).
-          </p>
         </WelcomeBanner>
 
         <Grid>
