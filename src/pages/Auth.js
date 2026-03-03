@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import { supabase } from '../lib/supabase';
 
@@ -181,9 +181,13 @@ const Toggle = styled.p`
   margin-top: 1.5rem;
   font-weight: 300;
 
-  a {
+  button {
+    background: none;
+    border: none;
+    padding: 0;
     color: ${({ theme }) => theme.colors.accent};
     font-weight: 500;
+    font-size: inherit;
     cursor: pointer;
 
     &:hover { text-decoration: underline; }
@@ -301,9 +305,9 @@ export default function Auth({ mode = 'login' }) {
 
         <Toggle>
           {isLogin ? (
-            <>Don't have an account? <a onClick={() => { setIsLogin(false); setError(''); setSuccess(''); }}>Sign up free</a></>
+            <>Don't have an account? <button onClick={() => { setIsLogin(false); setError(''); setSuccess(''); }}>Sign up free</button></>
           ) : (
-            <>Already have an account? <a onClick={() => { setIsLogin(true); setError(''); setSuccess(''); }}>Sign in</a></>
+            <>Already have an account? <button onClick={() => { setIsLogin(true); setError(''); setSuccess(''); }}>Sign in</button></>
           )}
         </Toggle>
       </Card>
