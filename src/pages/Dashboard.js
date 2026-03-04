@@ -150,6 +150,117 @@ const BtnConnect = styled.button`
   svg { width: 16px; height: 16px; }
 `;
 
+// ── Frozen Wall ───────────────────────────────────────────────────────────────
+const FrozenWall = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1rem 4rem;
+  text-align: center;
+  animation: ${fadeUp} 0.4s ease both;
+`;
+
+const FrozenIcon = styled.div`
+  font-size: 3rem;
+  margin-bottom: 1.25rem;
+`;
+
+const FrozenTitle = styled.h2`
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+`;
+
+const FrozenSubtitle = styled.p`
+  font-size: 0.9375rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-weight: 300;
+  max-width: 460px;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+`;
+
+const PlanGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 820px;
+  @media (max-width: 680px) { grid-template-columns: 1fr; }
+`;
+
+const PlanCard = styled.div`
+  background: ${({ theme, $highlight }) => $highlight ? theme.colors.accent : theme.colors.bgCard};
+  border: 1px solid ${({ theme, $highlight }) => $highlight ? 'transparent' : theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.xl};
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  transform: ${({ $highlight }) => $highlight ? 'scale(1.03)' : 'none'};
+`;
+
+const PlanBadge = styled.div`
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: ${({ theme }) => theme.colors.accent};
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+`;
+
+const PlanName = styled.div`
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: ${({ theme, $highlight }) => $highlight ? 'rgba(255,255,255,0.7)' : theme.colors.textDim};
+`;
+
+const PlanPrice = styled.div`
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: ${({ $highlight }) => $highlight ? '#fff' : 'inherit'};
+  span { font-size: 1rem; font-weight: 400; opacity: 0.6; }
+`;
+
+const PlanFeature = styled.div`
+  font-size: 0.8125rem;
+  color: ${({ $highlight }) => $highlight ? 'rgba(255,255,255,0.85)' : 'inherit'};
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  &::before { content: '✓'; font-weight: 700; opacity: 0.8; }
+`;
+
+const PlanBtn = styled.button`
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-weight: 700;
+  font-size: 0.9375rem;
+  transition: all 0.2s;
+  background: ${({ $highlight }) => $highlight ? '#fff' : 'transparent'};
+  color: ${({ theme, $highlight }) => $highlight ? theme.colors.accent : theme.colors.accent};
+  border: ${({ $highlight }) => $highlight ? 'none' : '1px solid currentColor'};
+  &:hover { opacity: 0.85; transform: translateY(-1px); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+`;
+
 // ── Section ───────────────────────────────────────────────────────────────────
 const SectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.display};
@@ -396,6 +507,64 @@ function fmtPos(n) {
   return n.toFixed(1);
 }
 
+// ── Frozen Wall Component ─────────────────────────────────────────────────────
+function FrozenWallView({ onUpgrade, upgrading }) {
+  const plans = [
+    {
+      key: 'basic',
+      name: 'Basic',
+      price: '19',
+      features: ['1 Domain', 'Monatlicher PDF-Report', 'GSC + GA4 Daten', 'KI-Zusammenfassung', 'Email-Versand'],
+    },
+    {
+      key: 'pro',
+      name: 'Pro',
+      price: '39',
+      highlight: true,
+      features: ['3 Domains', 'Alles in Basic', 'White-Label Reports', 'Eigenes Logo', 'Priority Delivery'],
+    },
+    {
+      key: 'agency',
+      name: 'Agency',
+      price: '79',
+      features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Bulk Reporting', 'Agency Branding'],
+    },
+  ];
+
+  return (
+    <FrozenWall>
+      <FrozenIcon>⏸️</FrozenIcon>
+      <FrozenTitle>Dein kostenloser Monat ist abgelaufen</FrozenTitle>
+      <FrozenSubtitle>
+        Wähle einen Plan um weiterhin automatische monatliche SEO-Reports zu erhalten.
+        Deine Daten sind sicher gespeichert.
+      </FrozenSubtitle>
+
+      <PlanGrid>
+        {plans.map(plan => (
+          <PlanCard key={plan.key} $highlight={plan.highlight}>
+            {plan.highlight && <PlanBadge>Empfohlen</PlanBadge>}
+            <PlanName $highlight={plan.highlight}>{plan.name}</PlanName>
+            <PlanPrice $highlight={plan.highlight}>
+              €{plan.price}<span>/mo</span>
+            </PlanPrice>
+            {plan.features.map(f => (
+              <PlanFeature key={f} $highlight={plan.highlight}>{f}</PlanFeature>
+            ))}
+            <PlanBtn
+              $highlight={plan.highlight}
+              onClick={() => onUpgrade(plan.key)}
+              disabled={upgrading}
+            >
+              {upgrading ? 'Wird geladen...' : 'Jetzt starten →'}
+            </PlanBtn>
+          </PlanCard>
+        ))}
+      </PlanGrid>
+    </FrozenWall>
+  );
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Dashboard({ user }) {
   const navigate = useNavigate();
@@ -414,17 +583,16 @@ export default function Dashboard({ user }) {
   const connected = new URLSearchParams(location.search).get('connected') === 'true';
   const upgraded = new URLSearchParams(location.search).get('upgraded') === 'true';
 
-  // Load properties on mount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadProperties();
     loadProfile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadProfile = async () => {
     const { data } = await supabase
       .from('profiles')
-      .select('plan, plan_status')
+      .select('plan, plan_status, free_report_sent, trial_ends_at')
       .eq('id', user.id)
       .single();
     setProfile(data);
@@ -451,7 +619,6 @@ export default function Dashboard({ user }) {
     setUpgrading(false);
   };
 
-  // Load report when property selected
   useEffect(() => {
     if (selectedProperty) loadLatestReport(selectedProperty.id);
   }, [selectedProperty]);
@@ -478,7 +645,6 @@ export default function Dashboard({ user }) {
       .limit(1);
 
     const reportData = reportRows?.[0] ?? null;
-
 
     if (reportData) {
       setReport(reportData);
@@ -530,6 +696,24 @@ export default function Dashboard({ user }) {
     ? new Date(report.report_month).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })
     : null;
 
+  // ── Frozen Account: nur Upgrade-Wall zeigen ───────────────────────────────
+  if (profile?.plan_status === 'frozen') {
+    return (
+      <Layout>
+        <TopBar>
+          <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
+          <TopBarRight>
+            <UserEmail>{user?.email}</UserEmail>
+            <BtnSignOut onClick={handleSignOut}>Sign out</BtnSignOut>
+          </TopBarRight>
+        </TopBar>
+        <Main>
+          <FrozenWallView onUpgrade={handleUpgrade} upgrading={upgrading} />
+        </Main>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <TopBar>
@@ -553,11 +737,12 @@ export default function Dashboard({ user }) {
           </Alert>
         )}
 
-        {profile?.plan === 'free' && properties.length > 0 && (
+        {/* Upgrade-Banner nur für Free-User MIT erstem Report (Trial läuft) */}
+        {profile?.plan === 'free' && profile?.free_report_sent && properties.length > 0 && (
           <ConnectBanner>
             <ConnectText>
-              <h2>Upgrade auf Basic</h2>
-              <p>Automatische monatliche Reports, KI-Zusammenfassung und PDF-Versand ab 19€/Monat.</p>
+              <h2>Dein kostenloser Monat läuft</h2>
+              <p>Wähle einen Plan um nach dem Freimonat weiterhin Reports zu erhalten.</p>
             </ConnectText>
             <BtnConnect onClick={() => handleUpgrade('basic')} disabled={upgrading}>
               {upgrading ? 'Wird geladen...' : 'Jetzt upgraden →'}
@@ -567,12 +752,11 @@ export default function Dashboard({ user }) {
 
         {loading ? <Spinner /> : (
           <>
-            {/* No properties yet */}
             {properties.length === 0 && (
               <ConnectBanner>
                 <ConnectText>
                   <h2>Google Search Console verbinden</h2>
-                  <p>Verbinde deine GSC Property um automatische monatliche Reports zu erhalten.</p>
+                  <p>Verbinde deine GSC Property um automatische monatliche Reports zu erhalten. Der erste Monat ist kostenlos.</p>
                 </ConnectText>
                 <BtnConnect onClick={handleConnectGoogle}>
                   <svg viewBox="0 0 24 24" fill="currentColor">
@@ -586,7 +770,6 @@ export default function Dashboard({ user }) {
               </ConnectBanner>
             )}
 
-            {/* Properties list */}
             {properties.length > 0 && (
               <>
                 <SectionTitle>Deine Properties</SectionTitle>
@@ -611,14 +794,12 @@ export default function Dashboard({ user }) {
                   ))}
                 </PropertyList>
 
-                {/* Report data */}
                 {reportLoading ? <Spinner /> : (
                   <>
                     {report ? (
                       <>
                         <ReportPeriod>Report: {reportMonth}</ReportPeriod>
 
-                        {/* KPIs */}
                         <KpiGrid>
                           <KpiCard>
                             <KpiLabel>Clicks</KpiLabel>
@@ -650,7 +831,6 @@ export default function Dashboard({ user }) {
                           </KpiCard>
                         </KpiGrid>
 
-                        {/* AI Summary */}
                         <SectionTitle>KI-Zusammenfassung</SectionTitle>
                         <SummaryCard>
                           {report.summary_text
@@ -660,7 +840,6 @@ export default function Dashboard({ user }) {
                               </SummaryEmpty>}
                         </SummaryCard>
 
-                        {/* Keywords + Pages */}
                         <TableGrid>
                           <TableCard>
                             <TableHeader>Top Keywords</TableHeader>
@@ -695,7 +874,6 @@ export default function Dashboard({ user }) {
                           </TableCard>
                         </TableGrid>
 
-                        {/* GA4 */}
                         {report.sessions === 0 && (
                           <Alert $type="info">
                             💡 GA4-Daten fehlen. <a href="https://analytics.google.com" target="_blank" rel="noreferrer" style={{color: 'inherit', textDecoration: 'underline'}}>GA4 einrichten</a> und beim nächsten Report wird die Engagement Rate automatisch erfasst.
@@ -706,7 +884,7 @@ export default function Dashboard({ user }) {
                       <EmptyState>
                         <EmptyIcon>📭</EmptyIcon>
                         <EmptyTitle>Noch kein Report vorhanden</EmptyTitle>
-                        <EmptyText>Der erste Report wird automatisch am 1. des nächsten Monats generiert.</EmptyText>
+                        <EmptyText>Der erste Report wird automatisch am 1. des nächsten Monats generiert und ist kostenlos.</EmptyText>
                       </EmptyState>
                     )}
                   </>
