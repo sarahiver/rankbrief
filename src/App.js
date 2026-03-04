@@ -18,6 +18,7 @@ const noFooterRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/do
 function AppInner() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lang, setLang] = useState(() => localStorage.getItem('rb_lang') || 'en');
   const location = useLocation();
   const path = location.pathname;
 
@@ -32,9 +33,14 @@ function AppInner() {
     return () => listener.subscription.unsubscribe();
   }, []);
 
+  const handleLangChange = (l) => {
+    setLang(l);
+    localStorage.setItem('rb_lang', l);
+  };
+
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: '#8888AA', fontSize: '0.875rem' }}>Loading...</div>
+      <div style={{ color: '#9898B8', fontSize: '0.875rem' }}>Loading...</div>
     </div>
   );
 
@@ -43,9 +49,9 @@ function AppInner() {
 
   return (
     <>
-      {showNav && <Navbar user={user} />}
+      {showNav && <Navbar user={user} lang={lang} onLangChange={handleLangChange} />}
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<Landing lang={lang} />} />
         <Route path="/login" element={!user ? <Auth mode="login" /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!user ? <Auth mode="register" /> : <Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/login" />} />

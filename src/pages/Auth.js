@@ -258,7 +258,7 @@ export default function Auth({ mode = 'login' }) {
         <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
 
         <Title>{isLogin ? 'Welcome back' : 'Create your account'}</Title>
-        <Sub>{isLogin ? 'Sign in to your RankBrief dashboard.' : 'Start your 14-day free trial. No credit card required.'}</Sub>
+        <Sub>{isLogin ? 'Sign in to your RankBrief dashboard.' : 'Start for free – first month on us. No credit card required.'}</Sub>
 
         <Form>
           {error && <ErrorMsg>{error}</ErrorMsg>}

@@ -2,15 +2,15 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
 
-// ── Animations ──────────────────────────────────────────────────────────────
+// ── Animations ────────────────────────────────────────────────────────────────
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
 `;
 
 const pulse = keyframes`
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50%       { opacity: 0.7; transform: scale(1.05); }
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.05); }
 `;
 
 const float = keyframes`
@@ -23,13 +23,10 @@ const shimmer = keyframes`
   100% { background-position: 200% center; }
 `;
 
-// ── Layout ───────────────────────────────────────────────────────────────────
-const Page = styled.div`
-  min-height: 100vh;
-  overflow-x: hidden;
-`;
+// ── Layout ────────────────────────────────────────────────────────────────────
+const Page = styled.div`min-height: 100vh; overflow-x: hidden;`;
 
-// ── Hero ─────────────────────────────────────────────────────────────────────
+// ── Hero ──────────────────────────────────────────────────────────────────────
 const HeroSection = styled.section`
   position: relative;
   min-height: 100vh;
@@ -51,20 +48,19 @@ const GlowOrb = styled.div`
 
   &.orb1 {
     width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(108,99,255,0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
     top: -100px; left: 50%;
     transform: translateX(-50%);
-    animation-delay: 0s;
   }
   &.orb2 {
     width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(99,207,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(99,207,255,0.08) 0%, transparent 70%);
     bottom: 100px; right: 10%;
     animation-delay: 2s;
   }
   &.orb3 {
     width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(255,99,180,0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255,99,180,0.06) 0%, transparent 70%);
     bottom: 200px; left: 5%;
     animation-delay: 4s;
   }
@@ -74,8 +70,8 @@ const GridBg = styled.div`
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(108,99,255,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(108,99,255,0.04) 1px, transparent 1px);
+    linear-gradient(rgba(108,99,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108,99,255,0.05) 1px, transparent 1px);
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 100%);
   pointer-events: none;
@@ -94,7 +90,6 @@ const HeroBadge = styled.div`
   color: ${({ theme }) => theme.colors.accent};
   margin-bottom: 2rem;
   animation: ${fadeUp} 0.6s ease both;
-
   &::before {
     content: '';
     width: 6px; height: 6px;
@@ -155,14 +150,12 @@ const BtnPrimary = styled(Link)`
   padding: 0.875rem 2rem;
   border-radius: ${({ theme }) => theme.radius.lg};
   transition: all 0.25s;
-  box-shadow: 0 0 0 0 rgba(108,99,255,0.4);
 
   &:hover {
     background: ${({ theme }) => theme.colors.accentHover};
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(108,99,255,0.4);
+    box-shadow: 0 8px 30px rgba(108,99,255,0.35);
   }
-
   svg { transition: transform 0.2s; }
   &:hover svg { transform: translateX(3px); }
 `;
@@ -178,11 +171,12 @@ const BtnGhost = styled(Link)`
   border-radius: ${({ theme }) => theme.radius.lg};
   border: 1px solid ${({ theme }) => theme.colors.border};
   transition: all 0.2s;
+  background: ${({ theme }) => theme.colors.bgCard};
 
   &:hover {
     color: ${({ theme }) => theme.colors.text};
     border-color: ${({ theme }) => theme.colors.borderLight};
-    background: ${({ theme }) => theme.colors.bgCard};
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   }
 `;
 
@@ -202,7 +196,6 @@ const TrustItem = styled.div`
   gap: 0.4rem;
   font-size: 0.8125rem;
   color: ${({ theme }) => theme.colors.textDim};
-
   svg { color: ${({ theme }) => theme.colors.success}; }
 `;
 
@@ -218,9 +211,8 @@ const PreviewWrap = styled.div`
 const PreviewGlow = styled.div`
   position: absolute;
   inset: -40px;
-  background: radial-gradient(ellipse at 50% 50%, rgba(108,99,255,0.15) 0%, transparent 70%);
+  background: radial-gradient(ellipse at 50% 50%, rgba(108,99,255,0.1) 0%, transparent 70%);
   pointer-events: none;
-  animation: ${float} 4s ease-in-out infinite;
 `;
 
 const PreviewCard = styled.div`
@@ -228,7 +220,7 @@ const PreviewCard = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radius.xl};
   overflow: hidden;
-  box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.1), 0 4px 20px rgba(108,99,255,0.08);
   animation: ${float} 5s ease-in-out infinite;
 `;
 
@@ -258,10 +250,7 @@ const PreviewBody = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-
-  @media (max-width: 640px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  @media (max-width: 640px) { grid-template-columns: repeat(2, 1fr); }
 `;
 
 const KpiCard = styled.div`
@@ -277,19 +266,16 @@ const KpiCard = styled.div`
     letter-spacing: 0.08em;
     margin-bottom: 0.5rem;
   }
-
   .value {
     font-family: ${({ theme }) => theme.fonts.display};
     font-size: 1.5rem;
     font-weight: 700;
     color: ${({ theme }) => theme.colors.text};
   }
-
   .delta {
     font-size: 0.75rem;
     margin-top: 0.25rem;
-    color: ${({ up }) => up ? '#34D399' : '#F87171'};
-
+    color: ${({ up }) => up ? '#10B981' : '#EF4444'};
     &::before { content: '${({ up }) => up ? '▲' : '▼'} '; }
   }
 `;
@@ -299,10 +285,7 @@ const ChartRow = styled.div`
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 1rem;
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
+  @media (max-width: 640px) { grid-template-columns: 1fr; }
 `;
 
 const ChartPlaceholder = styled.div`
@@ -311,7 +294,6 @@ const ChartPlaceholder = styled.div`
   border-radius: ${({ theme }) => theme.radius.md};
   padding: 1rem;
   height: 120px;
-  position: relative;
   overflow: hidden;
 
   .title {
@@ -321,7 +303,6 @@ const ChartPlaceholder = styled.div`
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
-
   svg { width: 100%; height: 70px; }
 `;
 
@@ -346,14 +327,12 @@ const TableRow = styled.div`
   align-items: center;
   padding: 0.35rem 0;
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};
-
   &:last-child { border-bottom: none; }
-
   .kw { font-size: 0.8rem; color: ${({ theme }) => theme.colors.textMuted}; }
   .val { font-size: 0.75rem; font-family: ${({ theme }) => theme.fonts.mono}; color: ${({ theme }) => theme.colors.accent}; }
 `;
 
-// ── Features ─────────────────────────────────────────────────────────────────
+// ── Sections ──────────────────────────────────────────────────────────────────
 const Section = styled.section`
   max-width: 1100px;
   margin: 0 auto;
@@ -388,11 +367,11 @@ const SectionSub = styled.p`
   margin-bottom: 3rem;
 `;
 
+// ── Features ──────────────────────────────────────────────────────────────────
 const FeaturesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
-
   @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
   @media (max-width: 600px) { grid-template-columns: 1fr; }
 `;
@@ -403,11 +382,10 @@ const FeatureCard = styled.div`
   border-radius: ${({ theme }) => theme.radius.lg};
   padding: 1.75rem;
   transition: all 0.25s;
-
   &:hover {
     border-color: ${({ theme }) => theme.colors.borderLight};
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
   }
 `;
 
@@ -415,9 +393,7 @@ const FeatureIcon = styled.div`
   width: 44px; height: 44px;
   background: ${({ theme }) => theme.colors.accentDim};
   border-radius: ${({ theme }) => theme.radius.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   font-size: 1.25rem;
   margin-bottom: 1.25rem;
 `;
@@ -437,7 +413,7 @@ const FeatureText = styled.p`
   font-weight: 300;
 `;
 
-// ── How it works ─────────────────────────────────────────────────────────────
+// ── Steps ─────────────────────────────────────────────────────────────────────
 const StepsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -458,25 +434,21 @@ const StepsGrid = styled.div`
   }
 `;
 
-const Step = styled.div`
-  text-align: center;
-  position: relative;
-`;
+const Step = styled.div`text-align: center; position: relative;`;
 
 const StepNum = styled.div`
   width: 48px; height: 48px;
   border-radius: 50%;
-  background: ${({ theme }) => theme.colors.bgElevated};
+  background: ${({ theme }) => theme.colors.bgCard};
   border: 1px solid ${({ theme }) => theme.colors.border};
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   font-family: ${({ theme }) => theme.fonts.mono};
   font-size: 0.875rem;
   color: ${({ theme }) => theme.colors.accent};
   margin: 0 auto 1.25rem;
   position: relative;
   z-index: 1;
+  box-shadow: ${({ theme }) => theme.shadow.card};
 `;
 
 const StepTitle = styled.h4`
@@ -500,8 +472,7 @@ const PricingGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   align-items: start;
-
-  @media (max-width: 860px) { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+  @media (max-width: 860px) { grid-template-columns: 1fr; max-width: 400px; }
 `;
 
 const PricingCard = styled.div`
@@ -510,20 +481,18 @@ const PricingCard = styled.div`
   border-radius: ${({ theme }) => theme.radius.xl};
   padding: 2rem;
   position: relative;
-  overflow: hidden;
   transition: transform 0.2s;
 
   ${({ $featured }) => $featured && `
-    box-shadow: 0 0 60px rgba(108,99,255,0.3);
+    box-shadow: 0 0 60px rgba(108,99,255,0.25);
     transform: scale(1.02);
   `}
-
   &:hover { transform: ${({ $featured }) => $featured ? 'scale(1.04)' : 'translateY(-3px)'}; }
 `;
 
 const PlanBadge = styled.div`
   display: inline-block;
-  background: rgba(255,255,255,0.15);
+  background: ${({ $featured }) => $featured ? 'rgba(255,255,255,0.2)' : 'rgba(108,99,255,0.1)'};
   border-radius: 100px;
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
@@ -531,21 +500,19 @@ const PlanBadge = styled.div`
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 1.5rem;
-  color: ${({ $featured }) => $featured ? '#fff' : ({ theme }) => theme.colors.accent};
+  color: ${({ $featured }) => $featured ? '#fff' : '#6C63FF'};
 `;
 
 const PlanPrice = styled.div`
   margin-bottom: 1.5rem;
-
   .amount {
     font-family: ${({ theme }) => theme.fonts.display};
     font-size: 3rem;
     font-weight: 800;
     letter-spacing: -0.04em;
-    color: ${({ $featured }) => $featured ? '#fff' : ({ theme }) => theme.colors.text};
+    color: ${({ $featured }) => $featured ? '#fff' : 'inherit'};
     line-height: 1;
   }
-
   .period {
     font-size: 0.875rem;
     color: ${({ $featured }) => $featured ? 'rgba(255,255,255,0.7)' : ({ theme }) => theme.colors.textMuted};
@@ -572,11 +539,9 @@ const PlanFeature = styled.li`
   &::before {
     content: '✓';
     width: 18px; height: 18px;
-    background: ${({ $featured }) => $featured ? 'rgba(255,255,255,0.2)' : 'rgba(108,99,255,0.15)'};
+    background: ${({ $featured }) => $featured ? 'rgba(255,255,255,0.2)' : 'rgba(108,99,255,0.12)'};
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-size: 0.6875rem;
     color: ${({ $featured }) => $featured ? '#fff' : '#6C63FF'};
     flex-shrink: 0;
@@ -592,13 +557,12 @@ const PlanCTA = styled(Link)`
   font-weight: 700;
   font-size: 0.9375rem;
   transition: all 0.2s;
-
-  background: ${({ $featured }) => $featured ? '#fff' : 'rgba(108,99,255,0.12)'};
-  color: ${({ $featured }) => $featured ? '#6C63FF' : ({ theme }) => theme.colors.accent};
+  background: ${({ $featured }) => $featured ? '#fff' : 'rgba(108,99,255,0.1)'};
+  color: ${({ $featured }) => $featured ? '#6C63FF' : '#6C63FF'};
   border: 1px solid ${({ $featured }) => $featured ? 'transparent' : 'rgba(108,99,255,0.2)'};
 
   &:hover {
-    background: ${({ $featured }) => $featured ? 'rgba(255,255,255,0.9)' : 'rgba(108,99,255,0.2)'};
+    background: ${({ $featured }) => $featured ? 'rgba(255,255,255,0.9)' : 'rgba(108,99,255,0.18)'};
     transform: translateY(-1px);
   }
 `;
@@ -607,7 +571,7 @@ const PlanCTA = styled(Link)`
 const FaqList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0.5rem;
   max-width: 720px;
 `;
 
@@ -615,7 +579,7 @@ const FaqItem = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radius.md};
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  background: ${({ theme }) => theme.colors.bgCard};
 `;
 
 const FaqQ = styled.button`
@@ -626,21 +590,14 @@ const FaqQ = styled.button`
   font-weight: 600;
   font-size: 0.9375rem;
   color: ${({ theme }) => theme.colors.text};
-  background: ${({ theme }) => theme.colors.bgCard};
+  background: transparent;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: background 0.2s;
   letter-spacing: -0.01em;
-
   &:hover { background: ${({ theme }) => theme.colors.bgElevated}; }
-
-  span {
-    color: ${({ theme }) => theme.colors.accent};
-    font-size: 1.25rem;
-    font-weight: 300;
-    flex-shrink: 0;
-  }
+  span { color: ${({ theme }) => theme.colors.accent}; font-size: 1.25rem; font-weight: 300; flex-shrink: 0; }
 `;
 
 const FaqA = styled.div`
@@ -655,50 +612,125 @@ const FaqA = styled.div`
   background: ${({ theme }) => theme.colors.bgCard};
 `;
 
-// ── data ──────────────────────────────────────────────────────────────────────
-const features = [
-  { icon: '⚡', title: 'Fully Automated', text: 'Connect once. Every month, your report is generated and delivered automatically – no manual work required.' },
-  { icon: '🤖', title: 'AI-Powered Summaries', text: 'Each report includes a plain-language summary written by Claude. No SEO jargon, just clear insights your clients understand.' },
-  { icon: '🏷️', title: 'White-Label Ready', text: 'Upload your logo and send reports under your own brand. Your clients see your name, not ours.' },
-  { icon: '📊', title: 'GSC + GA4 Combined', text: 'Clicks, impressions, sessions, engagement – all in one clean report. No switching between tools.' },
-  { icon: '📈', title: 'Month-over-Month Trends', text: 'Every metric comes with a comparison to the previous month. See what\'s improving and what needs attention.' },
-  { icon: '🔒', title: 'GDPR Compliant', text: 'EU servers, AES-256 token encryption, minimal data retention. Built for European privacy requirements from day one.' },
-];
-
-const steps = [
-  { n: '01', title: 'Connect Google', text: 'Sign in with Google and select your Search Console and GA4 properties.' },
-  { n: '02', title: 'Choose a plan', text: 'Pick Basic, Pro, or Agency depending on how many domains you manage.' },
-  { n: '03', title: 'Receive your report', text: 'On the 1st of every month, your PDF report lands in your inbox automatically.' },
-  { n: '04', title: 'Share with clients', text: 'Forward or white-label the report. Your clients get professional insights without any effort.' },
-];
-
-const plans = [
-  {
-    name: 'Basic', price: '19', period: '/mo',
-    features: ['1 domain', 'Monthly PDF report', 'GSC + GA4 data', 'AI summary', 'Email delivery'],
+// ── i18n content ──────────────────────────────────────────────────────────────
+const i18n = {
+  en: {
+    badge: 'Automated SEO reporting for agencies & freelancers',
+    heroTitle1: 'Your SEO report,',
+    heroTitle2: 'delivered automatically.',
+    heroSub: 'Connect Google Search Console once. Every month, RankBrief generates a professional PDF report and sends it to your inbox – powered by AI, zero manual work.',
+    heroCta: 'Start your first month free',
+    heroSeeHow: 'See how it works',
+    trust1: 'First month free',
+    trust2: 'GDPR compliant · EU servers',
+    trust3: 'Cancel anytime',
+    howLabel: 'How it works',
+    howTitle: 'Set it up once.\nReports run forever.',
+    howSub: 'Four steps between you and automated monthly SEO reporting.',
+    featLabel: 'Features',
+    featTitle: 'Everything you need.\nNothing you don\'t.',
+    featSub: 'Built for freelancers and small agencies who bill hourly and hate manual reporting.',
+    pricingLabel: 'Pricing',
+    pricingTitle: 'Simple pricing.\nNo surprises.',
+    pricingSub: 'First month free. No credit card required.',
+    faqLabel: 'FAQ',
+    faqTitle: 'Questions & answers',
+    faqSub: 'Everything you need to know before signing up.',
+    ctaTitle: 'Stop writing reports manually.',
+    ctaSub: 'Join freelancers and agencies who automated their SEO reporting with RankBrief.',
+    ctaBtn: 'Start your first month free →',
+    planCta: 'Get started',
+    steps: [
+      { n: '01', title: 'Connect Google', text: 'Sign in with Google and select your Search Console and GA4 properties.' },
+      { n: '02', title: 'Choose a plan', text: 'Pick Basic, Pro, or Agency depending on how many domains you manage.' },
+      { n: '03', title: 'Receive your report', text: 'On the 1st of every month, your PDF report lands in your inbox automatically.' },
+      { n: '04', title: 'Share with clients', text: 'Forward or white-label the report. Your clients get professional insights without any effort.' },
+    ],
+    features: [
+      { icon: '⚡', title: 'Fully Automated', text: 'Connect once. Every month, your report is generated and delivered automatically – no manual work required.' },
+      { icon: '🤖', title: 'AI-Powered Summaries', text: 'Each report includes a plain-language summary written by Claude. No SEO jargon, just clear insights your clients understand.' },
+      { icon: '🏷️', title: 'White-Label Ready', text: 'Upload your logo and send reports under your own brand. Your clients see your name, not ours.' },
+      { icon: '📊', title: 'GSC + GA4 Combined', text: 'Clicks, impressions, sessions, engagement – all in one clean report. No switching between tools.' },
+      { icon: '📈', title: 'Month-over-Month Trends', text: 'Every metric comes with a comparison to the previous month. See what\'s improving and what needs attention.' },
+      { icon: '🔒', title: 'GDPR Compliant', text: 'EU servers, AES-256 token encryption, minimal data retention. Built for European privacy requirements from day one.' },
+    ],
+    plans: [
+      { name: 'Basic', price: '19', period: '/mo', features: ['1 domain', 'Monthly PDF report', 'GSC + GA4 data', 'AI summary', 'Email delivery'] },
+      { name: 'Pro', price: '39', period: '/mo', featured: true, features: ['3 domains', 'Everything in Basic', 'White-label reports', 'Custom logo', 'Priority delivery'] },
+      { name: 'Agency', price: '79', period: '/mo', features: ['10 domains', 'Everything in Pro', 'Client management', 'Bulk reporting', 'Agency branding'] },
+    ],
+    faqs: [
+      { q: 'Is my Google data safe?', a: 'Yes. We request read-only access to your Search Console and Analytics data. OAuth tokens are encrypted using AES-256-GCM and stored on EU servers (Frankfurt). We never access your data beyond what\'s needed to generate your report.' },
+      { q: 'Can I cancel anytime?', a: 'Absolutely. Cancel from your dashboard at any time. Your subscription remains active until the end of the billing period. No questions asked, no hidden fees.' },
+      { q: 'Do I need to be technical to use RankBrief?', a: 'Not at all. Setup takes about 3 minutes: sign in with Google, select your website, choose a plan. After that, everything is automatic.' },
+      { q: 'What does the report include?', a: 'Each report covers clicks, impressions, CTR, average position, sessions, engagement rate, top 10 keywords, top 10 pages, month-over-month comparison, and an AI-written plain-language summary.' },
+      { q: 'Can I use my own logo?', a: 'Yes, on Pro and Agency plans. Upload your logo and your clients will receive reports branded with your company name and logo – no RankBrief branding.' },
+      { q: 'Which Google properties are supported?', a: 'Any verified Google Search Console property. GA4 support is available for all standard properties. We support both domain and URL-prefix GSC properties.' },
+    ],
   },
-  {
-    name: 'Pro', price: '39', period: '/mo', featured: true,
-    features: ['3 domains', 'Everything in Basic', 'White-label reports', 'Custom logo', 'Priority delivery'],
+  de: {
+    badge: 'Automatisches SEO-Reporting für Agenturen & Freelancer',
+    heroTitle1: 'Dein SEO-Report,',
+    heroTitle2: 'automatisch geliefert.',
+    heroSub: 'Google Search Console einmal verbinden. Jeden Monat erstellt RankBrief automatisch einen professionellen PDF-Report und schickt ihn in dein Postfach – KI-gestützt, kein manueller Aufwand.',
+    heroCta: 'Ersten Monat kostenlos starten',
+    heroSeeHow: 'So funktioniert\'s',
+    trust1: 'Erster Monat kostenlos',
+    trust2: 'DSGVO-konform · EU-Server',
+    trust3: 'Jederzeit kündbar',
+    howLabel: 'So funktioniert\'s',
+    howTitle: 'Einmal einrichten.\nReports laufen automatisch.',
+    howSub: 'Vier Schritte bis zu deinem automatischen monatlichen SEO-Report.',
+    featLabel: 'Features',
+    featTitle: 'Alles was du brauchst.\nNichts was du nicht brauchst.',
+    featSub: 'Gebaut für Freelancer und kleine Agenturen, die stundensatz abrechnen und manuelle Reports hassen.',
+    pricingLabel: 'Preise',
+    pricingTitle: 'Einfache Preise.\nKeine Überraschungen.',
+    pricingSub: 'Erster Monat kostenlos. Keine Kreditkarte erforderlich.',
+    faqLabel: 'FAQ',
+    faqTitle: 'Fragen & Antworten',
+    faqSub: 'Alles was du vor der Anmeldung wissen musst.',
+    ctaTitle: 'Hör auf, Reports manuell zu schreiben.',
+    ctaSub: 'Schließ dich Freelancern und Agenturen an, die ihr SEO-Reporting mit RankBrief automatisiert haben.',
+    ctaBtn: 'Ersten Monat kostenlos starten →',
+    planCta: 'Jetzt starten',
+    steps: [
+      { n: '01', title: 'Google verbinden', text: 'Mit Google anmelden und Search Console sowie GA4-Properties auswählen.' },
+      { n: '02', title: 'Plan wählen', text: 'Basic, Pro oder Agency – je nachdem wie viele Domains du verwaltest.' },
+      { n: '03', title: 'Report erhalten', text: 'Am 1. jeden Monats landet dein PDF-Report automatisch im Postfach.' },
+      { n: '04', title: 'Mit Kunden teilen', text: 'Report weiterleiten oder white-label versenden. Deine Kunden erhalten professionelle Einblicke.' },
+    ],
+    features: [
+      { icon: '⚡', title: 'Vollautomatisch', text: 'Einmal verbinden. Jeden Monat wird dein Report automatisch erstellt und geliefert – kein manueller Aufwand.' },
+      { icon: '🤖', title: 'KI-Zusammenfassung', text: 'Jeder Report enthält eine verständliche KI-Zusammenfassung. Kein SEO-Jargon, klare Einblicke die deine Kunden verstehen.' },
+      { icon: '🏷️', title: 'White-Label-fähig', text: 'Eigenes Logo hochladen und Reports unter deiner Marke versenden. Deine Kunden sehen deinen Namen.' },
+      { icon: '📊', title: 'GSC + GA4 kombiniert', text: 'Klicks, Impressionen, Sessions, Engagement – alles in einem Report. Kein Wechseln zwischen Tools.' },
+      { icon: '📈', title: 'Monatsvergleich', text: 'Jede Kennzahl wird mit dem Vormonat verglichen. Sofort sichtbar was sich verbessert und was Aufmerksamkeit braucht.' },
+      { icon: '🔒', title: 'DSGVO-konform', text: 'EU-Server, AES-256 Token-Verschlüsselung, minimale Datenspeicherung. Von Anfang an für europäische Datenschutzanforderungen gebaut.' },
+    ],
+    plans: [
+      { name: 'Basic', price: '19', period: '/Monat', features: ['1 Domain', 'Monatlicher PDF-Report', 'GSC + GA4 Daten', 'KI-Zusammenfassung', 'Email-Versand'] },
+      { name: 'Pro', price: '39', period: '/Monat', featured: true, features: ['3 Domains', 'Alles in Basic', 'White-Label Reports', 'Eigenes Logo', 'Priority Delivery'] },
+      { name: 'Agency', price: '79', period: '/Monat', features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Bulk Reporting', 'Agency Branding'] },
+    ],
+    faqs: [
+      { q: 'Sind meine Google-Daten sicher?', a: 'Ja. Wir fordern nur lesenden Zugriff auf deine Search Console und Analytics-Daten. OAuth-Tokens werden mit AES-256-GCM verschlüsselt und auf EU-Servern (Frankfurt) gespeichert.' },
+      { q: 'Kann ich jederzeit kündigen?', a: 'Ja. Jederzeit im Dashboard kündigen. Dein Abo bleibt bis Ende des Abrechnungszeitraums aktiv. Keine versteckten Gebühren.' },
+      { q: 'Muss ich technisches Wissen haben?', a: 'Nein. Die Einrichtung dauert ca. 3 Minuten: mit Google anmelden, Website auswählen, Plan wählen. Danach läuft alles automatisch.' },
+      { q: 'Was enthält der Report?', a: 'Klicks, Impressionen, CTR, durchschnittliche Position, Sessions, Engagement Rate, Top 10 Keywords, Top 10 Seiten, Vormonatsvergleich und eine KI-generierte Zusammenfassung.' },
+      { q: 'Kann ich mein eigenes Logo verwenden?', a: 'Ja, ab dem Pro-Plan. Logo hochladen und deine Kunden erhalten Reports mit deinem Firmenname und Logo – ohne RankBrief-Branding.' },
+      { q: 'Welche Google-Properties werden unterstützt?', a: 'Jede verifizierte Google Search Console Property. GA4 wird für alle Standard-Properties unterstützt. Wir unterstützen Domain- und URL-Prefix-GSC-Properties.' },
+    ],
   },
-  {
-    name: 'Agency', price: '79', period: '/mo',
-    features: ['10 domains', 'Everything in Pro', 'Client management', 'Bulk reporting', 'Agency branding'],
-  },
-];
-
-const faqs = [
-  { q: 'Is my Google data safe?', a: 'Yes. We request read-only access to your Search Console and Analytics data. OAuth tokens are encrypted using AES-256-GCM and stored on EU servers (Frankfurt). We never access your data beyond what\'s needed to generate your report.' },
-  { q: 'Can I cancel anytime?', a: 'Absolutely. Cancel from your dashboard at any time. Your subscription remains active until the end of the billing period. No questions asked, no hidden fees.' },
-  { q: 'Do I need to be technical to use RankBrief?', a: 'Not at all. Setup takes about 3 minutes: sign in with Google, select your website, choose a plan. After that, everything is automatic.' },
-  { q: 'What does the report include?', a: 'Each report covers clicks, impressions, CTR, average position, sessions, engagement rate, top 10 keywords, top 10 pages, month-over-month comparison, and an AI-written plain-language summary.' },
-  { q: 'Can I use my own logo?', a: 'Yes, on Pro and Agency plans. Upload your logo and your clients will receive reports branded with your company name and logo – no RankBrief branding.' },
-  { q: 'Which Google properties are supported?', a: 'Any verified Google Search Console property. GA4 support is available for all standard properties. We support both domain and URL-prefix GSC properties.' },
-];
+};
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function Landing() {
+export default function Landing({ lang = 'en' }) {
   const [openFaq, setOpenFaq] = React.useState(null);
+  const t = i18n[lang] || i18n.en;
+
+  // Reset open FAQ when language changes
+  React.useEffect(() => { setOpenFaq(null); }, [lang]);
 
   return (
     <Page>
@@ -709,40 +741,32 @@ export default function Landing() {
         <GlowOrb className="orb3" />
         <GridBg />
 
-        <HeroBadge>Automated SEO reporting for agencies & freelancers</HeroBadge>
+        <HeroBadge>{t.badge}</HeroBadge>
 
         <HeroTitle>
-          Your SEO report,<br />
-          <span className="gradient">delivered automatically.</span>
+          {t.heroTitle1}<br />
+          <span className="gradient">{t.heroTitle2}</span>
         </HeroTitle>
 
-        <HeroSub>
-          Connect Google Search Console once. Every month, RankBrief generates a professional PDF report and sends it to your inbox – powered by AI, zero manual work.
-        </HeroSub>
+        <HeroSub>{t.heroSub}</HeroSub>
 
         <HeroCTA>
           <BtnPrimary to="/register">
-            Ersten Monat gratis starten
+            {t.heroCta}
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </BtnPrimary>
-          <BtnGhost to="#features">See how it works</BtnGhost>
+          <BtnGhost to="#features">{t.heroSeeHow}</BtnGhost>
         </HeroCTA>
 
         <TrustRow>
-          <TrustItem>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M7 0l1.8 5.4H14l-4.6 3.3 1.8 5.5L7 11l-4.2 3.2 1.8-5.5L0 5.4h5.2z"/></svg>
-            Kein Risiko – erster Monat gratis
-          </TrustItem>
-          <TrustItem>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M7 0l1.8 5.4H14l-4.6 3.3 1.8 5.5L7 11l-4.2 3.2 1.8-5.5L0 5.4h5.2z"/></svg>
-            GDPR compliant · EU servers
-          </TrustItem>
-          <TrustItem>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M7 0l1.8 5.4H14l-4.6 3.3 1.8 5.5L7 11l-4.2 3.2 1.8-5.5L0 5.4h5.2z"/></svg>
-            Cancel anytime
-          </TrustItem>
+          {[t.trust1, t.trust2, t.trust3].map(item => (
+            <TrustItem key={item}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M7 0l1.8 5.4H14l-4.6 3.3 1.8 5.5L7 11l-4.2 3.2 1.8-5.5L0 5.4h5.2z"/></svg>
+              {item}
+            </TrustItem>
+          ))}
         </TrustRow>
 
         <PreviewWrap>
@@ -772,7 +796,7 @@ export default function Landing() {
                 <svg viewBox="0 0 400 70" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#6C63FF" stopOpacity="0.3"/>
+                      <stop offset="0%" stopColor="#6C63FF" stopOpacity="0.2"/>
                       <stop offset="100%" stopColor="#6C63FF" stopOpacity="0"/>
                     </linearGradient>
                   </defs>
@@ -796,11 +820,11 @@ export default function Landing() {
 
       {/* HOW IT WORKS */}
       <Section id="features">
-        <SectionLabel>How it works</SectionLabel>
-        <SectionTitle>Set it up once.<br />Reports run forever.</SectionTitle>
-        <SectionSub>Four steps between you and automated monthly SEO reporting.</SectionSub>
+        <SectionLabel>{t.howLabel}</SectionLabel>
+        <SectionTitle>{t.howTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>)}</SectionTitle>
+        <SectionSub>{t.howSub}</SectionSub>
         <StepsGrid>
-          {steps.map(s => (
+          {t.steps.map(s => (
             <Step key={s.n}>
               <StepNum>{s.n}</StepNum>
               <StepTitle>{s.title}</StepTitle>
@@ -812,11 +836,11 @@ export default function Landing() {
 
       {/* FEATURES */}
       <Section>
-        <SectionLabel>Features</SectionLabel>
-        <SectionTitle>Everything you need.<br />Nothing you don't.</SectionTitle>
-        <SectionSub>Built for freelancers and small agencies who bill hourly and hate manual reporting.</SectionSub>
+        <SectionLabel>{t.featLabel}</SectionLabel>
+        <SectionTitle>{t.featTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>)}</SectionTitle>
+        <SectionSub>{t.featSub}</SectionSub>
         <FeaturesGrid>
-          {features.map(f => (
+          {t.features.map(f => (
             <FeatureCard key={f.title}>
               <FeatureIcon>{f.icon}</FeatureIcon>
               <FeatureTitle>{f.title}</FeatureTitle>
@@ -828,11 +852,11 @@ export default function Landing() {
 
       {/* PRICING */}
       <Section id="pricing">
-        <SectionLabel>Pricing</SectionLabel>
-        <SectionTitle>Simple pricing.<br />No surprises.</SectionTitle>
-        <SectionSub>Erster Monat kostenlos. Keine Kreditkarte erforderlich.</SectionSub>
+        <SectionLabel>{t.pricingLabel}</SectionLabel>
+        <SectionTitle>{t.pricingTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>)}</SectionTitle>
+        <SectionSub>{t.pricingSub}</SectionSub>
         <PricingGrid>
-          {plans.map(p => (
+          {t.plans.map(p => (
             <PricingCard key={p.name} $featured={p.featured}>
               <PlanBadge $featured={p.featured}>{p.name}</PlanBadge>
               <PlanPrice $featured={p.featured}>
@@ -844,7 +868,7 @@ export default function Landing() {
                   <PlanFeature key={f} $featured={p.featured}>{f}</PlanFeature>
                 ))}
               </PlanFeatures>
-              <PlanCTA to="/register" $featured={p.featured}>Get started</PlanCTA>
+              <PlanCTA to="/register" $featured={p.featured}>{t.planCta}</PlanCTA>
             </PricingCard>
           ))}
         </PricingGrid>
@@ -852,12 +876,12 @@ export default function Landing() {
 
       {/* FAQ */}
       <Section id="faq">
-        <SectionLabel>FAQ</SectionLabel>
-        <SectionTitle>Questions & answers</SectionTitle>
-        <SectionSub style={{ marginBottom: '2.5rem' }}>Everything you need to know before signing up.</SectionSub>
+        <SectionLabel>{t.faqLabel}</SectionLabel>
+        <SectionTitle>{t.faqTitle}</SectionTitle>
+        <SectionSub style={{ marginBottom: '2.5rem' }}>{t.faqSub}</SectionSub>
         <FaqList>
-          {faqs.map((f, i) => (
-            <FaqItem key={i}>
+          {t.faqs.map((f, i) => (
+            <FaqItem key={`${lang}-${i}`}>
               <FaqQ onClick={() => setOpenFaq(openFaq === i ? null : i)}>
                 {f.q}
                 <span>{openFaq === i ? '−' : '+'}</span>
@@ -868,22 +892,22 @@ export default function Landing() {
         </FaqList>
       </Section>
 
-      {/* CTA BANNER */}
+      {/* CTA */}
       <Section style={{ paddingTop: 0 }}>
         <div style={{
-          background: 'linear-gradient(135deg, rgba(108,99,255,0.15) 0%, rgba(99,207,255,0.05) 100%)',
-          border: '1px solid rgba(108,99,255,0.2)',
+          background: 'linear-gradient(135deg, rgba(108,99,255,0.08) 0%, rgba(99,207,255,0.04) 100%)',
+          border: '1px solid rgba(108,99,255,0.15)',
           borderRadius: '24px',
           padding: '4rem 3rem',
           textAlign: 'center',
         }}>
           <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '1rem' }}>
-            Stop writing reports manually.
+            {t.ctaTitle}
           </h2>
-          <p style={{ color: '#8888AA', fontSize: '1.0625rem', marginBottom: '2rem', fontWeight: 300 }}>
-            Join freelancers and agencies who automated their SEO reporting with RankBrief.
+          <p style={{ color: '#52526E', fontSize: '1.0625rem', marginBottom: '2rem', fontWeight: 300 }}>
+            {t.ctaSub}
           </p>
-          <BtnPrimary to="/register">Ersten Monat kostenlos starten →</BtnPrimary>
+          <BtnPrimary to="/register">{t.ctaBtn}</BtnPrimary>
         </div>
       </Section>
     </Page>

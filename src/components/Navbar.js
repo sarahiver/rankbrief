@@ -4,9 +4,7 @@ import styled, { css } from 'styled-components';
 
 const Nav = styled.nav`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 100;
   padding: 0 2rem;
   height: 64px;
@@ -16,7 +14,7 @@ const Nav = styled.nav`
   transition: all 0.3s ease;
 
   ${({ $scrolled }) => $scrolled && css`
-    background: rgba(10, 10, 15, 0.85);
+    background: rgba(247, 247, 251, 0.92);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid ${({ theme }) => theme.colors.border};
   `}
@@ -31,15 +29,11 @@ const Logo = styled(Link)`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
-  span {
-    color: ${({ theme }) => theme.colors.accent};
-  }
+  span { color: ${({ theme }) => theme.colors.accent}; }
 `;
 
 const LogoDot = styled.div`
-  width: 8px;
-  height: 8px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   background: ${({ theme }) => theme.colors.accent};
   box-shadow: 0 0 10px ${({ theme }) => theme.colors.accent};
@@ -49,10 +43,7 @@ const NavLinks = styled.div`
   display: flex;
   align-items: center;
   gap: 2rem;
-
-  @media (max-width: 640px) {
-    display: none;
-  }
+  @media (max-width: 700px) { display: none; }
 `;
 
 const NavLink = styled(Link)`
@@ -60,16 +51,32 @@ const NavLink = styled(Link)`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.textMuted};
   transition: color 0.2s;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.text};
-  }
+  &:hover { color: ${({ theme }) => theme.colors.text}; }
 `;
 
 const NavActions = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
+`;
+
+const LangToggle = styled.div`
+  display: flex;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.md};
+  overflow: hidden;
+  @media (max-width: 480px) { display: none; }
+`;
+
+const LangBtn = styled.button`
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+  background: ${({ $active, theme }) => $active ? theme.colors.accent : 'transparent'};
+  color: ${({ $active, theme }) => $active ? '#fff' : theme.colors.textDim};
+  &:hover { color: ${({ $active, theme }) => $active ? '#fff' : theme.colors.text}; }
 `;
 
 const BtnGhost = styled(Link)`
@@ -79,10 +86,7 @@ const BtnGhost = styled(Link)`
   padding: 0.5rem 1rem;
   border-radius: ${({ theme }) => theme.radius.md};
   transition: color 0.2s;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.text};
-  }
+  &:hover { color: ${({ theme }) => theme.colors.text}; }
 `;
 
 const BtnPrimary = styled(Link)`
@@ -94,18 +98,24 @@ const BtnPrimary = styled(Link)`
   border-radius: ${({ theme }) => theme.radius.md};
   transition: all 0.2s;
   font-family: ${({ theme }) => theme.fonts.display};
-
+  white-space: nowrap;
   &:hover {
     background: ${({ theme }) => theme.colors.accentHover};
     transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(108, 99, 255, 0.4);
+    box-shadow: 0 4px 20px rgba(108, 99, 255, 0.3);
   }
 `;
 
-export default function Navbar({ user }) {
+const labels = {
+  en: { features: 'Features', pricing: 'Pricing', faq: 'FAQ', docs: 'Docs', signin: 'Sign in', start: 'Start free' },
+  de: { features: 'Features', pricing: 'Preise', faq: 'FAQ', docs: 'Docs', signin: 'Anmelden', start: 'Kostenlos' },
+};
+
+export default function Navbar({ user, lang, onLangChange }) {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const isLanding = location.pathname === '/';
+  const t = labels[lang || 'en'];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -115,26 +125,29 @@ export default function Navbar({ user }) {
 
   return (
     <Nav $scrolled={scrolled || !isLanding}>
-      <Logo to="/">
-        <LogoDot />
-        Rank<span>Brief</span>
-      </Logo>
+      <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
 
       {isLanding && (
         <NavLinks>
-          <NavLink to="/#features">Features</NavLink>
-          <NavLink to="/#pricing">Pricing</NavLink>
-          <NavLink to="/#faq">FAQ</NavLink>
+          <NavLink to="/#features">{t.features}</NavLink>
+          <NavLink to="/#pricing">{t.pricing}</NavLink>
+          <NavLink to="/#faq">{t.faq}</NavLink>
+          <NavLink to="/docs">{t.docs}</NavLink>
         </NavLinks>
       )}
 
       <NavActions>
+        <LangToggle>
+          <LangBtn $active={lang === 'en'} onClick={() => onLangChange?.('en')}>EN</LangBtn>
+          <LangBtn $active={lang === 'de'} onClick={() => onLangChange?.('de')}>DE</LangBtn>
+        </LangToggle>
+
         {user ? (
           <BtnPrimary to="/dashboard">Dashboard</BtnPrimary>
         ) : (
           <>
-            <BtnGhost to="/login">Sign in</BtnGhost>
-            <BtnPrimary to="/register">Start free</BtnPrimary>
+            <BtnGhost to="/login">{t.signin}</BtnGhost>
+            <BtnPrimary to="/register">{t.start}</BtnPrimary>
           </>
         )}
       </NavActions>

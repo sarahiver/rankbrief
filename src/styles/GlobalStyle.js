@@ -2,22 +2,22 @@ import { createGlobalStyle } from 'styled-components';
 
 export const theme = {
   colors: {
-    bg: '#0A0A0F',
-    bgCard: '#111118',
-    bgElevated: '#16161F',
-    border: '#1E1E2E',
-    borderLight: '#2A2A3E',
+    bg: '#F7F7FB',
+    bgCard: '#FFFFFF',
+    bgElevated: '#EFEFF7',
+    border: '#E3E3EF',
+    borderLight: '#C8C8DE',
     accent: '#6C63FF',
-    accentHover: '#8B85FF',
-    accentDim: 'rgba(108, 99, 255, 0.12)',
-    accentDimHover: 'rgba(108, 99, 255, 0.2)',
-    text: '#F0F0FF',
-    textMuted: '#8888AA',
-    textDim: '#55556A',
-    success: '#34D399',
-    successDim: 'rgba(52, 211, 153, 0.1)',
-    warning: '#FBBF24',
-    danger: '#F87171',
+    accentHover: '#5A52E0',
+    accentDim: 'rgba(108, 99, 255, 0.08)',
+    accentDimHover: 'rgba(108, 99, 255, 0.14)',
+    text: '#0F0F1A',
+    textMuted: '#52526E',
+    textDim: '#9898B8',
+    success: '#10B981',
+    successDim: 'rgba(16, 185, 129, 0.08)',
+    warning: '#F59E0B',
+    danger: '#EF4444',
   },
   fonts: {
     display: "'Syne', sans-serif",
@@ -31,9 +31,9 @@ export const theme = {
     xl: '24px',
   },
   shadow: {
-    card: '0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)',
-    glow: '0 0 40px rgba(108, 99, 255, 0.15)',
-    glowStrong: '0 0 60px rgba(108, 99, 255, 0.3)',
+    card: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)',
+    glow: '0 0 40px rgba(108, 99, 255, 0.1)',
+    glowStrong: '0 0 60px rgba(108, 99, 255, 0.18)',
   }
 };
 
@@ -60,10 +60,7 @@ export const GlobalStyle = createGlobalStyle`
     min-height: 100vh;
   }
 
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
+  a { color: inherit; text-decoration: none; }
 
   button {
     cursor: pointer;
@@ -72,23 +69,15 @@ export const GlobalStyle = createGlobalStyle`
     font-family: inherit;
   }
 
-  input, textarea {
-    font-family: inherit;
-  }
+  input, textarea { font-family: inherit; }
 
   ::selection {
-    background: rgba(108, 99, 255, 0.3);
-    color: #fff;
+    background: rgba(108, 99, 255, 0.15);
+    color: ${({ theme }) => theme.colors.text};
   }
 
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: ${({ theme }) => theme.colors.bg};
-  }
-
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: ${({ theme }) => theme.colors.bg}; }
   ::-webkit-scrollbar-thumb {
     background: ${({ theme }) => theme.colors.border};
     border-radius: 3px;
