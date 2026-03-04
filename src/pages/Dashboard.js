@@ -434,14 +434,16 @@ export default function Dashboard({ user }) {
 
   const loadLatestReport = async (propertyId) => {
     setReportLoading(true);
-    const { data: reportData } = await supabase
+    const { data: reportRows } = await supabase
       .from('reports')
       .select('*')
       .eq('property_id', propertyId)
       .eq('status', 'done')
       .order('report_month', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
+
+    const reportData = reportRows?.[0] ?? null;
+
 
     if (reportData) {
       setReport(reportData);
