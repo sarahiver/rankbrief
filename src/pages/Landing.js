@@ -722,7 +722,7 @@ export default function Landing() {
 
         <HeroCTA>
           <BtnPrimary to="/register">
-            Start for free
+            Ersten Monat gratis starten
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -733,7 +733,7 @@ export default function Landing() {
         <TrustRow>
           <TrustItem>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M7 0l1.8 5.4H14l-4.6 3.3 1.8 5.5L7 11l-4.2 3.2 1.8-5.5L0 5.4h5.2z"/></svg>
-            No credit card required
+            Kein Risiko – erster Monat gratis
           </TrustItem>
           <TrustItem>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M7 0l1.8 5.4H14l-4.6 3.3 1.8 5.5L7 11l-4.2 3.2 1.8-5.5L0 5.4h5.2z"/></svg>
@@ -830,7 +830,7 @@ export default function Landing() {
       <Section id="pricing">
         <SectionLabel>Pricing</SectionLabel>
         <SectionTitle>Simple pricing.<br />No surprises.</SectionTitle>
-        <SectionSub>Start free for 14 days. No credit card required.</SectionSub>
+        <SectionSub>Erster Monat kostenlos. Keine Kreditkarte erforderlich.</SectionSub>
         <PricingGrid>
           {plans.map(p => (
             <PricingCard key={p.name} $featured={p.featured}>
@@ -883,7 +883,7 @@ export default function Landing() {
           <p style={{ color: '#8888AA', fontSize: '1.0625rem', marginBottom: '2rem', fontWeight: 300 }}>
             Join freelancers and agencies who automated their SEO reporting with RankBrief.
           </p>
-          <BtnPrimary to="/register">Start your free trial →</BtnPrimary>
+          <BtnPrimary to="/register">Ersten Monat kostenlos starten →</BtnPrimary>
         </div>
       </Section>
     </Page>
