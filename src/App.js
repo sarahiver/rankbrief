@@ -3,16 +3,16 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { ThemeProvider } from 'styled-components';
 import { theme, GlobalStyle } from './styles/GlobalStyle';
 import { supabase } from './lib/supabase';
-
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
+import Onboarding from './pages/Onboarding';
 import { PrivacyEN, PrivacyDE, TermsEN, TermsDE } from './pages/Legal';
 
-const noNavRoutes = ['/login', '/register', '/dashboard'];
-const noFooterRoutes = ['/login', '/register', '/dashboard'];
+const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding'];
+const noFooterRoutes = ['/login', '/register', '/dashboard', '/onboarding'];
 
 function AppInner() {
   const [user, setUser] = useState(null);
@@ -25,11 +25,9 @@ function AppInner() {
       setUser(data.session?.user ?? null);
       setLoading(false);
     });
-
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
-
     return () => listener.subscription.unsubscribe();
   }, []);
 
@@ -50,6 +48,7 @@ function AppInner() {
         <Route path="/login" element={!user ? <Auth mode="login" /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!user ? <Auth mode="register" /> : <Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/login" />} />
+        <Route path="/onboarding" element={user ? <Onboarding user={user} /> : <Navigate to="/login" />} />
         <Route path="/privacy" element={<PrivacyEN />} />
         <Route path="/terms" element={<TermsEN />} />
         <Route path="/de/privacy" element={<PrivacyDE />} />
