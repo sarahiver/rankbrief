@@ -10,10 +10,11 @@ import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import Onboarding from './pages/Onboarding';
 import Docs from './pages/Docs';
+import Settings from './pages/Settings';
 import { PrivacyEN, PrivacyDE, TermsEN, TermsDE } from './pages/Legal';
 
-const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs'];
-const noFooterRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs'];
+const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings'];
+const noFooterRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings'];
 
 function AppInner() {
   const [user, setUser] = useState(null);
@@ -55,6 +56,7 @@ function AppInner() {
         <Route path="/login" element={!user ? <Auth mode="login" /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!user ? <Auth mode="register" /> : <Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/login" />} />
+        <Route path="/settings" element={user ? <Settings user={user} /> : <Navigate to="/login" />} />
         <Route path="/onboarding" element={user ? <Onboarding user={user} /> : <Navigate to="/login" />} />
         <Route path="/docs" element={<Docs />} />
         <Route path="/privacy" element={<PrivacyEN />} />

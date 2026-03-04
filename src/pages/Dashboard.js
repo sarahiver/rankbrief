@@ -72,6 +72,19 @@ const BtnSignOut = styled.button`
   &:hover { color: ${({ theme }) => theme.colors.text}; border-color: ${({ theme }) => theme.colors.borderLight}; }
 `;
 
+const BtnSettings = styled(Link)`
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  padding: 0.375rem 0.875rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  &:hover { color: ${({ theme }) => theme.colors.text}; border-color: ${({ theme }) => theme.colors.borderLight}; }
+`;
+
 const Main = styled.main`
   flex: 1;
   max-width: 1000px;
@@ -704,6 +717,7 @@ export default function Dashboard({ user }) {
           <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
           <TopBarRight>
             <UserEmail>{user?.email}</UserEmail>
+            <BtnSettings to="/settings">⚙ Settings</BtnSettings>
             <BtnSignOut onClick={handleSignOut}>Sign out</BtnSignOut>
           </TopBarRight>
         </TopBar>
@@ -720,6 +734,7 @@ export default function Dashboard({ user }) {
         <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
         <TopBarRight>
           <UserEmail>{user?.email}</UserEmail>
+          <BtnSettings to="/settings">⚙ Settings</BtnSettings>
           <BtnSignOut onClick={handleSignOut}>Sign out</BtnSignOut>
         </TopBarRight>
       </TopBar>
