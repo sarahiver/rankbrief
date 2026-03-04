@@ -415,6 +415,7 @@ export default function Dashboard({ user }) {
   const upgraded = new URLSearchParams(location.search).get('upgraded') === 'true';
 
   // Load properties on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadProperties();
     loadProfile();
