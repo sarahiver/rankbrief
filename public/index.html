@@ -2,32 +2,72 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Web site created using create-react-app" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    <!-- ── Primary Meta ──────────────────────────────────────────────────── -->
+    <title>RankBrief – Automated SEO Reporting</title>
+    <meta name="description" content="Connect Google Search Console once. Every month, RankBrief generates a professional PDF report and sends it to your inbox – powered by AI, zero manual work." />
+    <meta name="keywords" content="SEO reporting, Google Search Console, automated reports, GSC PDF, AI SEO summary, monthly SEO report, freelancer SEO tool" />
+    <meta name="author" content="RankBrief" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.rankbrief.com/" />
+
+    <!-- ── Open Graph ─────────────────────────────────────────────────────── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="RankBrief" />
+    <meta property="og:title" content="RankBrief – Automated SEO Reporting" />
+    <meta property="og:description" content="Connect Google Search Console once. Every month, RankBrief generates a professional PDF report and sends it to your inbox – powered by AI." />
+    <meta property="og:url" content="https://www.rankbrief.com/" />
+    <meta property="og:image" content="https://www.rankbrief.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="RankBrief – Automated SEO Reporting powered by AI" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- ── Twitter Card ───────────────────────────────────────────────────── -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RankBrief – Automated SEO Reporting" />
+    <meta name="twitter:description" content="Connect Google Search Console once. Every month, RankBrief generates a professional PDF report and sends it to your inbox – powered by AI." />
+    <meta name="twitter:image" content="https://www.rankbrief.com/og-image.png" />
+    <meta name="twitter:image:alt" content="RankBrief – Automated SEO Reporting" />
+
+    <!-- ── Favicons ───────────────────────────────────────────────────────── -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
+    <meta name="theme-color" content="#6C63FF" />
+    <meta name="msapplication-TileColor" content="#6C63FF" />
+
+    <!-- ── Fonts preconnect ───────────────────────────────────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- ── Schema.org structured data ───────────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "RankBrief",
+      "url": "https://www.rankbrief.com",
+      "description": "Automated monthly SEO reporting for freelancers and agencies. Connects Google Search Console and GA4 to generate professional PDF reports with AI summaries.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "AggregateOffer",
+        "lowPrice": "19",
+        "highPrice": "79",
+        "priceCurrency": "EUR"
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "RankBrief",
+        "url": "https://www.rankbrief.com"
+      }
+    }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>
