@@ -345,6 +345,120 @@ const BtnPrimary = styled(Link)`
   &:hover { background: ${({ theme }) => theme.colors.accentHover}; transform: translateY(-1px); }
 `;
 
+
+// ── Guide Tabs ────────────────────────────────────────────────────────────────
+const GuideTabs = styled.div`
+  display: flex;
+  gap: 0;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.lg};
+  overflow: hidden;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+`;
+
+const GuideTab = styled.button`
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s;
+  border-right: 1px solid ${({ theme }) => theme.colors.border};
+  min-width: 120px;
+  &:last-child { border-right: none; }
+  background: ${({ $active, theme }) => $active ? theme.colors.accent : 'transparent'};
+  color: ${({ $active, theme }) => $active ? '#fff' : theme.colors.textMuted};
+  &:hover { color: ${({ $active, theme }) => $active ? '#fff' : theme.colors.text}; }
+`;
+
+// ── Video Placeholder ─────────────────────────────────────────────────────────
+const VideoWrap = styled.div`
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: ${({ theme }) => theme.radius.xl};
+  overflow: hidden;
+  margin-bottom: 2rem;
+  background: ${({ theme }) => theme.colors.bgElevated};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+const VideoIframe = styled.iframe`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+`;
+
+const VideoPlaceholder = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: ${({ theme }) => theme.colors.bgElevated};
+`;
+
+const VideoPlaceholderIcon = styled.div`
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.colors.accentDim};
+  border: 1px solid ${({ theme }) => theme.colors.accent};
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+`;
+
+const VideoPlaceholderText = styled.div`
+  font-size: 0.875rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-weight: 300;
+  text-align: center;
+  a { color: ${({ theme }) => theme.colors.accent}; font-weight: 600; }
+`;
+
+// ── Guide Step extras ─────────────────────────────────────────────────────────
+const StepScreenshot = styled.div`
+  margin-top: 0.875rem;
+  padding: 0.75rem 1rem;
+  background: ${({ theme }) => theme.colors.bgElevated};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.md};
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.textDim};
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: ${({ theme }) => theme.fonts.mono};
+`;
+
+const TipBox = styled.div`
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(245,158,11,0.06);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: ${({ theme }) => theme.radius.md};
+  font-size: 0.8125rem;
+  color: #d97706;
+  line-height: 1.6;
+  font-weight: 300;
+`;
+
+const GuideIntro = styled.p`
+  font-size: 0.9375rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-weight: 300;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: ${({ theme }) => theme.colors.bgElevated};
+  border-radius: ${({ theme }) => theme.radius.lg};
+  border-left: 3px solid ${({ theme }) => theme.colors.accent};
+`;
+
 // ── Content ───────────────────────────────────────────────────────────────────
 const content = {
   en: {
@@ -431,14 +545,13 @@ const content = {
         ['Price', '€19/mo', '€39/mo', '€79/mo'],
         ['Domains', '1', '3', '10'],
         ['Monthly PDF report', '✓', '✓', '✓'],
-        ['GSC data', '✓', '✓', '✓'],
-        ['GA4 data', '✓', '✓', '✓'],
-        ['AI summary', '✓', '✓', '✓'],
+        ['GSC data (clicks, rankings)', '✓', '✓', '✓'],
+        ['GA4 data (sessions, conversions)', '–', '✓', '✓'],
+        ['AI summary', '–', '✓', '✓'],
+        ['SEO recommendations', '–', '✓', '✓'],
         ['Email delivery', '✓', '✓', '✓'],
-        ['White-label reports', '–', '✓', '✓'],
-        ['Custom logo in PDF', '–', '✓', '✓'],
-        ['Client management', '–', '–', '✓'],
-        ['Bulk reporting', '–', '–', '✓'],
+        ['White-label + custom logo', '–', '–', '✓'],
+        ['Priority support', '–', '–', '✓'],
         ['First month free', '✓', '✓', '✓'],
       ],
     },
@@ -532,14 +645,13 @@ const content = {
         ['Preis', '19€/Monat', '39€/Monat', '79€/Monat'],
         ['Domains', '1', '3', '10'],
         ['Monatlicher PDF-Report', '✓', '✓', '✓'],
-        ['GSC-Daten', '✓', '✓', '✓'],
-        ['GA4-Daten', '✓', '✓', '✓'],
-        ['KI-Zusammenfassung', '✓', '✓', '✓'],
+        ['GSC-Daten (Klicks, Rankings)', '✓', '✓', '✓'],
+        ['GA4-Daten (Sessions, Conversions)', '–', '✓', '✓'],
+        ['KI-Zusammenfassung', '–', '✓', '✓'],
+        ['SEO-Empfehlungen', '–', '✓', '✓'],
         ['Email-Versand', '✓', '✓', '✓'],
-        ['White-Label Reports', '–', '✓', '✓'],
-        ['Eigenes Logo im PDF', '–', '✓', '✓'],
-        ['Client Management', '–', '–', '✓'],
-        ['Bulk Reporting', '–', '–', '✓'],
+        ['White-Label + eigenes Logo', '–', '–', '✓'],
+        ['Priority Support', '–', '–', '✓'],
         ['Erster Monat kostenlos', '✓', '✓', '✓'],
       ],
     },
@@ -567,9 +679,40 @@ function FaqItemComponent({ q, a }) {
   );
 }
 
+
+function VideoBlock({ guide, lang }) {
+  if (guide.videoUrl) {
+    return (
+      <VideoWrap>
+        <VideoIframe
+          src={guide.videoUrl}
+          title={guide.videoLabel}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </VideoWrap>
+    );
+  }
+  return (
+    <VideoWrap>
+      <VideoPlaceholder>
+        <VideoPlaceholderIcon>▶</VideoPlaceholderIcon>
+        <VideoPlaceholderText>
+          {guide.videoLink
+            ? <><a href={guide.videoLink} target="_blank" rel="noreferrer" style={{fontWeight:600}}>{guide.videoLabel} →</a><br/><span style={{fontSize:'0.75rem',opacity:0.6}}>{lang === 'de' ? 'Eigenes Video folgt – bis dahin empfehlen wir das verlinkte Tutorial' : 'Own video coming soon – linked tutorial recommended in the meantime'}</span></>
+            : <>{lang === 'de' ? 'Eigenes Tutorial-Video folgt demnächst' : 'Tutorial video coming soon'}</>
+          }
+        </VideoPlaceholderText>
+      </VideoPlaceholder>
+    </VideoWrap>
+  );
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Docs() {
   const [lang, setLang] = useState('de');
+  const [guideTab, setGuideTab] = useState(0);
+  React.useEffect(() => setGuideTab(0), [lang]);
   const t = content[lang];
 
   return (
@@ -610,6 +753,42 @@ export default function Docs() {
               </Step>
             ))}
           </StepList>
+        </Section>
+
+        <Divider />
+
+        {/* ── Guides ─────────────────────────────────────────────── */}
+        <Section>
+          <SectionLabel>{t.guides.label}</SectionLabel>
+          <SectionTitle>{t.guides.title}</SectionTitle>
+          <SectionSub>{t.guides.sub}</SectionSub>
+
+          <GuideTabs>
+            {t.guides.tabs.map((tab, i) => (
+              <GuideTab key={i} $active={guideTab === i} onClick={() => setGuideTab(i)}>{tab}</GuideTab>
+            ))}
+          </GuideTabs>
+
+          {[t.guides.gsc, t.guides.ga4, t.guides.connect].map((guide, idx) => guideTab === idx && (
+            <div key={idx}>
+              <GuideIntro>{guide.intro}</GuideIntro>
+              <VideoBlock guide={guide} lang={lang} />
+              <StepList>
+                {guide.steps.map((step, i) => (
+                  <Step key={i}>
+                    <StepNum>{i + 1}</StepNum>
+                    <StepContent>
+                      <StepTitle>{step.title}</StepTitle>
+                      <StepText>{step.text}</StepText>
+                      {step.path && <StepScreenshot>📍 {step.path}</StepScreenshot>}
+                      {step.tip  && <TipBox>💡 {step.tip}</TipBox>}
+                      {step.note && <StepNote>{step.note}</StepNote>}
+                    </StepContent>
+                  </Step>
+                ))}
+              </StepList>
+            </div>
+          ))}
         </Section>
 
         <Divider />
