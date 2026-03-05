@@ -26,7 +26,8 @@ const Nav = styled.nav`
     border-bottom: 1px solid ${({ theme }) => theme.colors.border};
   `}
 
-  @media (max-width: 700px) { padding: 0 1.25rem; }
+  @media (max-width: 700px) { padding: 0 1rem; }
+  @media (max-width: 380px) { padding: 0 0.75rem; }
 `;
 
 const Logo = styled(Link)`
@@ -40,6 +41,8 @@ const Logo = styled(Link)`
   gap: 0.5rem;
   span { color: ${({ theme }) => theme.colors.accent}; }
   z-index: 200;
+  flex-shrink: 0;
+  @media (max-width: 380px) { font-size: 1.1rem; }
 `;
 
 const LogoDot = styled.div`
@@ -81,8 +84,10 @@ const NavLinkRouter = styled(Link)`
 const NavActions = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   z-index: 200;
+  flex-shrink: 0;
+  @media (max-width: 480px) { gap: 0.375rem; }
 `;
 
 const LangToggle = styled.div`
@@ -129,6 +134,10 @@ const BtnPrimary = styled(Link)`
     background: ${({ theme }) => theme.colors.accentHover};
     transform: translateY(-1px);
     box-shadow: 0 4px 20px rgba(108, 99, 255, 0.3);
+  }
+  @media (max-width: 480px) {
+    padding: 0.4rem 0.875rem;
+    font-size: 0.8125rem;
   }
 `;
 
