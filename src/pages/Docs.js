@@ -506,9 +506,9 @@ const content = {
       gsc: {
         title: 'Set up Google Search Console',
         intro: 'Google Search Console (GSC) is a free Google tool that shows you how your website appears in Google Search – clicks, impressions, rankings, and more. You need it for RankBrief to work.',
-        videoUrl: null,
-        videoLabel: 'GSC setup tutorial on YouTube',
-        videoLink: 'https://www.youtube.com/results?search_query=google+search+console+setup+tutorial+2025',
+        videoUrl: 'https://www.youtube.com/embed/uoQ-0xREQgQ',
+        videoLabel: 'GSC setup tutorial',
+        videoLink: null,
         steps: [
           { title: 'Go to Google Search Console', text: 'Open search.google.com/search-console and sign in with your Google Account.', path: '→ search.google.com/search-console' },
           { title: 'Add a property', text: 'Click "Add property". Choose "Domain" to track all versions of your site (recommended), or "URL prefix" for a specific version.', tip: 'Tip: "Domain" tracking covers http, https, www and non-www automatically.' },
@@ -520,9 +520,9 @@ const content = {
       ga4: {
         title: 'Set up Google Analytics 4',
         intro: 'Google Analytics 4 (GA4) is a free tool that shows what visitors do on your website. Optional but recommended for Pro and Agency plans.',
-        videoUrl: null,
-        videoLabel: 'GA4 setup tutorial on YouTube',
-        videoLink: 'https://www.youtube.com/results?search_query=google+analytics+4+setup+tutorial+2025',
+        videoUrl: 'https://www.youtube.com/embed/HMUOVj9yxjc',
+        videoLabel: 'GA4 setup tutorial',
+        videoLink: null,
         steps: [
           { title: 'Go to Google Analytics', text: "Open analytics.google.com and sign in. If you've never used Analytics before, click \"Start measuring\".", path: '→ analytics.google.com' },
           { title: 'Create an account', text: 'Enter an account name (e.g. your company name). Click "Next".' },
@@ -535,8 +535,8 @@ const content = {
       connect: {
         title: 'Connect your properties to RankBrief',
         intro: 'Once GSC is set up, connecting to RankBrief takes about 2 minutes. RankBrief only requests read-only access – we never modify your data.',
-        videoUrl: null,
-        videoLabel: 'Watch the setup walkthrough',
+        videoUrl: 'NONE',
+        videoLabel: '',
         videoLink: null,
         steps: [
           { title: 'Register or log in', text: 'Go to rankbrief.com and create a free account with your email address.', path: '→ rankbrief.com/register' },
@@ -656,9 +656,9 @@ const content = {
       gsc: {
         title: 'Google Search Console einrichten',
         intro: 'Die Google Search Console (GSC) ist ein kostenloses Google-Tool, das dir zeigt wie deine Website in der Google-Suche erscheint – Klicks, Impressionen, Rankings und mehr. Du brauchst sie damit RankBrief funktioniert.',
-        videoUrl: null,
-        videoLabel: 'GSC einrichten – Tutorial auf YouTube',
-        videoLink: 'https://www.youtube.com/results?search_query=google+search+console+einrichten+2025',
+        videoUrl: 'https://www.youtube.com/embed/y37uYyzKmro',
+        videoLabel: 'GSC einrichten – Tutorial',
+        videoLink: null,
         steps: [
           { title: 'Google Search Console öffnen', text: 'Gehe auf search.google.com/search-console und melde dich mit deinem Google-Konto an.', path: '→ search.google.com/search-console' },
           { title: 'Property hinzufügen', text: 'Klicke auf "Property hinzufügen". Wähle "Domain" (empfohlen) oder "URL-Präfix" für eine bestimmte Version.', tip: 'Tipp: "Domain"-Tracking deckt http, https, www und non-www automatisch ab.' },
@@ -670,9 +670,9 @@ const content = {
       ga4: {
         title: 'Google Analytics 4 einrichten',
         intro: 'Google Analytics 4 (GA4) zeigt was Besucher auf deiner Website tun. Optional, aber sehr empfohlen ab dem Pro-Plan.',
-        videoUrl: null,
-        videoLabel: 'GA4 einrichten – Tutorial auf YouTube',
-        videoLink: 'https://www.youtube.com/results?search_query=google+analytics+4+einrichten+2025+deutsch',
+        videoUrl: 'https://www.youtube.com/embed/Fu_BKpzKIW4',
+        videoLabel: 'GA4 einrichten – Tutorial',
+        videoLink: null,
         steps: [
           { title: 'Google Analytics öffnen', text: 'Gehe auf analytics.google.com und melde dich mit deinem Google-Konto an.', path: '→ analytics.google.com' },
           { title: 'Konto erstellen', text: 'Gib einen Kontonamen ein (z.B. deinen Firmennamen). Klicke auf "Weiter".' },
@@ -685,8 +685,8 @@ const content = {
       connect: {
         title: 'Google Properties mit RankBrief verbinden',
         intro: 'Sobald GSC eingerichtet ist, dauert die Verbindung mit RankBrief ca. 2 Minuten. Nur lesender Zugriff – deine Daten werden niemals verändert.',
-        videoUrl: null,
-        videoLabel: 'Setup-Walkthrough ansehen',
+        videoUrl: 'NONE',
+        videoLabel: '',
         videoLink: null,
         steps: [
           { title: 'Bei RankBrief registrieren', text: 'Gehe auf rankbrief.com und erstelle ein kostenloses Konto mit deiner E-Mail.', path: '→ rankbrief.com/register' },
@@ -780,30 +780,16 @@ function FaqItemComponent({ q, a }) {
 }
 
 
-function VideoBlock({ guide, lang }) {
-  if (guide.videoUrl) {
-    return (
-      <VideoWrap>
-        <VideoIframe
-          src={guide.videoUrl}
-          title={guide.videoLabel}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </VideoWrap>
-    );
-  }
+function VideoBlock({ guide }) {
+  if (!guide.videoUrl || guide.videoUrl === 'NONE') return null;
   return (
     <VideoWrap>
-      <VideoPlaceholder>
-        <VideoPlaceholderIcon>▶</VideoPlaceholderIcon>
-        <VideoPlaceholderText>
-          {guide.videoLink
-            ? <><a href={guide.videoLink} target="_blank" rel="noreferrer" style={{fontWeight:600}}>{guide.videoLabel} →</a><br/><span style={{fontSize:'0.75rem',opacity:0.6}}>{lang === 'de' ? 'Eigenes Video folgt – bis dahin empfehlen wir das verlinkte Tutorial' : 'Own video coming soon – linked tutorial recommended in the meantime'}</span></>
-            : <>{lang === 'de' ? 'Eigenes Tutorial-Video folgt demnächst' : 'Tutorial video coming soon'}</>
-          }
-        </VideoPlaceholderText>
-      </VideoPlaceholder>
+      <VideoIframe
+        src={guide.videoUrl}
+        title={guide.videoLabel}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
     </VideoWrap>
   );
 }
@@ -872,7 +858,7 @@ export default function Docs() {
           {[t.guides.gsc, t.guides.ga4, t.guides.connect].map((guide, idx) => guideTab === idx && (
             <div key={idx}>
               <GuideIntro>{guide.intro}</GuideIntro>
-              <VideoBlock guide={guide} lang={lang} />
+              <VideoBlock guide={guide} />
               <StepList>
                 {guide.steps.map((step, i) => (
                   <Step key={i}>
