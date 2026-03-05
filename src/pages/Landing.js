@@ -727,7 +727,7 @@ const i18n = {
     ],
     plans: [
       {
-        name: 'Basic', slug: 'basic', price: '19', yearlyPrice: '14.17', yearlyTotal: '170', yearlySave: '58', period: '/mo',
+        name: 'Basic', slug: 'basic', price: '19', yearlyPrice: '15', yearlyTotal: '180', yearlySave: '48', period: '/mo',
         features: [
           { t: '1 domain', ok: true },
           { t: 'Monthly PDF report', ok: true },
@@ -738,7 +738,7 @@ const i18n = {
         ],
       },
       {
-        name: 'Pro', slug: 'pro', price: '39', yearlyPrice: '29.17', yearlyTotal: '350', yearlySave: '118', period: '/mo', featured: true,
+        name: 'Pro', slug: 'pro', price: '39', yearlyPrice: '29', yearlyTotal: '348', yearlySave: '120', period: '/mo', featured: true,
         features: [
           { t: '3 domains', ok: true },
           { t: 'Monthly PDF report', ok: true },
@@ -749,7 +749,7 @@ const i18n = {
         ],
       },
       {
-        name: 'Agency', slug: 'agency', price: '79', yearlyPrice: '65.83', yearlyTotal: '790', yearlySave: '158', period: '/mo',
+        name: 'Agency', slug: 'agency', price: '79', yearlyPrice: '65', yearlyTotal: '780', yearlySave: '168', period: '/mo',
         features: [
           { t: '10 domains', ok: true },
           { t: 'Monthly PDF report', ok: true },
@@ -813,7 +813,7 @@ const i18n = {
     ],
     plans: [
       {
-        name: 'Basic', slug: 'basic', price: '19', yearlyPrice: '14,17', yearlyTotal: '170', yearlySave: '58', period: '/Monat',
+        name: 'Basic', slug: 'basic', price: '19', yearlyPrice: '15', yearlyTotal: '180', yearlySave: '48', period: '/Monat',
         features: [
           { t: '1 Domain', ok: true },
           { t: 'Monatlicher PDF-Report', ok: true },
@@ -824,7 +824,7 @@ const i18n = {
         ],
       },
       {
-        name: 'Pro', slug: 'pro', price: '39', yearlyPrice: '29,17', yearlyTotal: '350', yearlySave: '118', period: '/Monat', featured: true,
+        name: 'Pro', slug: 'pro', price: '39', yearlyPrice: '29', yearlyTotal: '348', yearlySave: '120', period: '/Monat', featured: true,
         features: [
           { t: '3 Domains', ok: true },
           { t: 'Monatlicher PDF-Report', ok: true },
@@ -835,7 +835,7 @@ const i18n = {
         ],
       },
       {
-        name: 'Agency', slug: 'agency', price: '79', yearlyPrice: '65,83', yearlyTotal: '790', yearlySave: '158', period: '/Monat',
+        name: 'Agency', slug: 'agency', price: '79', yearlyPrice: '65', yearlyTotal: '780', yearlySave: '168', period: '/Monat',
         features: [
           { t: '10 Domains', ok: true },
           { t: 'Monatlicher PDF-Report', ok: true },
@@ -997,7 +997,7 @@ export default function Landing({ lang = 'en' }) {
           <ToggleLabel $active={!yearly}>{t.billingToggle[0]}</ToggleLabel>
           <ToggleTrack $on={yearly} onClick={() => setYearly(y => !y)} aria-label="Toggle yearly billing" />
           <ToggleLabel $active={yearly}>{t.billingToggle[1]}</ToggleLabel>
-          {yearly && <YearlySaveBadge>🎉 {t.yearlySaveLabel} bis zu {lang === 'de' ? '158 €' : '€158'}</YearlySaveBadge>}
+          {yearly && <YearlySaveBadge>🎉 {t.yearlySaveLabel} bis zu {lang === 'de' ? '168 €' : '€168'}</YearlySaveBadge>}
         </BillingToggleWrap>
 
         <PricingGrid>
