@@ -24,7 +24,7 @@ const shimmer = keyframes`
 `;
 
 // ── Layout ────────────────────────────────────────────────────────────────────
-const Page = styled.div`min-height: 100vh; overflow-x: hidden;`;
+const Page = styled.div`min-height: 100vh; overflow-x: hidden; width: 100%;`;
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 const HeroSection = styled.section`
@@ -37,6 +37,11 @@ const HeroSection = styled.section`
   text-align: center;
   padding: 8rem 2rem 6rem;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  @media (max-width: 480px) {
+    padding: 7rem 1.25rem 4rem;
+  }
 `;
 
 const GlowOrb = styled.div`
@@ -89,6 +94,8 @@ const HeroBadge = styled.div`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.accent};
   margin-bottom: 2rem;
+  max-width: 90vw;
+  text-align: center;
   animation: ${fadeUp} 0.6s ease both;
   &::before {
     content: '';
@@ -101,12 +108,15 @@ const HeroBadge = styled.div`
 
 const HeroTitle = styled.h1`
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-size: clamp(2rem, 7vw, 5.5rem);
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: -0.04em;
   max-width: 900px;
+  width: 100%;
   margin-bottom: 1.5rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
   animation: ${fadeUp} 0.6s 0.1s ease both;
 
   .gradient {
@@ -336,8 +346,13 @@ const TableRow = styled.div`
 const Section = styled.section`
   overflow: hidden;
   max-width: 1100px;
+  width: 100%;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: 6rem 2rem;
+  @media (max-width: 480px) {
+    padding: 4rem 1.25rem;
+  }
 `;
 
 const SectionLabel = styled.div`
@@ -351,12 +366,14 @@ const SectionLabel = styled.div`
 
 const SectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-size: clamp(1.5rem, 4vw, 3rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
   margin-bottom: 1rem;
   max-width: 600px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 `;
 
 const SectionSub = styled.p`
@@ -520,9 +537,12 @@ const FeatureCardMobile = styled.div`
     box-shadow: 0 8px 30px rgba(0,0,0,0.06);
   }
   @media (max-width: 600px) {
-    min-width: min(280px, 80vw);
+    min-width: min(260px, 75vw);
+    max-width: min(260px, 75vw);
     flex-shrink: 0;
     scroll-snap-align: start;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 `;
 
@@ -644,9 +664,8 @@ const PricingGrid = styled.div`
     padding-bottom: 1rem;
     scrollbar-width: none;
     &::-webkit-scrollbar { display: none; }
-    // center the featured card
-    padding-left: calc(50vw - min(280px, 80vw) / 2 - 2rem);
-    padding-right: calc(50vw - min(280px, 80vw) / 2 - 2rem);
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
   }
 `;
 
@@ -665,7 +684,8 @@ const PricingCard = styled.div`
   &:hover { transform: ${({ $featured }) => $featured ? 'scale(1.04)' : 'translateY(-3px)'}; }
 
   @media (max-width: 860px) {
-    min-width: min(300px, 82vw);
+    min-width: min(280px, 78vw);
+    max-width: min(280px, 78vw);
     flex-shrink: 0;
     scroll-snap-align: center;
   }
@@ -1216,7 +1236,7 @@ export default function Landing({ lang = 'en' }) {
           background: 'linear-gradient(135deg, rgba(108,99,255,0.08) 0%, rgba(99,207,255,0.04) 100%)',
           border: '1px solid rgba(108,99,255,0.15)',
           borderRadius: '24px',
-          padding: '4rem 3rem',
+          padding: 'clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3rem)',
           textAlign: 'center',
         }}>
           <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '1rem' }}>
