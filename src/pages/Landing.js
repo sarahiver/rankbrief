@@ -334,6 +334,7 @@ const TableRow = styled.div`
 
 // ── Sections ──────────────────────────────────────────────────────────────────
 const Section = styled.section`
+  overflow: hidden;
   max-width: 1100px;
   margin: 0 auto;
   padding: 6rem 2rem;
@@ -495,7 +496,34 @@ const FeaturesGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 600px) { grid-template-columns: 1fr; }
+  @media (max-width: 600px) {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+`;
+
+const FeatureCardMobile = styled.div`
+  background: ${({ theme }) => theme.colors.bgCard};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.lg};
+  padding: 1.75rem;
+  transition: all 0.25s;
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.borderLight};
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+  }
+  @media (max-width: 600px) {
+    min-width: min(280px, 80vw);
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
 `;
 
 const FeatureCard = styled.div`
@@ -533,6 +561,19 @@ const FeatureText = styled.p`
   color: ${({ theme }) => theme.colors.textMuted};
   line-height: 1.6;
   font-weight: 300;
+`;
+
+// ── Scroll hint ───────────────────────────────────────────────────────────────
+const ScrollHint = styled.p`
+  display: none;
+  @media (max-width: 600px) {
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-top: 0.75rem;
+    letter-spacing: 0.05em;
+  }
 `;
 
 // ── Steps ─────────────────────────────────────────────────────────────────────
@@ -594,7 +635,19 @@ const PricingGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   align-items: start;
-  @media (max-width: 860px) { grid-template-columns: 1fr; max-width: 400px; }
+  @media (max-width: 860px) {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+    // center the featured card
+    padding-left: calc(50vw - min(280px, 80vw) / 2 - 2rem);
+    padding-right: calc(50vw - min(280px, 80vw) / 2 - 2rem);
+  }
 `;
 
 const PricingCard = styled.div`
@@ -610,6 +663,12 @@ const PricingCard = styled.div`
     transform: scale(1.02);
   `}
   &:hover { transform: ${({ $featured }) => $featured ? 'scale(1.04)' : 'translateY(-3px)'}; }
+
+  @media (max-width: 860px) {
+    min-width: min(300px, 82vw);
+    flex-shrink: 0;
+    scroll-snap-align: center;
+  }
 `;
 
 const PlanBadge = styled.div`
@@ -1043,13 +1102,14 @@ export default function Landing({ lang = 'en' }) {
         <SectionSub>{t.featSub}</SectionSub>
         <FeaturesGrid>
           {t.features.map(f => (
-            <FeatureCard key={f.title}>
+            <FeatureCardMobile key={f.title}>
               <FeatureIcon>{f.icon}</FeatureIcon>
               <FeatureTitle>{f.title}</FeatureTitle>
               <FeatureText>{f.text}</FeatureText>
-            </FeatureCard>
+            </FeatureCardMobile>
           ))}
         </FeaturesGrid>
+        <ScrollHint className="mobile-only">← {lang === 'de' ? 'Wischen zum Erkunden' : 'Swipe to explore'} →</ScrollHint>
       </Section>
 
       {/* SAMPLE REPORTS */}
