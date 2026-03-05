@@ -382,10 +382,31 @@ const LogoDropZone = styled.div`
   border-radius: ${({ theme }) => theme.radius.lg};
   border: 2px dashed ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.border};
   background: ${({ $active, theme }) => $active ? theme.colors.accentDim : theme.colors.bgElevated};
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 0.25rem;
   transition: all 0.2s; overflow: hidden;
-  img { max-height: 64px; max-width: 100%; object-fit: contain; }
 `;
+
+const LogoThumbWrap = styled.div`
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.lg};
+  background: ${({ theme }) => theme.colors.bgElevated};
+`;
+
+const LogoThumb = styled.div`
+  width: 96px; height: 56px;
+  border-radius: ${({ theme }) => theme.radius.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex-shrink: 0;
+  img { max-width: 88px; max-height: 48px; object-fit: contain; }
+`;
+
+const LogoThumbInfo = styled.div`flex: 1; min-width: 0;`;
+const LogoThumbName = styled.div`font-size: 0.8125rem; font-weight: 500; color: ${({ theme }) => theme.colors.text}; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;`;
+const LogoThumbMeta = styled.div`font-size: 0.75rem; color: ${({ theme }) => theme.colors.textDim}; font-weight: 300;`;
 
 const ColorRow = styled.div`
   display: flex; align-items: center; gap: 0.75rem;
@@ -684,20 +705,32 @@ export default function Settings({ user }) {
   };
 
   // ── Logo Upload via Cloudinary ────────────────────────────────────────────
+  const LOGO_MAX_BYTES = 500 * 1024; // 500 KB
+  const LOGO_ALLOWED   = ['image/png', 'image/jpeg', 'image/svg+xml'];
+  const LOGO_ACCEPT    = '.png,.jpg,.jpeg,.svg';
+
   const uploadLogo = async (file) => {
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { showAlert('Logo max. 2 MB.', 'error'); return; }
+    if (!LOGO_ALLOWED.includes(file.type)) {
+      showAlert('Nur PNG, JPG oder SVG erlaubt.', 'error'); return;
+    }
+    if (file.size > LOGO_MAX_BYTES) {
+      showAlert(`Logo zu groß – max. 500 KB (aktuell ${(file.size / 1024).toFixed(0)} KB).`, 'error'); return;
+    }
     setLogoUploading(true);
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('upload_preset', process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET);
-      fd.append('folder', `rankbrief/logos/${user.id}`);
-      const res  = await fetch(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
-      const data = await res.json();
-      if (data.secure_url) { setBranding(b => ({ ...b, brand_logo_url: data.secure_url })); showAlert('Logo hochgeladen – "Branding speichern" klicken.'); }
-      else showAlert('Upload fehlgeschlagen.', 'error');
-    } catch { showAlert('Upload-Fehler. Cloudinary konfiguriert?', 'error'); }
+      // Upload to Supabase Storage (bucket: logos)
+      const ext      = file.name.split('.').pop();
+      const path     = `${user.id}/logo.${ext}`;
+      const { error } = await supabase.storage.from('logos').upload(path, file, { upsert: true, contentType: file.type });
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(path);
+      const cacheBusted = publicUrl + '?t=' + Date.now();
+      setBranding(b => ({ ...b, brand_logo_url: cacheBusted, _logoFile: file.name, _logoSize: file.size }));
+      showAlert('Logo hochgeladen – "Branding speichern" klicken.');
+    } catch (err) {
+      showAlert('Upload fehlgeschlagen: ' + err.message, 'error');
+    }
     setLogoUploading(false);
   };
 
@@ -981,37 +1014,55 @@ export default function Settings({ user }) {
             {/* Logo */}
             <Field>
               <Label>Firmenlogo</Label>
-              <LogoDropZone
-                $active={dragging}
-                onClick={() => isPro && document.getElementById('rb-logo-input').click()}
-                onDragOver={e => { e.preventDefault(); if (isPro) setDragging(true); }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={e => { e.preventDefault(); setDragging(false); if (isPro) uploadLogo(e.dataTransfer.files?.[0]); }}
-                style={{ cursor: isPro ? 'pointer' : 'not-allowed', opacity: isPro ? 1 : 0.6 }}
-              >
-                {branding.brand_logo_url
-                  ? <img src={branding.brand_logo_url} alt="Logo" />
-                  : <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>🖼</div>
-                      <p style={{ fontSize: '0.8125rem', color: '#9898B8', fontWeight: 300 }}>
-                        {logoUploading ? 'Wird hochgeladen...' : 'Drag & Drop oder klicken'}
-                      </p>
-                    </div>
-                }
-              </LogoDropZone>
-              <input id="rb-logo-input" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp"
+
+              {/* Thumbnail wenn Logo vorhanden */}
+              {branding.brand_logo_url ? (
+                <LogoThumbWrap>
+                  <LogoThumb>
+                    <img src={branding.brand_logo_url} alt="Logo" />
+                  </LogoThumb>
+                  <LogoThumbInfo>
+                    <LogoThumbName>{branding._logoFile || 'logo'}</LogoThumbName>
+                    <LogoThumbMeta>
+                      {branding._logoSize ? `${(branding._logoSize / 1024).toFixed(0)} KB · ` : ''}PNG / JPG / SVG
+                    </LogoThumbMeta>
+                  </LogoThumbInfo>
+                  <Row style={{ gap: '0.5rem' }}>
+                    <Btn onClick={() => isPro && document.getElementById('rb-logo-input').click()} disabled={!isPro || logoUploading}>
+                      Ändern
+                    </Btn>
+                    <Btn $variant="danger" onClick={() => setBranding(b => ({ ...b, brand_logo_url: '', _logoFile: '', _logoSize: 0 }))} disabled={!isPro}>
+                      Entfernen
+                    </Btn>
+                  </Row>
+                </LogoThumbWrap>
+              ) : (
+                /* Drop Zone wenn kein Logo */
+                <LogoDropZone
+                  $active={dragging}
+                  onClick={() => isPro && document.getElementById('rb-logo-input').click()}
+                  onDragOver={e => { e.preventDefault(); if (isPro) setDragging(true); }}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={e => { e.preventDefault(); setDragging(false); if (isPro) uploadLogo(e.dataTransfer.files?.[0]); }}
+                  style={{ cursor: isPro ? 'pointer' : 'not-allowed', opacity: isPro ? 1 : 0.6 }}
+                >
+                  <div style={{ fontSize: '1.25rem' }}>🖼</div>
+                  <p style={{ fontSize: '0.8125rem', color: '#9898B8', fontWeight: 300 }}>
+                    {logoUploading ? 'Wird hochgeladen...' : 'Drag & Drop oder klicken zum Hochladen'}
+                  </p>
+                </LogoDropZone>
+              )}
+
+              <input id="rb-logo-input" type="file" accept=".png,.jpg,.jpeg,.svg"
                 style={{ display: 'none' }} onChange={e => uploadLogo(e.target.files?.[0])} disabled={!isPro} />
-              <Row style={{ marginTop: '0.5rem' }}>
-                <Btn onClick={() => isPro && document.getElementById('rb-logo-input').click()} disabled={!isPro || logoUploading}>
+
+              {!branding.brand_logo_url && (
+                <Btn style={{ marginTop: '0.5rem' }} onClick={() => isPro && document.getElementById('rb-logo-input').click()} disabled={!isPro || logoUploading}>
                   {logoUploading ? 'Lädt hoch...' : '↑ Logo hochladen'}
                 </Btn>
-                {branding.brand_logo_url && (
-                  <Btn $variant="danger" onClick={() => setBranding(b => ({ ...b, brand_logo_url: '' }))} disabled={!isPro}>
-                    Entfernen
-                  </Btn>
-                )}
-              </Row>
-              <FieldHint>PNG, JPG, SVG oder WebP · max. 2 MB · Empfohlen: 400×120px, transparenter Hintergrund</FieldHint>
+              )}
+
+              <FieldHint>PNG, JPG oder SVG · max. 500 KB · Empfohlen: 400×120px, transparenter Hintergrund</FieldHint>
             </Field>
 
             {/* Firmenname */}
