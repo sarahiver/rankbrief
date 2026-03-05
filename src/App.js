@@ -12,6 +12,8 @@ import Onboarding from './pages/Onboarding';
 import Docs from './pages/Docs';
 import Settings from './pages/Settings';
 import { PrivacyEN, PrivacyDE, TermsEN, TermsDE } from './pages/Legal';
+import CookieBanner from './components/CookieBanner';
+import usePageTracking from './components/usePageTracking';
 
 const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings'];
 const noFooterRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings'];
@@ -22,6 +24,7 @@ function AppInner() {
   const [lang, setLang] = useState(() => localStorage.getItem('rb_lang') || 'en');
   const location = useLocation();
   const path = location.pathname;
+  usePageTracking();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -66,6 +69,7 @@ function AppInner() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       {showFooter && <Footer />}
+      <CookieBanner />
     </>
   );
 }
