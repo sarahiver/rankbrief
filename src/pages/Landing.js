@@ -367,6 +367,127 @@ const SectionSub = styled.p`
   margin-bottom: 3rem;
 `;
 
+// ── Sample Reports ────────────────────────────────────────────────────────────
+const SampleGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+  @media (max-width: 760px) { grid-template-columns: 1fr; }
+`;
+
+const SampleCard = styled.div`
+  position: relative;
+  border-radius: 14px;
+  border: 1px solid ${({ $featured, theme }) => $featured ? 'rgba(108,99,255,0.4)' : theme.colors.border};
+  background: ${({ theme }) => theme.colors.bgCard};
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+  ${({ $featured }) => $featured && `box-shadow: 0 6px 32px rgba(108,99,255,0.15); transform: scale(1.02);`}
+  &:hover { transform: ${({ $featured }) => $featured ? 'scale(1.04)' : 'translateY(-3px)'}; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+`;
+
+const SamplePopularBadge = styled.div`
+  position: absolute; top: 12px; right: 12px;
+  background: #6C63FF; color: white;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 3px 9px; border-radius: 20px;
+`;
+
+const SampleCardHead = styled.div`
+  display: flex; align-items: center; gap: 0.6rem;
+`;
+
+const SampleIcon = styled.div`font-size: 1.4rem; line-height: 1;`;
+
+const SamplePlan = styled.div`
+  font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em;
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+const SampleDesc = styled.p`
+  font-size: 0.85rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  line-height: 1.6;
+  flex: 1;
+`;
+
+const SampleBtn = styled.div`
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.85rem; font-weight: 600;
+  color: #6C63FF;
+  margin-top: 0.25rem;
+  svg { transition: transform 0.15s; }
+  ${SampleCard}:hover & svg { transform: translateX(3px); }
+`;
+
+const SampleHint = styled.p`
+  font-size: 0.78rem; color: ${({ theme }) => theme.colors.textMuted};
+  opacity: 0.55; text-align: center;
+`;
+
+// Lightbox
+const Overlay = styled.div`
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.15s ease;
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+`;
+
+const LightboxWrap = styled.div`
+  position: relative;
+  width: 100%; max-width: 860px;
+  height: 90vh;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+`;
+
+const LightboxHeader = styled.div`
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: #f8f8fc;
+  border-bottom: 1px solid #e5e5f0;
+  flex-shrink: 0;
+`;
+
+const LightboxTitle = styled.div`
+  font-size: 0.875rem; font-weight: 700; color: #1a1a2e;
+  display: flex; align-items: center; gap: 0.5rem;
+`;
+
+const LightboxActions = styled.div`
+  display: flex; align-items: center; gap: 0.75rem;
+`;
+
+const LightboxDownload = styled.a`
+  font-size: 0.8rem; font-weight: 600; color: #6C63FF;
+  text-decoration: none; padding: 0.3rem 0.75rem;
+  border: 1px solid rgba(108,99,255,0.35); border-radius: 6px;
+  transition: background 0.15s;
+  &:hover { background: rgba(108,99,255,0.08); }
+`;
+
+const LightboxClose = styled.button`
+  background: none; border: none; cursor: pointer;
+  font-size: 1.3rem; color: #888; line-height: 1;
+  padding: 0.2rem 0.4rem; border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  &:hover { color: #1a1a2e; background: #eee; }
+`;
+
+const LightboxFrame = styled.iframe`
+  flex: 1; width: 100%; border: none;
+`;
+
 // ── Features ──────────────────────────────────────────────────────────────────
 const FeaturesGrid = styled.div`
   display: grid;
@@ -612,77 +733,6 @@ const FaqA = styled.div`
   background: ${({ theme }) => theme.colors.bgCard};
 `;
 
-
-// ── Billing Toggle ─────────────────────────────────────────────────────────────
-const BillingToggleWrap = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  margin-bottom: 2.5rem;
-`;
-
-const ToggleTrack = styled.button`
-  width: 52px; height: 28px;
-  border-radius: 99px;
-  background: ${({ $on, theme }) => $on ? theme.colors.accent : theme.colors.bgElevated};
-  border: 1px solid ${({ $on, theme }) => $on ? 'transparent' : theme.colors.border};
-  position: relative;
-  transition: all 0.25s;
-  cursor: pointer;
-  flex-shrink: 0;
-  &::after {
-    content: '';
-    position: absolute;
-    top: 3px; left: ${({ $on }) => $on ? '25px' : '3px'};
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: #fff;
-    transition: left 0.25s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-  }
-`;
-
-const ToggleLabel = styled.span`
-  font-size: 0.9375rem;
-  font-weight: ${({ $active }) => $active ? 600 : 300};
-  color: ${({ $active, theme }) => $active ? theme.colors.text : theme.colors.textDim};
-  transition: all 0.2s;
-`;
-
-const YearlySaveBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  background: rgba(16,185,129,0.12);
-  color: #10B981;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.2rem 0.5rem;
-  border-radius: 99px;
-  border: 1px solid rgba(16,185,129,0.2);
-`;
-
-const PlanSaveTag = styled.div`
-  font-size: 0.75rem;
-  color: #10B981;
-  font-weight: 600;
-  margin-top: 0.25rem;
-`;
-
-const PriceStrike = styled.span`
-  font-size: 0.875rem;
-  color: ${({ theme }) => theme.colors.textDim};
-  text-decoration: line-through;
-  margin-right: 0.25rem;
-  font-weight: 300;
-`;
-
-const FeatureCheck = styled.span`
-  color: ${({ $ok, $featured }) => $ok ? ($featured ? '#fff' : '#10B981') : 'rgba(128,128,160,0.5)'};
-  font-size: 0.75rem;
-  flex-shrink: 0;
-`;
-
 // ── i18n content ──────────────────────────────────────────────────────────────
 const i18n = {
   en: {
@@ -701,6 +751,18 @@ const i18n = {
     featLabel: 'Features',
     featTitle: 'Everything you need.\nNothing you don\'t.',
     featSub: 'Built for freelancers and small agencies who bill hourly and hate manual reporting.',
+    sampleLabel: 'Sample Reports',
+    sampleTitle: 'See exactly what\nyour clients receive.',
+    sampleSub: 'Real report previews – generated from actual data, delivered as a PDF every month.',
+    samplePopular: 'Most popular',
+    sampleCards: [
+      { plan: 'Basic', icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: '/samples/sample-basic.html', featured: false },
+      { plan: 'Pro', icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: '/samples/sample-pro.html', featured: true },
+      { plan: 'Agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: '/samples/sample-agency.html', featured: false },
+    ],
+    sampleCta: 'View sample report',
+    sampleClose: 'Close preview',
+    sampleHint: 'Open in browser → Ctrl+P → Save as PDF to get the exact file your clients receive.',
     pricingLabel: 'Pricing',
     pricingTitle: 'Simple pricing.\nNo surprises.',
     pricingSub: 'First month free. No credit card required.',
@@ -726,42 +788,10 @@ const i18n = {
       { icon: '🔒', title: 'GDPR Compliant', text: 'EU servers, AES-256 token encryption, minimal data retention. Built for European privacy requirements from day one.' },
     ],
     plans: [
-      {
-        name: 'Basic', slug: 'basic', price: '19', yearlyPrice: '15', yearlyTotal: '180', yearlySave: '48', period: '/mo',
-        features: [
-          { t: '1 domain', ok: true },
-          { t: 'Monthly PDF report', ok: true },
-          { t: 'GSC data (clicks, rankings, keywords)', ok: true },
-          { t: 'GA4 data (sessions, conversions)', ok: false },
-          { t: 'AI summary & SEO recommendations', ok: false },
-          { t: 'White-label branding', ok: false },
-        ],
-      },
-      {
-        name: 'Pro', slug: 'pro', price: '39', yearlyPrice: '29', yearlyTotal: '348', yearlySave: '120', period: '/mo', featured: true,
-        features: [
-          { t: '3 domains', ok: true },
-          { t: 'Monthly PDF report', ok: true },
-          { t: 'GSC data (clicks, rankings, keywords)', ok: true },
-          { t: 'GA4 data (sessions, conversions)', ok: true },
-          { t: 'AI summary & SEO recommendations', ok: true },
-          { t: 'White-label branding', ok: false },
-        ],
-      },
-      {
-        name: 'Agency', slug: 'agency', price: '79', yearlyPrice: '65', yearlyTotal: '780', yearlySave: '168', period: '/mo',
-        features: [
-          { t: '10 domains', ok: true },
-          { t: 'Monthly PDF report', ok: true },
-          { t: 'GSC data (clicks, rankings, keywords)', ok: true },
-          { t: 'GA4 data (sessions, conversions)', ok: true },
-          { t: 'AI summary & SEO recommendations', ok: true },
-          { t: 'White-label branding + custom logo', ok: true },
-        ],
-      },
+      { name: 'Basic', price: '19', period: '/mo', features: ['1 domain', 'Monthly PDF report', 'GSC + GA4 data', 'AI summary', 'Email delivery'] },
+      { name: 'Pro', price: '39', period: '/mo', featured: true, features: ['3 domains', 'Everything in Basic', 'White-label reports', 'Custom logo', 'Priority delivery'] },
+      { name: 'Agency', price: '79', period: '/mo', features: ['10 domains', 'Everything in Pro', 'Client management', 'Bulk reporting', 'Agency branding'] },
     ],
-    billingToggle: ['Monthly', 'Yearly'],
-    yearlySaveLabel: 'Save',
     faqs: [
       { q: 'Is my Google data safe?', a: 'Yes. We request read-only access to your Search Console and Analytics data. OAuth tokens are encrypted using AES-256-GCM and stored on EU servers (Frankfurt). We never access your data beyond what\'s needed to generate your report.' },
       { q: 'Can I cancel anytime?', a: 'Absolutely. Cancel from your dashboard at any time. Your subscription remains active until the end of the billing period. No questions asked, no hidden fees.' },
@@ -787,6 +817,18 @@ const i18n = {
     featLabel: 'Features',
     featTitle: 'Alles was du brauchst.\nNichts was du nicht brauchst.',
     featSub: 'Gebaut für Freelancer und kleine Agenturen, die stundensatz abrechnen und manuelle Reports hassen.',
+    sampleLabel: 'Beispiel-Reports',
+    sampleTitle: 'Sieh genau was\ndeine Kunden erhalten.',
+    sampleSub: 'Echte Report-Vorschauen – aus realen Daten generiert, jeden Monat als PDF geliefert.',
+    samplePopular: 'Am beliebtesten',
+    sampleCards: [
+      { plan: 'Basic', icon: '📊', desc: 'GSC-Übersicht, Top-Keywords & Seiten, KI-Zusammenfassung und Begriffserklärung. Klar und verständlich.', file: '/samples/sample-basic.html', featured: false },
+      { plan: 'Pro', icon: '🤖', desc: 'Alles aus Basic plus GA4-Besucher­statistik, 3 verständliche SEO-Empfehlungen, Keyword-Chancen und Vormonatsvergleich.', file: '/samples/sample-pro.html', featured: true },
+      { plan: 'Agentur', icon: '🏢', desc: 'Vollständiges White-Label mit eigenem Logo und Farben. Bis zu 10 Domains. Kein RankBrief-Branding.', file: '/samples/sample-agency.html', featured: false },
+    ],
+    sampleCta: 'Beispiel-Report ansehen',
+    sampleClose: 'Vorschau schließen',
+    sampleHint: 'Im Browser öffnen → Strg+P → Als PDF speichern – so kommt der Report beim Kunden an.',
     pricingLabel: 'Preise',
     pricingTitle: 'Einfache Preise.\nKeine Überraschungen.',
     pricingSub: 'Erster Monat kostenlos. Keine Kreditkarte erforderlich.',
@@ -812,42 +854,10 @@ const i18n = {
       { icon: '🔒', title: 'DSGVO-konform', text: 'EU-Server, AES-256 Token-Verschlüsselung, minimale Datenspeicherung. Von Anfang an für europäische Datenschutzanforderungen gebaut.' },
     ],
     plans: [
-      {
-        name: 'Basic', slug: 'basic', price: '19', yearlyPrice: '15', yearlyTotal: '180', yearlySave: '48', period: '/Monat',
-        features: [
-          { t: '1 Domain', ok: true },
-          { t: 'Monatlicher PDF-Report', ok: true },
-          { t: 'GSC-Daten (Klicks, Rankings, Keywords)', ok: true },
-          { t: 'GA4-Daten (Sessions, Conversions)', ok: false },
-          { t: 'KI-Zusammenfassung & SEO-Empfehlungen', ok: false },
-          { t: 'White-Label-Branding', ok: false },
-        ],
-      },
-      {
-        name: 'Pro', slug: 'pro', price: '39', yearlyPrice: '29', yearlyTotal: '348', yearlySave: '120', period: '/Monat', featured: true,
-        features: [
-          { t: '3 Domains', ok: true },
-          { t: 'Monatlicher PDF-Report', ok: true },
-          { t: 'GSC-Daten (Klicks, Rankings, Keywords)', ok: true },
-          { t: 'GA4-Daten (Sessions, Conversions)', ok: true },
-          { t: 'KI-Zusammenfassung & SEO-Empfehlungen', ok: true },
-          { t: 'White-Label-Branding', ok: false },
-        ],
-      },
-      {
-        name: 'Agency', slug: 'agency', price: '79', yearlyPrice: '65', yearlyTotal: '780', yearlySave: '168', period: '/Monat',
-        features: [
-          { t: '10 Domains', ok: true },
-          { t: 'Monatlicher PDF-Report', ok: true },
-          { t: 'GSC-Daten (Klicks, Rankings, Keywords)', ok: true },
-          { t: 'GA4-Daten (Sessions, Conversions)', ok: true },
-          { t: 'KI-Zusammenfassung & SEO-Empfehlungen', ok: true },
-          { t: 'White-Label-Branding + eigenes Logo', ok: true },
-        ],
-      },
+      { name: 'Basic', price: '19', period: '/Monat', features: ['1 Domain', 'Monatlicher PDF-Report', 'GSC + GA4 Daten', 'KI-Zusammenfassung', 'Email-Versand'] },
+      { name: 'Pro', price: '39', period: '/Monat', featured: true, features: ['3 Domains', 'Alles in Basic', 'White-Label Reports', 'Eigenes Logo', 'Priority Delivery'] },
+      { name: 'Agency', price: '79', period: '/Monat', features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Bulk Reporting', 'Agency Branding'] },
     ],
-    billingToggle: ['Monatlich', 'Jährlich'],
-    yearlySaveLabel: 'Spare',
     faqs: [
       { q: 'Sind meine Google-Daten sicher?', a: 'Ja. Wir fordern nur lesenden Zugriff auf deine Search Console und Analytics-Daten. OAuth-Tokens werden mit AES-256-GCM verschlüsselt und auf EU-Servern (Frankfurt) gespeichert.' },
       { q: 'Kann ich jederzeit kündigen?', a: 'Ja. Jederzeit im Dashboard kündigen. Dein Abo bleibt bis Ende des Abrechnungszeitraums aktiv. Keine versteckten Gebühren.' },
@@ -862,7 +872,7 @@ const i18n = {
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Landing({ lang = 'en' }) {
   const [openFaq, setOpenFaq] = React.useState(null);
-  const [yearly, setYearly]   = React.useState(false);
+  const [sampleOpen, setSampleOpen] = React.useState(null); // { plan, file }
   const t = i18n[lang] || i18n.en;
 
   // Reset open FAQ when language changes
@@ -986,41 +996,78 @@ export default function Landing({ lang = 'en' }) {
         </FeaturesGrid>
       </Section>
 
+      {/* SAMPLE REPORTS */}
+      <Section>
+        <SectionLabel>{t.sampleLabel}</SectionLabel>
+        <SectionTitle>{t.sampleTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>)}</SectionTitle>
+        <SectionSub>{t.sampleSub}</SectionSub>
+        <SampleGrid>
+          {t.sampleCards.map(s => (
+            <SampleCard key={s.plan} $featured={s.featured} onClick={() => setSampleOpen(s)}>
+              {s.featured && <SamplePopularBadge>{t.samplePopular}</SamplePopularBadge>}
+              <SampleCardHead>
+                <SampleIcon>{s.icon}</SampleIcon>
+                <SamplePlan>{s.plan}</SamplePlan>
+              </SampleCardHead>
+              <SampleDesc>{s.desc}</SampleDesc>
+              <SampleBtn>
+                {t.sampleCta}
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M3 7h8M7 3l4 4-4 4" stroke="#6C63FF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </SampleBtn>
+            </SampleCard>
+          ))}
+        </SampleGrid>
+        <SampleHint>💡 {t.sampleHint}</SampleHint>
+      </Section>
+
+      {/* LIGHTBOX */}
+      {sampleOpen && (
+        <Overlay onClick={() => setSampleOpen(null)}>
+          <LightboxWrap onClick={e => e.stopPropagation()}>
+            <LightboxHeader>
+              <LightboxTitle>
+                <span>{sampleOpen.icon}</span>
+                <span>{sampleOpen.plan} – {t.sampleLabel}</span>
+              </LightboxTitle>
+              <LightboxActions>
+                <LightboxDownload
+                  href={sampleOpen.file}
+                  download={`rankbrief-sample-${sampleOpen.plan.toLowerCase()}.html`}
+                >
+                  ↓ {lang === 'de' ? 'Als PDF speichern' : 'Save as PDF'}
+                </LightboxDownload>
+                <LightboxClose onClick={() => setSampleOpen(null)} aria-label={t.sampleClose}>✕</LightboxClose>
+              </LightboxActions>
+            </LightboxHeader>
+            <LightboxFrame
+              src={sampleOpen.file}
+              title={`${sampleOpen.plan} sample report`}
+            />
+          </LightboxWrap>
+        </Overlay>
+      )}
+
       {/* PRICING */}
       <Section id="pricing">
         <SectionLabel>{t.pricingLabel}</SectionLabel>
         <SectionTitle>{t.pricingTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>)}</SectionTitle>
         <SectionSub>{t.pricingSub}</SectionSub>
-
-        {/* Billing Toggle */}
-        <BillingToggleWrap>
-          <ToggleLabel $active={!yearly}>{t.billingToggle[0]}</ToggleLabel>
-          <ToggleTrack $on={yearly} onClick={() => setYearly(y => !y)} aria-label="Toggle yearly billing" />
-          <ToggleLabel $active={yearly}>{t.billingToggle[1]}</ToggleLabel>
-          {yearly && <YearlySaveBadge>🎉 {t.yearlySaveLabel} bis zu {lang === 'de' ? '168 €' : '€168'}</YearlySaveBadge>}
-        </BillingToggleWrap>
-
         <PricingGrid>
           {t.plans.map(p => (
             <PricingCard key={p.name} $featured={p.featured}>
               <PlanBadge $featured={p.featured}>{p.name}</PlanBadge>
               <PlanPrice $featured={p.featured}>
-                {yearly && <PriceStrike>€{p.price}</PriceStrike>}
-                <span className="amount">€{yearly ? p.yearlyPrice : p.price}</span>
+                <span className="amount">€{p.price}</span>
                 <span className="period">{p.period}</span>
               </PlanPrice>
-              {yearly && (
-                <PlanSaveTag>{t.yearlySaveLabel} {lang === 'de' ? p.yearlySave + ' €' : '€' + p.yearlySave} · {lang === 'de' ? p.yearlyTotal + ' €/Jahr' : '€' + p.yearlyTotal + '/yr'}</PlanSaveTag>
-              )}
               <PlanFeatures>
                 {p.features.map(f => (
-                  <PlanFeature key={f.t} $featured={p.featured} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', opacity: f.ok ? 1 : 0.45 }}>
-                    <FeatureCheck $ok={f.ok} $featured={p.featured}>{f.ok ? '✓' : '✕'}</FeatureCheck>
-                    {f.t}
-                  </PlanFeature>
+                  <PlanFeature key={f} $featured={p.featured}>{f}</PlanFeature>
                 ))}
               </PlanFeatures>
-              <PlanCTA to={`/register?plan=${p.slug}&billing=${yearly ? 'yearly' : 'monthly'}`} $featured={p.featured}>{t.planCta}</PlanCTA>
+              <PlanCTA to="/register" $featured={p.featured}>{t.planCta}</PlanCTA>
             </PricingCard>
           ))}
         </PricingGrid>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#1a1a2e;font-size:11px;line-height:1.5}
+.page{width:210mm;min-height:297mm;padding:13mm 14mm 10mm;display:flex;flex-direction:column}
+.content{flex:1}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:9px;border-bottom:3px solid #6C63FF;margin-bottom:13px}
+.hdr-l{display:flex;align-items:center;gap:9px}
+.logo{height:32px;object-fit:contain}
+.logo-dot{width:9px;height:9px;border-radius:50%;background:#6C63FF;flex-shrink:0}
+.co{font-size:15px;font-weight:700;color:#6C63FF;letter-spacing:-0.02em}
+.hdr-r{text-align:right}
+.rt{font-size:9px;color:#999}
+.rp{font-size:12px;font-weight:600;color:#333}
+.prop{background:#f8f8fc;border-radius:7px;padding:6px 11px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;border:1px solid #ebebf5}
+.purl{font-family:monospace;font-size:9px;color:#444;font-weight:600}
+.plbl{font-size:8px;color:#999}
+.sec-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6C63FF;margin-bottom:6px;margin-top:12px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:1px;background:#6C63FF25}
+.badge{font-size:7px;background:#10B98115;color:#059669;padding:1px 6px;border-radius:10px;text-transform:none;letter-spacing:0;font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.kpi{border-radius:7px;padding:9px 10px;background:#6C63FF0d;border-left:3px solid #6C63FF}
+.kl{font-size:7.5px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.kv{font-size:18px;font-weight:700;color:#111;line-height:1.1;margin-bottom:2px}
+.kd{font-size:8px;font-weight:600}
+.kd.up{color:#10B981}.kd.dn{color:#EF4444}.kd.neu{color:#aaa}
+.kd-sm{font-size:7.5px;color:#999;margin-top:1px}
+.ga4-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ga4k{border-radius:7px;padding:9px 10px;background:#A78BFA0d;border-left:3px solid #A78BFA}
+.sumbox{background:#6C63FF07;border-left:3px solid #6C63FF;border-radius:6px;padding:9px 12px;font-size:10px;color:#2a2a3e;line-height:1.7}
+.recs{display:flex;flex-direction:column;gap:5px}
+.rec{display:flex;align-items:flex-start;gap:9px;background:#f8f8fc;border-radius:7px;padding:8px 11px;border:1px solid #ebebf5}
+.rec-open{background:#fff8f0;border-color:#fed7aa}
+.rec-num{width:19px;height:19px;border-radius:50%;background:#6C63FF;color:white;font-size:8.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.rec-num-open{background:#f97316}
+.rec-body{flex:1}
+.rec-title{font-size:9px;font-weight:700;color:#1a1a2e;margin-bottom:2px}
+.rec-text{font-size:9px;color:#4a4a6e;line-height:1.6}
+.chances-intro{font-size:8.5px;color:#555;margin-bottom:7px;margin-top:-3px;line-height:1.55}
+.chance-ctr{color:#f59e0b !important}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+table{width:100%;border-collapse:collapse}
+th{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6C63FF;border-bottom:1.5px solid #6C63FF35;padding:5px 7px;text-align:left}
+th.r{text-align:right}
+td{padding:4px 7px;font-size:9px;border-bottom:1px solid #f0f0f4;color:#2a2a3e}
+td.r{text-align:right;color:#6C63FF;font-weight:600;font-variant-numeric:tabular-nums}
+td.mono{font-family:monospace;font-size:8px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#555}
+td.empty{color:#ccc;padding:8px 7px;font-style:italic;font-size:8.5px}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:#fafafa}
+.legende{background:#f8f8fc;border-radius:7px;padding:8px 11px;margin-top:12px;border:1px solid #ebebf5}
+.legende-title{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#bbb;margin-bottom:5px}
+.legende-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px}
+.legende-grid div{font-size:8px;color:#888;line-height:1.55}
+.legende-grid strong{color:#555}
+.foot{padding-top:8px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:flex-end;margin-top:11px}
+.foot-left{font-size:7.5px;color:#ccc;line-height:1.6}
+.foot-ai{font-size:7px;color:#ddd;margin-top:1px}
+.foot-brand{font-size:7.5px;color:#A78BFA;font-weight:600;white-space:nowrap}
+</style></head>
+<body><div class="page"><div class="content">
+<div class="hdr">
+  <div class="hdr-l"><div class="logo-dot"></div><div class="co">RankBrief</div></div>
+  <div class="hdr-r"><div class="rt">Monatlicher SEO-Report</div><div class="rp">März 2025</div></div>
+</div>
+<div class="prop">
+  <span class="purl">naturkosmetik-shop.de</span>
+  <span class="plbl">Generiert am 01.04.2025</span>
+</div>
+<div class="sec-label">Google Suchmaschinenoptimierung</div>
+<div class="kpis">
+  <div class="kpi"><div class="kl">Klicks</div><div class="kv">4.821</div><div class="kd up">▲ 12.4% ggü. Vormonat</div></div>
+  <div class="kpi"><div class="kl">Sichtbarkeit</div><div class="kv">89.340</div><div class="kd up">▲ 8.1% ggü. Vormonat</div></div>
+  <div class="kpi"><div class="kl">Klickrate</div><div class="kv">5,4%</div><div class="kd dn">▼ 0.3% ggü. Vormonat</div></div>
+  <div class="kpi"><div class="kl">Ø Position</div><div class="kv">12,1</div><div class="kd up">▲ 1.8% ggü. Vormonat</div></div>
+</div>
+
+    <div class="sec-label">Besucher-Statistik (Google Analytics)</div>
+    <div class="ga4-grid">
+      <div class="ga4k"><div class="kl">Besuche gesamt</div><div class="kv">8.940</div><div class="kd-sm">▲ 9.7% Vormonat</div></div>
+      <div class="ga4k"><div class="kl">Einzelne Besucher</div><div class="kv">6.210</div><div class="kd-sm">▲ 8.2% Vormonat</div></div>
+      <div class="ga4k"><div class="kl">Engagement Rate</div><div class="kv">64,2%</div><div class="kd-sm">▲ 3.1% Vormonat</div></div>
+    </div>
+<div class="sec-label">Zusammenfassung</div><div class="sumbox">Ihr Shop hatte im März 2025 so viele Besucher aus Google wie noch nie: 4.821 Klicks – ein Plus von 12,4&thinsp;%. Besonders Ihre Seiten für vegane Naturkosmetik und Gesichtspflege zogen viele Interessenten an. Einzig die Klickrate sank leicht um 0,3&thinsp;% – das deutet darauf hin, dass Ihre Kurzbeschreibungen in Google noch nicht optimal auf die Suchanfragen abgestimmt sind.</div>
+<div class="sec-label">Empfehlungen für nächsten Monat</div><div class="recs"><div class="rec ">
+          <div class="rec-num ">1</div>
+          <div class="rec-body">
+            <div class="rec-title">Bessere Kurzbeschreibungen für Ihre Pflegeseiten</div>
+            <div class="rec-text">Ihre Seiten für Gesichtspflege und Sonnenschutz erscheinen häufig in Google, werden aber seltener angeklickt als möglich. Schreiben Sie eine einladende Kurzbeschreibung die klar macht was Sie anbieten – z.B. "Zertifizierte Naturkosmetik ab 12,90&thinsp;€ – vegan &amp; plastikfrei".</div>
+          </div>
+        </div><div class="rec ">
+          <div class="rec-num ">2</div>
+          <div class="rec-body">
+            <div class="rec-title">Mehr Links zwischen Blog und Shop</div>
+            <div class="rec-text">Ihr Blog-Artikel über Naturkosmetik-Inhaltsstoffe wird gut gefunden, führt Besucher aber nicht weiter zu Ihren Produkten. Fügen Sie 2–3 direkte Links zu passenden Kategorieseiten ein – das bringt mehr Besucher in Ihren Shop.</div>
+          </div>
+        </div><div class="rec ">
+          <div class="rec-num ">3</div>
+          <div class="rec-body">
+            <div class="rec-title">Neue Seite für "Naturkosmetik ohne Plastik"</div>
+            <div class="rec-text">Für diese Suchanfrage wird Ihre Website 1.840-mal gezeigt – aber nur 38 Personen klicken drauf (2,1&thinsp;%). Eine eigene Seite die genau dieses Thema behandelt könnte die Klickzahl deutlich steigern.</div>
+          </div>
+        </div></div>
+<div class="tgrid">
+  <div>
+    <div class="sec-label">Top Suchbegriffe</div>
+    <table><thead><tr><th>Suchbegriff</th><th class="r">Klicks</th><th class="r">Klickrate</th><th class="r">Position</th></tr></thead>
+    <tbody><tr><td>naturkosmetik online shop</td><td class="r">642</td><td class="r">5,7%</td><td class="r">5,7</td></tr><tr><td>naturkosmetik vegan</td><td class="r">498</td><td class="r">5,7%</td><td class="r">5,6</td></tr><tr><td>gesichtscreme naturkosmetik</td><td class="r">387</td><td class="r">5,3%</td><td class="r">5,3</td></tr><tr><td>bio sonnencreme</td><td class="r">312</td><td class="r">5,5%</td><td class="r">5,5</td></tr><tr><td>vegane lippenpflege</td><td class="r">276</td><td class="r">5,6%</td><td class="r">5,6</td></tr><tr><td>shampoo ohne sulfate</td><td class="r">241</td><td class="r">5,5%</td><td class="r">5,5</td></tr><tr><td>naturkosmetik baby</td><td class="r">198</td><td class="r">5,2%</td><td class="r">5,2</td></tr><tr><td>naturkosmetik ohne mikroplastik</td><td class="r">38</td><td class="r">2,1%</td><td class="r">4,2</td></tr></tbody></table>
+  </div>
+  <div>
+    <div class="sec-label">Meistbesuchte Seiten</div>
+    <table><thead><tr><th>Seite</th><th class="r">Klicks</th><th class="r">Klickrate</th></tr></thead>
+    <tbody><tr><td class="mono">/kategorien/gesichtspflege</td><td class="r">1.284</td><td class="r">5,4%</td></tr><tr><td class="mono">/kategorien/naturkosmetik-vegan</td><td class="r">741</td><td class="r">5,6%</td></tr><tr><td class="mono">/produkte/bio-sonnencreme-lsf50</td><td class="r">487</td><td class="r">4,9%</td></tr><tr><td class="mono">/blog/naturkosmetik-inhaltsstoffe</td><td class="r">312</td><td class="r">3,7%</td></tr><tr><td class="mono">/kategorien/sonnenschutz</td><td class="r">241</td><td class="r">2,9%</td></tr><tr><td class="mono">/kategorien/babypflege</td><td class="r">287</td><td class="r">5,2%</td></tr><tr><td class="mono">/startseite</td><td class="r">198</td><td class="r">6,2%</td></tr><tr><td class="mono">/kategorien/koerperpflege</td><td class="r">892</td><td class="r">5,3%</td></tr></tbody></table>
+  </div>
+</div>
+<div class="sec-label">Ungenutztes Potenzial <span class="badge">Schnelle Gewinne möglich</span></div>
+    <div class="chances-intro">Ihre Website erscheint für diese Suchanfragen bereits häufig in Google – wird aber selten angeklickt. Mit einem besseren Seitentitel oder einer einladenderen Kurzbeschreibung können Sie hier ohne großen Aufwand mehr Besucher gewinnen.</div>
+    <table style="margin-bottom:4px"><thead><tr><th>Suchanfrage</th><th class="r">Zeigungen</th><th class="r">Klicks</th><th class="r">Klickrate</th><th class="r">Position</th></tr></thead><tbody><tr><td>naturkosmetik ohne mikroplastik</td><td class="r">1.840</td><td class="r">38</td><td class="r chance-ctr">2,1%</td><td class="r">4,2</td></tr><tr><td>bio sonnencreme gesicht</td><td class="r">1.240</td><td class="r">31</td><td class="r chance-ctr">2,5%</td><td class="r">6,1</td></tr><tr><td>vegane tagescreme test</td><td class="r">890</td><td class="r">19</td><td class="r chance-ctr">2,1%</td><td class="r">7,8</td></tr></tbody></table>
+<div class="legende">
+  <div class="legende-title">Was bedeuten diese Zahlen?</div>
+  <div class="legende-grid">
+    <div><strong>Klicks</strong> – Wie oft jemand auf Ihr Suchergebnis in Google geklickt hat.</div>
+    <div><strong>Sichtbarkeit</strong> – Wie oft Ihre Website in den Suchergebnissen erschienen ist.</div>
+    <div><strong>Klickrate</strong> – Von 100 Personen die Ihr Ergebnis sahen, haben X% geklickt.</div>
+    <div><strong>Ø Position</strong> – Ihr durchschnittlicher Rang in Google (1 = ganz oben).</div>
+    
+    <div><strong>Besuche (Sessions)</strong> – Gesamtanzahl der Website-Besuche. Eine Person kann mehrere Besuche haben.</div>
+    <div><strong>Einzelne Besucher</strong> – Wie viele verschiedene Personen Ihre Website besucht haben.</div>
+    <div><strong>Engagement Rate</strong> – Anteil der Besuche bei denen jemand wirklich interagiert hat (gescrollt, geklickt oder mind. 10 Sek. geblieben).</div>
+    <div><strong>▲ / ▼</strong> – Veränderung gegenüber dem Vormonat.</div>
+  </div>
+</div>
+</div>
+<div class="foot">
+  <div class="foot-left">
+    <div>RankBrief · Automatischer SEO-Report · März 2025</div>
+    <div class="foot-ai">Zusammenfassung und Empfehlungen werden mit Unterstützung von KI erstellt und basieren auf Ihren tatsächlichen Suchdaten.</div>
+  </div>
+  <div class="foot-brand">Powered by RankBrief</div>
+</div>
+</div></body></html>
