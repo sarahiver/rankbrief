@@ -433,6 +433,31 @@ const FontPill = styled.button`
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 `;
 
+const LangGrid = styled.div`display: flex; flex-direction: column; gap: 0.5rem;`;
+
+const LangPill = styled.button`
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem; border-radius: 10px; text-align: left; width: 100%;
+  border: 1px solid ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.border};
+  background: ${({ $active, theme }) => $active ? theme.colors.accentDim : 'transparent'};
+  cursor: pointer; transition: all 0.18s;
+  &:hover { border-color: ${({ theme }) => theme.colors.accent}; }
+`;
+
+const LangFlag  = styled.span`font-size: 1.5rem; line-height: 1; flex-shrink: 0;`;
+const LangInfo  = styled.div`flex: 1;`;
+const LangLabel = styled.div`
+  font-size: 0.9rem; font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`;
+const LangSub   = styled.div`
+  font-size: 0.78rem; color: ${({ theme }) => theme.colors.textMuted}; margin-top: 1px;
+`;
+const LangCheck = styled.div`
+  font-size: 0.85rem; font-weight: 700;
+  color: ${({ theme }) => theme.colors.accent}; flex-shrink: 0;
+`;
+
 // PDF Preview
 const PdfShell     = styled.div`border: 1px solid ${({ theme }) => theme.colors.border}; border-radius: ${({ theme }) => theme.radius.lg}; overflow: hidden; background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,0.06);`;
 const PdfHead      = styled.div`padding: 0.875rem 1.25rem; border-bottom: 3px solid ${({ $c }) => $c}; display: flex; align-items: center; justify-content: space-between; background: #fff;`;
@@ -551,6 +576,7 @@ export default function Settings({ user }) {
     brand_accent_color:   '#A78BFA',
     brand_font:           'Inter',
     brand_reply_to_email: '',
+    report_language:      'de',
   });
   const [brandingSaving, setBrandingSaving] = useState(false);
   const [logoUploading, setLogoUploading]   = useState(false);
@@ -578,6 +604,7 @@ export default function Settings({ user }) {
         brand_accent_color:   toFullHex(prof.brand_accent_color   || '#A78BFA'),
         brand_font:           prof.brand_font           || 'Inter',
         brand_reply_to_email: prof.brand_reply_to_email || '',
+        report_language:      prof.report_language      || 'de',
       });
     }
     // Init GA4 edits
@@ -708,6 +735,7 @@ export default function Settings({ user }) {
       brand_accent_color:   branding.brand_accent_color,
       brand_font:           branding.brand_font,
       brand_reply_to_email: branding.brand_reply_to_email || null,
+      report_language:      branding.report_language,
     }).eq('id', user.id);
     if (error) showAlert('Fehler beim Speichern.', 'error');
     else showAlert('Branding gespeichert – wirkt beim nächsten Report. ✓');
@@ -1154,6 +1182,31 @@ export default function Settings({ user }) {
                 ))}
               </FontGrid>
               <FieldHint>Schriftart wird im PDF via Google Fonts geladen</FieldHint>
+            </Field>
+
+            {/* Report-Sprache */}
+            <Field>
+              <Label>Report-Sprache</Label>
+              <LangGrid>
+                {[
+                  { key: 'de', flag: '🇩🇪', label: 'Deutsch', sub: 'Zusammenfassung & Empfehlungen auf Deutsch' },
+                  { key: 'en', flag: '🇬🇧', label: 'English', sub: 'Summary & recommendations in English' },
+                ].map(l => (
+                  <LangPill
+                    key={l.key}
+                    $active={branding.report_language === l.key}
+                    onClick={() => setBranding(b => ({ ...b, report_language: l.key }))}
+                  >
+                    <LangFlag>{l.flag}</LangFlag>
+                    <LangInfo>
+                      <LangLabel>{l.label}</LangLabel>
+                      <LangSub>{l.sub}</LangSub>
+                    </LangInfo>
+                    {branding.report_language === l.key && <LangCheck>✓</LangCheck>}
+                  </LangPill>
+                ))}
+              </LangGrid>
+              <FieldHint>Gilt für KI-Zusammenfassung, Empfehlungen und alle Beschriftungen im PDF</FieldHint>
             </Field>
 
             {/* Live PDF Preview */}
