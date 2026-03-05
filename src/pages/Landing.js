@@ -468,12 +468,13 @@ const LightboxActions = styled.div`
   display: flex; align-items: center; gap: 0.75rem;
 `;
 
-const LightboxDownload = styled.a`
-  font-size: 0.8rem; font-weight: 600; color: #6C63FF;
-  text-decoration: none; padding: 0.3rem 0.75rem;
-  border: 1px solid rgba(108,99,255,0.35); border-radius: 6px;
-  transition: background 0.15s;
-  &:hover { background: rgba(108,99,255,0.08); }
+const LightboxDownloadBtn = styled.button`
+  font-size: 0.8rem; font-weight: 600; color: ${({ $loading }) => $loading ? '#aaa' : '#6C63FF'};
+  background: none; border: 1px solid ${({ $loading }) => $loading ? '#ddd' : 'rgba(108,99,255,0.35)'};
+  padding: 0.3rem 0.75rem; border-radius: 6px; cursor: ${({ $loading }) => $loading ? 'default' : 'pointer'};
+  transition: background 0.15s, color 0.15s;
+  &:hover:not(:disabled) { background: rgba(108,99,255,0.08); }
+  &:disabled { opacity: 0.6; }
 `;
 
 const LightboxClose = styled.button`
@@ -756,9 +757,9 @@ const i18n = {
     sampleSub: 'Real report previews – generated from actual data, delivered as a PDF every month.',
     samplePopular: 'Most popular',
     sampleCards: [
-      { plan: 'Basic', icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: '/samples/sample-basic.html', featured: false },
-      { plan: 'Pro', icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: '/samples/sample-pro.html', featured: true },
-      { plan: 'Agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: '/samples/sample-agency.html', featured: false },
+      { plan: 'Basic',  slug: 'basic',  icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: '/samples/sample-basic.html', featured: false },
+      { plan: 'Pro',    slug: 'pro',    icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: '/samples/sample-pro.html', featured: true },
+      { plan: 'Agency', slug: 'agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: '/samples/sample-agency.html', featured: false },
     ],
     sampleCta: 'View sample report',
     sampleClose: 'Close preview',
@@ -822,9 +823,9 @@ const i18n = {
     sampleSub: 'Echte Report-Vorschauen – aus realen Daten generiert, jeden Monat als PDF geliefert.',
     samplePopular: 'Am beliebtesten',
     sampleCards: [
-      { plan: 'Basic', icon: '📊', desc: 'GSC-Übersicht, Top-Keywords & Seiten, KI-Zusammenfassung und Begriffserklärung. Klar und verständlich.', file: '/samples/sample-basic.html', featured: false },
-      { plan: 'Pro', icon: '🤖', desc: 'Alles aus Basic plus GA4-Besucher­statistik, 3 verständliche SEO-Empfehlungen, Keyword-Chancen und Vormonatsvergleich.', file: '/samples/sample-pro.html', featured: true },
-      { plan: 'Agentur', icon: '🏢', desc: 'Vollständiges White-Label mit eigenem Logo und Farben. Bis zu 10 Domains. Kein RankBrief-Branding.', file: '/samples/sample-agency.html', featured: false },
+      { plan: 'Basic',   slug: 'basic',  icon: '📊', desc: 'GSC-Übersicht, Top-Keywords & Seiten, KI-Zusammenfassung und Begriffserklärung. Klar und verständlich.', file: '/samples/sample-basic.html', featured: false },
+      { plan: 'Pro',     slug: 'pro',    icon: '🤖', desc: 'Alles aus Basic plus GA4-Besucher­statistik, 3 verständliche SEO-Empfehlungen, Keyword-Chancen und Vormonatsvergleich.', file: '/samples/sample-pro.html', featured: true },
+      { plan: 'Agentur', slug: 'agency', icon: '🏢', desc: 'Vollständiges White-Label mit eigenem Logo und Farben. Bis zu 10 Domains. Kein RankBrief-Branding.', file: '/samples/sample-agency.html', featured: false },
     ],
     sampleCta: 'Beispiel-Report ansehen',
     sampleClose: 'Vorschau schließen',
@@ -872,8 +873,49 @@ const i18n = {
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Landing({ lang = 'en' }) {
   const [openFaq, setOpenFaq] = React.useState(null);
-  const [sampleOpen, setSampleOpen] = React.useState(null); // { plan, file }
+  const [sampleOpen, setSampleOpen] = React.useState(null);
+  const [pdfLoading, setPdfLoading] = React.useState(false);
   const t = i18n[lang] || i18n.en;
+
+  const downloadSamplePdf = async (sample) => {
+    if (pdfLoading) return;
+    setPdfLoading(true);
+    try {
+      const SUPABASE_URL  = process.env.REACT_APP_SUPABASE_URL;
+      const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
+      const planSlug = sample.slug || sample.plan.toLowerCase().replace('agentur', 'agency');
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/generate-sample-pdf`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON}`,
+          'apikey': SUPABASE_ANON,
+        },
+        body: JSON.stringify({ plan: planSlug, lang }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const contentType = res.headers.get('Content-Type') || '';
+      if (contentType.includes('application/pdf')) {
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `rankbrief-sample-${planSlug}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        // Fallback: HTML response – open in new tab
+        const html = await res.text();
+        const win  = window.open('', '_blank');
+        if (win) { win.document.write(html); win.document.close(); }
+      }
+    } catch (err) {
+      console.error('PDF download failed:', err);
+      alert(lang === 'de' ? 'PDF konnte nicht erstellt werden. Bitte versuche es erneut.' : 'Could not generate PDF. Please try again.');
+    } finally {
+      setPdfLoading(false);
+    }
+  };
 
   // Reset open FAQ when language changes
   React.useEffect(() => { setOpenFaq(null); }, [lang]);
@@ -1032,12 +1074,15 @@ export default function Landing({ lang = 'en' }) {
                 <span>{sampleOpen.plan} – {t.sampleLabel}</span>
               </LightboxTitle>
               <LightboxActions>
-                <LightboxDownload
-                  href={sampleOpen.file}
-                  download={`rankbrief-sample-${sampleOpen.plan.toLowerCase()}.html`}
+                <LightboxDownloadBtn
+                  $loading={pdfLoading}
+                  onClick={() => downloadSamplePdf(sampleOpen)}
+                  disabled={pdfLoading}
                 >
-                  ↓ {lang === 'de' ? 'Als PDF speichern' : 'Save as PDF'}
-                </LightboxDownload>
+                  {pdfLoading
+                    ? (lang === 'de' ? '⏳ PDF wird erstellt…' : '⏳ Generating PDF…')
+                    : (lang === 'de' ? '↓ Als PDF herunterladen' : '↓ Download as PDF')}
+                </LightboxDownloadBtn>
                 <LightboxClose onClick={() => setSampleOpen(null)} aria-label={t.sampleClose}>✕</LightboxClose>
               </LightboxActions>
             </LightboxHeader>
