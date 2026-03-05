@@ -904,10 +904,24 @@ export default function Landing({ lang = 'en' }) {
         a.click();
         URL.revokeObjectURL(url);
       } else {
-        // Fallback: HTML response – open in new tab
+        // Fallback: HTML response – inject print button + auto-print
         const html = await res.text();
-        const win  = window.open('', '_blank');
-        if (win) { win.document.write(html); win.document.close(); }
+        const printBtn = `<div style="position:fixed;top:16px;right:16px;z-index:9999;display:flex;gap:8px;font-family:Inter,sans-serif;">
+          <button onclick="window.print()" style="background:#6C63FF;color:white;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 12px rgba(108,99,255,0.3);">
+            ↓ Als PDF speichern
+          </button>
+          <button onclick="this.parentElement.style.display='none'" style="background:#f0f0f4;color:#666;border:none;padding:8px 12px;border-radius:8px;font-size:13px;cursor:pointer;">✕</button>
+        </div>
+        <style>@media print{div[style*="position:fixed"]{display:none!important}}</style>`;
+        const htmlWithBtn = html.replace('</body>', printBtn + '</body>');
+        const blob = new Blob([htmlWithBtn], { type: 'text/html' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.target   = '_blank';
+        a.rel      = 'noopener noreferrer';
+        a.click();
+        URL.revokeObjectURL(url);
       }
     } catch (err) {
       console.error('PDF download failed:', err);
