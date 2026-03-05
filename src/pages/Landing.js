@@ -456,6 +456,7 @@ const Overlay = styled.div`
   padding: 1.5rem;
   animation: fadeIn 0.15s ease;
   @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+  @media (max-width: 600px) { padding: 0.75rem; }
 `;
 
 const LightboxWrap = styled.div`
@@ -467,6 +468,10 @@ const LightboxWrap = styled.div`
   overflow: hidden;
   display: flex; flex-direction: column;
   box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+  @media (max-width: 600px) {
+    height: 85vh;
+    border-radius: 12px;
+  }
 `;
 
 const LightboxHeader = styled.div`
@@ -475,11 +480,17 @@ const LightboxHeader = styled.div`
   background: #f8f8fc;
   border-bottom: 1px solid #e5e5f0;
   flex-shrink: 0;
+  gap: 0.5rem;
+  @media (max-width: 600px) {
+    padding: 0.65rem 0.875rem;
+    flex-wrap: wrap;
+  }
 `;
 
 const LightboxTitle = styled.div`
   font-size: 0.875rem; font-weight: 700; color: #1a1a2e;
   display: flex; align-items: center; gap: 0.5rem;
+  @media (max-width: 600px) { font-size: 0.8rem; }
 `;
 
 const LightboxActions = styled.div`
@@ -491,8 +502,10 @@ const LightboxDownloadBtn = styled.button`
   background: none; border: 1px solid ${({ $loading }) => $loading ? '#ddd' : 'rgba(108,99,255,0.35)'};
   padding: 0.3rem 0.75rem; border-radius: 6px; cursor: ${({ $loading }) => $loading ? 'default' : 'pointer'};
   transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
   &:hover:not(:disabled) { background: rgba(108,99,255,0.08); }
   &:disabled { opacity: 0.6; }
+  @media (max-width: 600px) { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
 `;
 
 const LightboxClose = styled.button`
@@ -504,7 +517,10 @@ const LightboxClose = styled.button`
 `;
 
 const LightboxFrame = styled.iframe`
-  flex: 1; width: 100%; border: none;
+  flex: 1;
+  width: 100%;
+  border: none;
+  min-height: 0;
 `;
 
 // ── Features ──────────────────────────────────────────────────────────────────
@@ -954,6 +970,12 @@ export default function Landing({ lang = 'en' }) {
   const [openFaq, setOpenFaq] = React.useState(null);
   const [sampleOpen, setSampleOpen] = React.useState(null);
   const [pdfLoading, setPdfLoading] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 700);
+  React.useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 700);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
   const t = i18n[lang] || i18n.en;
 
   const downloadSamplePdf = async (sample) => {
@@ -1139,7 +1161,7 @@ export default function Landing({ lang = 'en' }) {
         <SectionSub>{t.sampleSub}</SectionSub>
         <SampleGrid>
           {t.sampleCards.map(s => (
-            <SampleCard key={s.plan} $featured={s.featured} onClick={() => setSampleOpen(s)}>
+            <SampleCard key={s.plan} $featured={s.featured} onClick={() => isMobile ? downloadSamplePdf(s) : setSampleOpen(s)}>
               {s.featured && <SamplePopularBadge>{t.samplePopular}</SamplePopularBadge>}
               <SampleCardHead>
                 <SampleIcon>{s.icon}</SampleIcon>
@@ -1147,7 +1169,7 @@ export default function Landing({ lang = 'en' }) {
               </SampleCardHead>
               <SampleDesc>{s.desc}</SampleDesc>
               <SampleBtn>
-                {t.sampleCta}
+                {isMobile ? (lang === 'de' ? '↓ Als PDF herunterladen' : '↓ Download PDF') : t.sampleCta}
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <path d="M3 7h8M7 3l4 4-4 4" stroke="#6C63FF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
