@@ -274,6 +274,91 @@ const PlanBtn = styled.button`
   &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 `;
 
+
+// ── Upsell Banner ─────────────────────────────────────────────────────────────
+const UpgradeHint = styled.div`
+  background: linear-gradient(135deg, rgba(108,99,255,0.06) 0%, rgba(99,207,255,0.04) 100%);
+  border: 1px solid rgba(108,99,255,0.18);
+  border-radius: ${({ theme }) => theme.radius.xl};
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+`;
+
+const UpgradeHintText = styled.div`
+  h3 {
+    font-family: ${({ theme }) => theme.fonts.display};
+    font-size: 0.9375rem;
+    font-weight: 700;
+    margin-bottom: 0.375rem;
+  }
+  p { font-size: 0.8125rem; color: ${({ theme }) => theme.colors.textMuted}; font-weight: 300; line-height: 1.5; }
+  ul { margin: 0.5rem 0 0 0; padding: 0; list-style: none; }
+  ul li { font-size: 0.8125rem; color: ${({ theme }) => theme.colors.textMuted}; font-weight: 300; display: flex; align-items: center; gap: 0.375rem; }
+  ul li::before { content: '→'; color: ${({ theme }) => theme.colors.accent}; font-size: 0.75rem; }
+`;
+
+const UpgradeHintBtn = styled.button`
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-weight: 700; font-size: 0.875rem;
+  background: ${({ theme }) => theme.colors.accent};
+  color: #fff; border: none; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
+  &:hover { background: ${({ theme }) => theme.colors.accentHover}; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(108,99,255,0.3); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+`;
+
+// ── Data Explained ─────────────────────────────────────────────────────────────
+const DataExplainCard = styled.div`
+  background: ${({ theme }) => theme.colors.bgCard};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.lg};
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+`;
+
+const DataExplainTitle = styled.div`
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.textDim};
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+`;
+
+const DataExplainGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+`;
+
+const DataExplainItem = styled.div`
+  display: flex;
+  gap: 0.625rem;
+  align-items: flex-start;
+`;
+
+const DataExplainIcon = styled.div`
+  width: 28px; height: 28px;
+  border-radius: ${({ theme }) => theme.radius.md};
+  background: ${({ $color }) => $color || 'rgba(108,99,255,0.1)'};
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.875rem; flex-shrink: 0;
+`;
+
+const DataExplainBody = styled.div`
+  strong { font-size: 0.8125rem; font-weight: 600; color: ${({ theme }) => theme.colors.text}; display: block; margin-bottom: 0.125rem; }
+  span { font-size: 0.75rem; color: ${({ theme }) => theme.colors.textMuted}; font-weight: 300; line-height: 1.4; }
+`;
+
 // ── Section ───────────────────────────────────────────────────────────────────
 const SectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.display};
@@ -846,14 +931,72 @@ export default function Dashboard({ user }) {
                           </KpiCard>
                         </KpiGrid>
 
-                        <SectionTitle>KI-Zusammenfassung</SectionTitle>
-                        <SummaryCard>
-                          {report.summary_text
-                            ? <SummaryText>{report.summary_text}</SummaryText>
-                            : <SummaryEmpty>
-                                🤖 Noch keine KI-Zusammenfassung vorhanden. Wird automatisch beim nächsten Report generiert.
-                              </SummaryEmpty>}
-                        </SummaryCard>
+                        {/* Was bedeuten diese Zahlen? */}
+                        <DataExplainCard>
+                          <DataExplainTitle>Was bedeuten diese Zahlen?</DataExplainTitle>
+                          <DataExplainGrid>
+                            <DataExplainItem>
+                              <DataExplainIcon $color="rgba(108,99,255,0.1)">👆</DataExplainIcon>
+                              <DataExplainBody>
+                                <strong>Clicks</strong>
+                                <span>Wie oft jemand auf deine Website in Google geklickt hat. Mehr = mehr Besucher.</span>
+                              </DataExplainBody>
+                            </DataExplainItem>
+                            <DataExplainItem>
+                              <DataExplainIcon $color="rgba(99,207,255,0.1)">👁</DataExplainIcon>
+                              <DataExplainBody>
+                                <strong>Impressionen</strong>
+                                <span>Wie oft deine Website in Google angezeigt wurde – egal ob jemand geklickt hat oder nicht.</span>
+                              </DataExplainBody>
+                            </DataExplainItem>
+                            <DataExplainItem>
+                              <DataExplainIcon $color="rgba(16,185,129,0.1)">🎯</DataExplainIcon>
+                              <DataExplainBody>
+                                <strong>CTR (Klickrate)</strong>
+                                <span>Von 100 Leuten die deine Website sahen, haben X% geklickt. Über 3% ist gut.</span>
+                              </DataExplainBody>
+                            </DataExplainItem>
+                            <DataExplainItem>
+                              <DataExplainIcon $color="rgba(245,158,11,0.1)">📍</DataExplainIcon>
+                              <DataExplainBody>
+                                <strong>Ø Position</strong>
+                                <span>Dein durchschnittlicher Platz in den Google-Suchergebnissen. Position 1–3 = erste Seite oben.</span>
+                              </DataExplainBody>
+                            </DataExplainItem>
+                          </DataExplainGrid>
+                        </DataExplainCard>
+
+                        {/* Upsell für Basic-User */}
+                        {profile?.plan === 'basic' && (
+                          <UpgradeHint>
+                            <UpgradeHintText>
+                              <h3>🚀 Mit Pro bekommst du noch mehr</h3>
+                              <ul>
+                                <li><strong>GA4-Daten:</strong> Sieh wie viele Besucher wirklich auf deiner Website ankommen und was sie dort tun</li>
+                                <li><strong>KI-Zusammenfassung:</strong> Klare Erklärung was sich verbessert hat – kein SEO-Wissen nötig</li>
+                                <li><strong>SEO-Empfehlungen:</strong> Konkrete Maßnahmen was du diese Woche tun kannst um besser gefunden zu werden</li>
+                                <li><strong>3 Domains:</strong> Mehrere Websites in einem Account</li>
+                              </ul>
+                            </UpgradeHintText>
+                            <UpgradeHintBtn onClick={() => handleUpgrade('pro')} disabled={upgrading}>
+                              {upgrading ? 'Lädt...' : 'Upgrade auf Pro – ab 29,17 €/Monat →'}
+                            </UpgradeHintBtn>
+                          </UpgradeHint>
+                        )}
+
+                        {/* KI-Zusammenfassung nur für Pro/Agency */}
+                        {['pro', 'agency'].includes(profile?.plan) && (
+                          <>
+                            <SectionTitle>KI-Zusammenfassung</SectionTitle>
+                            <SummaryCard>
+                              {report.summary_text
+                                ? <SummaryText>{report.summary_text}</SummaryText>
+                                : <SummaryEmpty>
+                                    🤖 Noch keine KI-Zusammenfassung vorhanden. Wird automatisch beim nächsten Report generiert.
+                                  </SummaryEmpty>}
+                            </SummaryCard>
+                          </>
+                        )}
 
                         <TableGrid>
                           <TableCard>
@@ -889,9 +1032,27 @@ export default function Dashboard({ user }) {
                           </TableCard>
                         </TableGrid>
 
-                        {report.sessions === 0 && (
+                        {report.sessions === 0 && ['pro', 'agency'].includes(profile?.plan) && (
                           <Alert $type="info">
-                            💡 GA4-Daten fehlen. <a href="https://analytics.google.com" target="_blank" rel="noreferrer" style={{color: 'inherit', textDecoration: 'underline'}}>GA4 einrichten</a> und beim nächsten Report wird die Engagement Rate automatisch erfasst.
+                            <strong>GA4-Daten fehlen</strong><br />
+                            <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
+                              Google Analytics 4 zeigt dir was Besucher auf deiner Website tun – ob sie anfragen, kaufen oder wieder abspringen.{' '}
+                              <a href="https://analytics.google.com" target="_blank" rel="noreferrer" style={{color: 'inherit', fontWeight: 600, textDecoration: 'underline'}}>
+                                GA4 kostenlos einrichten →
+                              </a>
+                              {' '}(dauert ca. 5 Minuten)
+                            </span>
+                          </Alert>
+                        )}
+                        {report.sessions === 0 && profile?.plan === 'basic' && (
+                          <Alert $type="info">
+                            <strong>Was machen Besucher auf deiner Website?</strong><br />
+                            <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
+                              Mit dem Pro-Plan siehst du GA4-Daten: Sessions, Engagement Rate und ob Besucher zu Kunden werden.{' '}
+                              <button onClick={() => handleUpgrade('pro')} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}>
+                                Jetzt upgraden →
+                              </button>
+                            </span>
                           </Alert>
                         )}
                       </>
