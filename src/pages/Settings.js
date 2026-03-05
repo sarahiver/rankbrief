@@ -564,8 +564,8 @@ export default function Settings({ user }) {
       setBranding({
         brand_company_name:   prof.brand_company_name   || '',
         brand_logo_url:       prof.brand_logo_url       || '',
-        brand_primary_color:  prof.brand_primary_color  || '#6C63FF',
-        brand_accent_color:   prof.brand_accent_color   || '#A78BFA',
+        brand_primary_color:  toFullHex(prof.brand_primary_color  || '#6C63FF'),
+        brand_accent_color:   toFullHex(prof.brand_accent_color   || '#A78BFA'),
         brand_font:           prof.brand_font           || 'Inter',
         brand_reply_to_email: prof.brand_reply_to_email || '',
       });
@@ -729,7 +729,10 @@ export default function Settings({ user }) {
       setBranding(b => ({ ...b, brand_logo_url: cacheBusted, _logoFile: file.name, _logoSize: file.size }));
       showAlert('Logo hochgeladen – "Branding speichern" klicken.');
     } catch (err) {
-      showAlert('Upload fehlgeschlagen: ' + err.message, 'error');
+      const hint = err.message?.includes('400') || err.message?.includes('policy')
+        ? ' – Bitte RLS Policy für den "logos" Bucket in Supabase prüfen.'
+        : '';
+      showAlert('Upload fehlgeschlagen: ' + err.message + hint, 'error');
     }
     setLogoUploading(false);
   };
@@ -753,6 +756,14 @@ export default function Settings({ user }) {
 
   // ── Account löschen ───────────────────────────────────────────────────────
   const handleDeleteAccount = async () => {
+    // Block deletion if active paid subscription exists
+    const hasActivePlan = ['basic', 'pro', 'agency'].includes(profile?.plan)
+      && profile?.plan_status === 'active';
+    if (hasActivePlan) {
+      setDeleteConfirm(false);
+      showAlert('Bitte kündige zuerst dein Abo über das Billing Portal, bevor du den Account löschst.', 'error');
+      return;
+    }
     setDeleteLoading(true);
     try {
       // Delete all properties (cascades reports via FK)
@@ -808,17 +819,31 @@ export default function Settings({ user }) {
         <ModalOverlay onClick={() => setDeleteConfirm(false)}>
           <ModalCard onClick={e => e.stopPropagation()}>
             <ModalTitle>Account wirklich löschen?</ModalTitle>
-            <ModalText>
-              Dein Account, alle Properties und alle Report-Daten werden dauerhaft gelöscht.
-              Ein aktives Abonnement wird nicht automatisch gekündigt – bitte zuerst über
-              das Billing-Portal kündigen.
-            </ModalText>
-            <ModalActions>
-              <Btn onClick={() => setDeleteConfirm(false)}>Abbrechen</Btn>
-              <Btn $variant="danger" onClick={handleDeleteAccount} disabled={deleteLoading}>
-                {deleteLoading ? 'Wird gelöscht...' : 'Account löschen'}
-              </Btn>
-            </ModalActions>
+            {['basic', 'pro', 'agency'].includes(profile?.plan) && profile?.plan_status === 'active' ? (
+              <>
+                <ModalText style={{ color: '#ef4444' }}>
+                  ⚠️ Du hast noch ein aktives Abo ({profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1)}).
+                  Bitte kündige es zuerst im Billing Portal – danach kannst du deinen Account löschen.
+                </ModalText>
+                <ModalActions>
+                  <Btn onClick={() => setDeleteConfirm(false)}>Abbrechen</Btn>
+                  <Btn $variant="primary" onClick={handleBillingPortal}>Zum Billing Portal →</Btn>
+                </ModalActions>
+              </>
+            ) : (
+              <>
+                <ModalText>
+                  Dein Account, alle Properties und alle Report-Daten werden dauerhaft gelöscht.
+                  Diese Aktion kann nicht rückgängig gemacht werden.
+                </ModalText>
+                <ModalActions>
+                  <Btn onClick={() => setDeleteConfirm(false)}>Abbrechen</Btn>
+                  <Btn $variant="danger" onClick={handleDeleteAccount} disabled={deleteLoading}>
+                    {deleteLoading ? 'Wird gelöscht...' : 'Account löschen'}
+                  </Btn>
+                </ModalActions>
+              </>
+            )}
           </ModalCard>
         </ModalOverlay>
       )}
@@ -1087,7 +1112,7 @@ export default function Settings({ user }) {
               <ColorRow>
                 <ColorSwatch $c={branding.brand_primary_color}>
                   <input type="color" value={branding.brand_primary_color}
-                    onChange={e => isPro && setBranding(b => ({ ...b, brand_primary_color: e.target.value }))} disabled={!isPro} />
+                    onChange={e => isPro && setBranding(b => ({ ...b, brand_primary_color: toFullHex(e.target.value) }))} disabled={!isPro} />
                 </ColorSwatch>
                 <Input style={{ flex: 1 }} value={branding.brand_primary_color} placeholder="#6C63FF"
                   onChange={e => setBranding(b => ({ ...b, brand_primary_color: e.target.value }))} disabled={!isPro} />
@@ -1100,7 +1125,7 @@ export default function Settings({ user }) {
               <ColorRow>
                 <ColorSwatch $c={branding.brand_accent_color}>
                   <input type="color" value={branding.brand_accent_color}
-                    onChange={e => isPro && setBranding(b => ({ ...b, brand_accent_color: e.target.value }))} disabled={!isPro} />
+                    onChange={e => isPro && setBranding(b => ({ ...b, brand_accent_color: toFullHex(e.target.value) }))} disabled={!isPro} />
                 </ColorSwatch>
                 <Input style={{ flex: 1 }} value={branding.brand_accent_color} placeholder="#A78BFA"
                   onChange={e => setBranding(b => ({ ...b, brand_accent_color: e.target.value }))} disabled={!isPro} />
