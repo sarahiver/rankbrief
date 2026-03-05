@@ -696,7 +696,7 @@ export default function Dashboard({ user }) {
     setProfile(data);
   };
 
-  const handleUpgrade = async (plan) => {
+  const handleUpgrade = async (plan, billing = 'monthly') => {
     setUpgrading(true);
     try {
       const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
@@ -707,7 +707,7 @@ export default function Dashboard({ user }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify({ plan, user_id: user.id, email: user.email }),
+        body: JSON.stringify({ plan, billing, user_id: user.id, email: user.email }),
       });
       const data = await res.json();
       if (data.checkout_url) window.location.href = data.checkout_url;
@@ -1049,7 +1049,7 @@ export default function Dashboard({ user }) {
                             <strong>Was machen Besucher auf deiner Website?</strong><br />
                             <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
                               Mit dem Pro-Plan siehst du GA4-Daten: Sessions, Engagement Rate und ob Besucher zu Kunden werden.{' '}
-                              <button onClick={() => handleUpgrade('pro')} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}>
+                              <button onClick={() => handleUpgrade('pro', 'yearly')} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}>
                                 Jetzt upgraden →
                               </button>
                             </span>

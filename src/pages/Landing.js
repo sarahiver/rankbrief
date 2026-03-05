@@ -1020,7 +1020,7 @@ export default function Landing({ lang = 'en' }) {
                   </PlanFeature>
                 ))}
               </PlanFeatures>
-              <PlanCTA to="/register" $featured={p.featured}>{t.planCta}</PlanCTA>
+              <PlanCTA to={`/register?plan=${p.slug}&billing=${yearly ? 'yearly' : 'monthly'}`} $featured={p.featured}>{t.planCta}</PlanCTA>
             </PricingCard>
           ))}
         </PricingGrid>
