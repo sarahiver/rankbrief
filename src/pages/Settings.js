@@ -365,6 +365,82 @@ const DangerText = styled.p`
   margin-bottom: 1rem;
 `;
 
+
+// ── Branding Components ───────────────────────────────────────────────────────
+const ProTag = styled.span`
+  display: inline-flex; align-items: center;
+  background: ${({ theme }) => theme.colors.accentDim};
+  color: ${({ theme }) => theme.colors.accent};
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+  padding: 0.15rem 0.5rem; border-radius: 99px;
+  border: 1px solid rgba(108,99,255,0.2);
+  text-transform: uppercase;
+`;
+
+const LogoDropZone = styled.div`
+  width: 100%; height: 96px;
+  border-radius: ${({ theme }) => theme.radius.lg};
+  border: 2px dashed ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.border};
+  background: ${({ $active, theme }) => $active ? theme.colors.accentDim : theme.colors.bgElevated};
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; overflow: hidden;
+  img { max-height: 64px; max-width: 100%; object-fit: contain; }
+`;
+
+const ColorRow = styled.div`
+  display: flex; align-items: center; gap: 0.75rem;
+`;
+
+const ColorSwatch = styled.div`
+  width: 44px; height: 44px;
+  border-radius: ${({ theme }) => theme.radius.md};
+  border: 2px solid ${({ theme }) => theme.colors.border};
+  background: ${({ $c }) => $c};
+  flex-shrink: 0; position: relative; overflow: hidden; transition: border-color 0.2s;
+  input[type="color"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+`;
+
+const FontGrid = styled.div`display: flex; flex-wrap: wrap; gap: 0.5rem;`;
+
+const FontPill = styled.button`
+  padding: 0.4rem 0.875rem; border-radius: 99px; font-size: 0.875rem;
+  border: 1px solid ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.border};
+  background: ${({ $active, theme }) => $active ? theme.colors.accentDim : 'transparent'};
+  color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.textMuted};
+  font-family: ${({ $ff }) => $ff}; transition: all 0.2s;
+  &:hover:not(:disabled) { border-color: ${({ theme }) => theme.colors.accent}; color: ${({ theme }) => theme.colors.accent}; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+`;
+
+// PDF Preview
+const PdfShell     = styled.div`border: 1px solid ${({ theme }) => theme.colors.border}; border-radius: ${({ theme }) => theme.radius.lg}; overflow: hidden; background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,0.06);`;
+const PdfHead      = styled.div`padding: 0.875rem 1.25rem; border-bottom: 3px solid ${({ $c }) => $c}; display: flex; align-items: center; justify-content: space-between; background: #fff;`;
+const PdfHeadLeft  = styled.div`display: flex; align-items: center; gap: 0.625rem; img { height: 28px; object-fit: contain; }`;
+const PdfCompany   = styled.div`font-family: ${({ $ff }) => $ff}; font-size: 0.9375rem; font-weight: 700; color: ${({ $c }) => $c};`;
+const PdfPeriod    = styled.div`font-size: 0.6875rem; color: #aaa;`;
+const PdfKpis      = styled.div`display: grid; grid-template-columns: repeat(4,1fr); gap: 0.5rem; padding: 0.875rem 1.25rem;`;
+const PdfKpi       = styled.div`
+  border-radius: 6px; padding: 0.625rem;
+  background: ${({ $c }) => $c + '14'};
+  border-left: 3px solid ${({ $c }) => $c};
+  .label { font-size: 0.55rem; color: #999; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem; }
+  .val   { font-family: ${({ $ff }) => $ff}; font-size: 0.9375rem; font-weight: 700; color: #111; line-height: 1; }
+  .delta { font-size: 0.6rem; color: #10B981; margin-top: 0.15rem; }
+`;
+const PdfSummary   = styled.div`margin: 0 1.25rem; padding: 0.625rem 0.875rem; background: ${({ $c }) => $c + '0a'}; border-left: 3px solid ${({ $c }) => $c}; border-radius: 5px; font-size: 0.6875rem; color: #555; font-family: ${({ $ff }) => $ff}; line-height: 1.5;`;
+const PdfTableHead = styled.div`display: flex; justify-content: space-between; padding: 0.375rem 1.25rem; font-size: 0.6rem; font-weight: 700; color: ${({ $c }) => $c}; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid #f0f0f0; margin-top: 0.625rem;`;
+const PdfTableRow  = styled.div`display: flex; justify-content: space-between; padding: 0.3rem 1.25rem; font-size: 0.6875rem; color: #444; font-family: ${({ $ff }) => $ff}; border-bottom: 1px solid #f9f9f9; &:last-child { border-bottom: none; }`;
+const PdfFoot      = styled.div`padding: 0.5rem 1.25rem; border-top: 1px solid #eee; display: flex; justify-content: space-between; font-size: 0.6rem; color: #bbb; font-family: ${({ $ff }) => $ff}; margin-top: 0.625rem;`;
+
+const FONTS = [
+  { key: 'Inter',            label: 'Inter',        ff: 'Inter, sans-serif' },
+  { key: 'Roboto',           label: 'Roboto',       ff: 'Roboto, sans-serif' },
+  { key: 'Montserrat',       label: 'Montserrat',   ff: 'Montserrat, sans-serif' },
+  { key: 'Lato',             label: 'Lato',         ff: 'Lato, sans-serif' },
+  { key: 'Playfair Display', label: 'Playfair',     ff: '"Playfair Display", serif' },
+  { key: 'Merriweather',     label: 'Merriweather', ff: 'Merriweather, serif' },
+];
+
 // ── Confirm Modal ─────────────────────────────────────────────────────────────
 const ModalOverlay = styled.div`
   position: fixed;
@@ -436,6 +512,19 @@ export default function Settings({ user }) {
   const [ga4Edits, setGa4Edits] = useState({});
   const [ga4Saving, setGa4Saving] = useState({});
 
+  // Branding state
+  const [branding, setBranding] = useState({
+    brand_company_name:   '',
+    brand_logo_url:       '',
+    brand_primary_color:  '#6C63FF',
+    brand_accent_color:   '#A78BFA',
+    brand_font:           'Inter',
+    brand_reply_to_email: '',
+  });
+  const [brandingSaving, setBrandingSaving] = useState(false);
+  const [logoUploading, setLogoUploading]   = useState(false);
+  const [dragging, setDragging]             = useState(false);
+
   const showAlert = (msg, type = 'success') => {
     setAlert({ msg, type });
     setTimeout(() => setAlert(null), 4000);
@@ -449,6 +538,17 @@ export default function Settings({ user }) {
     ]);
     setProfile(prof);
     setProperties(props ?? []);
+    // Init branding from profile
+    if (prof) {
+      setBranding({
+        brand_company_name:   prof.brand_company_name   || '',
+        brand_logo_url:       prof.brand_logo_url       || '',
+        brand_primary_color:  prof.brand_primary_color  || '#6C63FF',
+        brand_accent_color:   prof.brand_accent_color   || '#A78BFA',
+        brand_font:           prof.brand_font           || 'Inter',
+        brand_reply_to_email: prof.brand_reply_to_email || '',
+      });
+    }
     // Init GA4 edits
     const edits = {};
     (props ?? []).forEach(p => { edits[p.id] = p.ga_property_id || ''; });
@@ -565,6 +665,40 @@ export default function Settings({ user }) {
     authUrl.searchParams.set('prompt', 'consent');
     authUrl.searchParams.set('state', state);
     window.location.href = authUrl.toString();
+  };
+
+  // ── Branding speichern ───────────────────────────────────────────────────────
+  const saveBranding = async () => {
+    setBrandingSaving(true);
+    const { error } = await supabase.from('profiles').update({
+      brand_company_name:   branding.brand_company_name   || null,
+      brand_logo_url:       branding.brand_logo_url       || null,
+      brand_primary_color:  branding.brand_primary_color,
+      brand_accent_color:   branding.brand_accent_color,
+      brand_font:           branding.brand_font,
+      brand_reply_to_email: branding.brand_reply_to_email || null,
+    }).eq('id', user.id);
+    if (error) showAlert('Fehler beim Speichern.', 'error');
+    else showAlert('Branding gespeichert – wirkt beim nächsten Report. ✓');
+    setBrandingSaving(false);
+  };
+
+  // ── Logo Upload via Cloudinary ────────────────────────────────────────────
+  const uploadLogo = async (file) => {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { showAlert('Logo max. 2 MB.', 'error'); return; }
+    setLogoUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET);
+      fd.append('folder', `rankbrief/logos/${user.id}`);
+      const res  = await fetch(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.secure_url) { setBranding(b => ({ ...b, brand_logo_url: data.secure_url })); showAlert('Logo hochgeladen – "Branding speichern" klicken.'); }
+      else showAlert('Upload fehlgeschlagen.', 'error');
+    } catch { showAlert('Upload-Fehler. Cloudinary konfiguriert?', 'error'); }
+    setLogoUploading(false);
   };
 
   // ── Passwort ändern ───────────────────────────────────────────────────────
@@ -820,6 +954,166 @@ export default function Settings({ user }) {
                 )}
               </FieldHint>
             )}
+          </SectionBody>
+        </Section>
+
+
+        {/* ── Branding & White-Label ───────────────────────────────────── */}
+        <Section>
+          <SectionHead>
+            <div>
+              <SectionTitle>Branding & White-Label <ProTag>Pro / Agency</ProTag></SectionTitle>
+              <SectionSub>Logo, Farben, Schriftart und Absendername im monatlichen PDF-Report</SectionSub>
+            </div>
+          </SectionHead>
+          <SectionBody>
+            {!isPro && (
+              <Alert $type="info" style={{ marginBottom: '1.5rem' }}>
+                🔒 White-Label ist ab dem Pro-Plan verfügbar.{' '}
+                <button onClick={() => handleUpgrade('pro')} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}>
+                  Jetzt upgraden →
+                </button>
+              </Alert>
+            )}
+
+            {/* Logo */}
+            <Field>
+              <Label>Firmenlogo</Label>
+              <LogoDropZone
+                $active={dragging}
+                onClick={() => isPro && document.getElementById('rb-logo-input').click()}
+                onDragOver={e => { e.preventDefault(); if (isPro) setDragging(true); }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={e => { e.preventDefault(); setDragging(false); if (isPro) uploadLogo(e.dataTransfer.files?.[0]); }}
+                style={{ cursor: isPro ? 'pointer' : 'not-allowed', opacity: isPro ? 1 : 0.6 }}
+              >
+                {branding.brand_logo_url
+                  ? <img src={branding.brand_logo_url} alt="Logo" />
+                  : <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>🖼</div>
+                      <p style={{ fontSize: '0.8125rem', color: '#9898B8', fontWeight: 300 }}>
+                        {logoUploading ? 'Wird hochgeladen...' : 'Drag & Drop oder klicken'}
+                      </p>
+                    </div>
+                }
+              </LogoDropZone>
+              <input id="rb-logo-input" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                style={{ display: 'none' }} onChange={e => uploadLogo(e.target.files?.[0])} disabled={!isPro} />
+              <Row style={{ marginTop: '0.5rem' }}>
+                <Btn onClick={() => isPro && document.getElementById('rb-logo-input').click()} disabled={!isPro || logoUploading}>
+                  {logoUploading ? 'Lädt hoch...' : '↑ Logo hochladen'}
+                </Btn>
+                {branding.brand_logo_url && (
+                  <Btn $variant="danger" onClick={() => setBranding(b => ({ ...b, brand_logo_url: '' }))} disabled={!isPro}>
+                    Entfernen
+                  </Btn>
+                )}
+              </Row>
+              <FieldHint>PNG, JPG, SVG oder WebP · max. 2 MB · Empfohlen: 400×120px, transparenter Hintergrund</FieldHint>
+            </Field>
+
+            {/* Firmenname */}
+            <Field>
+              <Label>Firmenname im Report</Label>
+              <Input placeholder="z.B. Muster SEO GmbH" value={branding.brand_company_name}
+                onChange={e => setBranding(b => ({ ...b, brand_company_name: e.target.value }))} disabled={!isPro} />
+              <FieldHint>Erscheint im Header und Footer anstelle von "RankBrief"</FieldHint>
+            </Field>
+
+            {/* Reply-To */}
+            <Field>
+              <Label>Reply-To E-Mail</Label>
+              <Input type="email" placeholder="reports@deine-agentur.de" value={branding.brand_reply_to_email}
+                onChange={e => setBranding(b => ({ ...b, brand_reply_to_email: e.target.value }))} disabled={!isPro} />
+              <FieldHint>Kunden sehen diese Adresse wenn sie auf den Report antworten</FieldHint>
+            </Field>
+
+            {/* Primärfarbe */}
+            <Field>
+              <Label>Primärfarbe (Headlines, KPI-Akzente)</Label>
+              <ColorRow>
+                <ColorSwatch $c={branding.brand_primary_color}>
+                  <input type="color" value={branding.brand_primary_color}
+                    onChange={e => isPro && setBranding(b => ({ ...b, brand_primary_color: e.target.value }))} disabled={!isPro} />
+                </ColorSwatch>
+                <Input style={{ flex: 1 }} value={branding.brand_primary_color} placeholder="#6C63FF"
+                  onChange={e => setBranding(b => ({ ...b, brand_primary_color: e.target.value }))} disabled={!isPro} />
+              </ColorRow>
+            </Field>
+
+            {/* Akzentfarbe */}
+            <Field>
+              <Label>Akzentfarbe (Trennlinien, Highlights)</Label>
+              <ColorRow>
+                <ColorSwatch $c={branding.brand_accent_color}>
+                  <input type="color" value={branding.brand_accent_color}
+                    onChange={e => isPro && setBranding(b => ({ ...b, brand_accent_color: e.target.value }))} disabled={!isPro} />
+                </ColorSwatch>
+                <Input style={{ flex: 1 }} value={branding.brand_accent_color} placeholder="#A78BFA"
+                  onChange={e => setBranding(b => ({ ...b, brand_accent_color: e.target.value }))} disabled={!isPro} />
+              </ColorRow>
+            </Field>
+
+            {/* Schriftart */}
+            <Field>
+              <Label>Schriftart</Label>
+              <FontGrid>
+                {FONTS.map(f => (
+                  <FontPill key={f.key} $active={branding.brand_font === f.key} $ff={f.ff}
+                    onClick={() => isPro && setBranding(b => ({ ...b, brand_font: f.key }))} disabled={!isPro}>
+                    {f.label}
+                  </FontPill>
+                ))}
+              </FontGrid>
+              <FieldHint>Schriftart wird im PDF via Google Fonts geladen</FieldHint>
+            </Field>
+
+            {/* Live PDF Preview */}
+            <Field>
+              <Label>Live-Vorschau PDF-Report</Label>
+              <PdfShell>
+                <PdfHead $c={branding.brand_primary_color}>
+                  <PdfHeadLeft>
+                    {branding.brand_logo_url
+                      ? <img src={branding.brand_logo_url} alt="Logo" />
+                      : <div style={{ width: 8, height: 8, borderRadius: '50%', background: branding.brand_primary_color }} />
+                    }
+                    <PdfCompany $c={branding.brand_primary_color} $ff={activeFontFF}>
+                      {branding.brand_company_name || 'RankBrief'}
+                    </PdfCompany>
+                  </PdfHeadLeft>
+                  <PdfPeriod>SEO Report · {new Date().toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}</PdfPeriod>
+                </PdfHead>
+                <PdfKpis>
+                  {[{l:'Clicks',v:'4.821',d:'▲ 12.4%'},{l:'Impressionen',v:'89.3k',d:'▲ 8.1%'},{l:'Ø CTR',v:'5.4%',d:'▲ 0.8%'},{l:'Ø Position',v:'14.2',d:'▲ 2.1'}].map(k => (
+                    <PdfKpi key={k.l} $c={branding.brand_primary_color} $ff={activeFontFF}>
+                      <div className="label">{k.l}</div>
+                      <div className="val">{k.v}</div>
+                      <div className="delta">{k.d}</div>
+                    </PdfKpi>
+                  ))}
+                </PdfKpis>
+                <PdfSummary $c={branding.brand_primary_color} $ff={activeFontFF}>
+                  🤖 KI-Zusammenfassung: Im vergangenen Monat verzeichnete deine Website starkes Wachstum. Die Klickrate stieg auf 5.4 %, getrieben durch bessere Rankings für deine Top-Keywords.
+                </PdfSummary>
+                <PdfTableHead $c={branding.brand_primary_color}><span>Top Keywords</span><span>Klicks</span></PdfTableHead>
+                {[['seo agentur hamburg',142],['website optimierung',98],['google ranking verbessern',76]].map(([kw,cl]) => (
+                  <PdfTableRow key={kw} $ff={activeFontFF}>
+                    <span>{kw}</span>
+                    <span style={{ color: branding.brand_accent_color, fontWeight: 600 }}>{cl}</span>
+                  </PdfTableRow>
+                ))}
+                <PdfFoot $ff={activeFontFF}>
+                  <span>{branding.brand_company_name || 'RankBrief'} · Automatischer SEO-Report</span>
+                  <span style={{ color: branding.brand_accent_color }}>Powered by RankBrief</span>
+                </PdfFoot>
+              </PdfShell>
+              <FieldHint>Echtzeit-Vorschau — das finale PDF kann minimal abweichen</FieldHint>
+            </Field>
+
+            <Btn $variant="primary" onClick={saveBranding} disabled={brandingSaving || !isPro}>
+              {brandingSaving ? 'Wird gespeichert...' : 'Branding speichern'}
+            </Btn>
           </SectionBody>
         </Section>
 
