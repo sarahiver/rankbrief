@@ -453,6 +453,16 @@ const PdfTableHead = styled.div`display: flex; justify-content: space-between; p
 const PdfTableRow  = styled.div`display: flex; justify-content: space-between; padding: 0.3rem 1.25rem; font-size: 0.6875rem; color: #444; font-family: ${({ $ff }) => $ff}; border-bottom: 1px solid #f9f9f9; &:last-child { border-bottom: none; }`;
 const PdfFoot      = styled.div`padding: 0.5rem 1.25rem; border-top: 1px solid #eee; display: flex; justify-content: space-between; font-size: 0.6rem; color: #bbb; font-family: ${({ $ff }) => $ff}; margin-top: 0.625rem;`;
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function toFullHex(hex) {
+  if (!hex || typeof hex !== 'string') return '#6C63FF';
+  const h = hex.trim();
+  if (/^#[0-9a-fA-F]{3}$/.test(h))
+    return '#' + h[1]+h[1] + h[2]+h[2] + h[3]+h[3];
+  if (/^#[0-9a-fA-F]{6}$/.test(h)) return h;
+  return '#6C63FF';
+}
+
 const FONTS = [
   { key: 'Inter',            label: 'Inter',        ff: 'Inter, sans-serif' },
   { key: 'Roboto',           label: 'Roboto',       ff: 'Roboto, sans-serif' },
@@ -827,7 +837,7 @@ export default function Settings({ user }) {
                 </ModalText>
                 <ModalActions>
                   <Btn onClick={() => setDeleteConfirm(false)}>Abbrechen</Btn>
-                  <Btn $variant="primary" onClick={handleBillingPortal}>Zum Billing Portal →</Btn>
+                  <Btn $variant="primary" onClick={handlePortal}>Zum Billing Portal →</Btn>
                 </ModalActions>
               </>
             ) : (
