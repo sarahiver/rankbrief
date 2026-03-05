@@ -108,9 +108,48 @@ const BtnDecline = styled.button`
   @media (max-width: 600px) { flex: 1; }
 `;
 
+// Persistent cookie settings button – always visible after decision
+const CookieToggle = styled.button`
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 9998;
+  background: #1a1a2e;
+  border: 1px solid rgba(108,99,255,0.3);
+  border-radius: 20px;
+  padding: 6px 12px 6px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+
+  &:hover {
+    border-color: rgba(108,99,255,0.7);
+    box-shadow: 0 2px 16px rgba(108,99,255,0.2);
+  }
+
+  span.emoji { font-size: 14px; }
+  span.label {
+    font-size: 11px;
+    color: #8888aa;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  span.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: ${({ $granted }) => $granted ? '#22c55e' : '#ef4444'};
+    flex-shrink: 0;
+  }
+`;
+
 export default function CookieBanner() {
-  const [visible, setVisible] = useState(false);
-  const [hiding, setHiding]   = useState(false);
+  const [visible, setVisible]       = useState(false);
+  const [hiding, setHiding]         = useState(false);
+  const [consent, setConsentState]  = useState(getConsent); // 'granted' | 'denied' | null
 
   useEffect(() => {
     if (getConsent() === null) {
@@ -123,27 +162,44 @@ export default function CookieBanner() {
     setHiding(true);
     setTimeout(() => {
       setConsent(decision);
+      setConsentState(decision);
       setVisible(false);
       setHiding(false);
     }, 350);
   };
 
-  if (!visible) return null;
+  const reopenBanner = () => {
+    setVisible(true);
+  };
 
   return (
-    <Banner $hiding={hiding}>
-      <Icon>🍪</Icon>
-      <TextBlock>
-        <Title>Cookies &amp; Datenschutz · Privacy</Title>
-        <Body>
-          Wir nutzen Google Analytics zur Verbesserung unserer Website. · We use Google Analytics to improve our site.{' '}
-          <a href="/privacy" target="_blank" rel="noopener noreferrer">Datenschutz · Privacy</a>
-        </Body>
-      </TextBlock>
-      <Buttons>
-        <BtnDecline onClick={() => dismiss('denied')}>Ablehnen · Decline</BtnDecline>
-        <BtnAccept onClick={() => dismiss('granted')}>Akzeptieren · Accept</BtnAccept>
-      </Buttons>
-    </Banner>
+    <>
+      {/* Banner – shown on first visit or when reopened */}
+      {visible && (
+        <Banner $hiding={hiding}>
+          <Icon>🍪</Icon>
+          <TextBlock>
+            <Title>Cookies &amp; Datenschutz · Privacy</Title>
+            <Body>
+              Wir nutzen Google Analytics zur Verbesserung unserer Website. · We use Google Analytics to improve our site.{' '}
+              <a href="/privacy" target="_blank" rel="noopener noreferrer">Datenschutz · Privacy</a>
+            </Body>
+          </TextBlock>
+          <Buttons>
+            <BtnDecline onClick={() => dismiss('denied')}>Ablehnen · Decline</BtnDecline>
+            <BtnAccept onClick={() => dismiss('granted')}>Akzeptieren · Accept</BtnAccept>
+          </Buttons>
+        </Banner>
+      )}
+
+      {/* Persistent toggle – shown after decision has been made */}
+      {consent !== null && !visible && (
+        <CookieToggle onClick={reopenBanner} $granted={consent === 'granted'}>
+          <span className="emoji">🍪</span>
+          <span className="label">Cookies</span>
+          <span className="dot" />
+        </CookieToggle>
+      )}
+    </>
   );
 }
