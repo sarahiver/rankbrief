@@ -514,7 +514,7 @@ const content = {
           { title: 'Add a property', text: 'Click "Add property". Choose "Domain" to track all versions of your site (recommended), or "URL prefix" for a specific version.', tip: 'Tip: "Domain" tracking covers http, https, www and non-www automatically.' },
           { title: 'Verify ownership', text: 'Google needs to confirm you own the website. The easiest method is via your domain registrar or by adding a DNS TXT record.', tip: 'Tip: If your site uses WordPress, the Google Site Kit plugin verifies automatically.' },
           { title: 'Wait for data', text: 'After verification, GSC starts collecting data. It takes 2–3 days for the first data to appear.', path: '→ Status: Verified ✓' },
-          { title: 'You're done', text: 'GSC is set up. Follow Guide 3 to connect it to RankBrief.', tip: '✓ GSC is free and takes about 10 minutes to set up.' },
+          { title: "You're done", text: 'GSC is set up. Follow Guide 3 to connect it to RankBrief.', tip: '✓ GSC is free and takes about 10 minutes to set up.' },
         ],
       },
       ga4: {
@@ -524,12 +524,12 @@ const content = {
         videoLabel: 'GA4 setup tutorial on YouTube',
         videoLink: 'https://www.youtube.com/results?search_query=google+analytics+4+setup+tutorial+2025',
         steps: [
-          { title: 'Go to Google Analytics', text: 'Open analytics.google.com and sign in. If you've never used Analytics before, click "Start measuring".', path: '→ analytics.google.com' },
+          { title: 'Go to Google Analytics', text: "Open analytics.google.com and sign in. If you've never used Analytics before, click \"Start measuring\".", path: '→ analytics.google.com' },
           { title: 'Create an account', text: 'Enter an account name (e.g. your company name). Click "Next".' },
           { title: 'Create a property', text: 'Enter a property name, select your time zone and currency (Euro). Click "Create".', tip: 'Select your correct time zone to match your reporting period.' },
           { title: 'Add a data stream', text: 'Choose "Web". Enter your website URL. Click "Create stream". Google gives you a Measurement ID (G-XXXXXXXX) – this is NOT the Property ID.' },
           { title: 'Install the tracking code', text: 'Paste the code into the <head> of your website, or use Google Tag Manager / a WordPress plugin like "Site Kit".', tip: 'Tip: Google Site Kit (free WordPress plugin) installs both GSC and GA4 in one step.' },
-          { title: 'Find your GA4 Property ID', text: 'Go to Admin → Property Settings. You'll see "Property ID" – a plain number like 123456789. This is what you enter in RankBrief.', path: '→ Admin → Property Settings → Property ID', tip: 'Important: The Property ID is a plain number (e.g. 123456789). Not the Measurement ID (G-XXXXXXXX).' },
+          { title: 'Find your GA4 Property ID', text: "Go to Admin → Property Settings. You'll see \"Property ID\" – a plain number like 123456789. This is what you enter in RankBrief.", path: '→ Admin → Property Settings → Property ID', tip: 'Important: The Property ID is a plain number (e.g. 123456789). Not the Measurement ID (G-XXXXXXXX).' },
         ],
       },
       connect: {
@@ -544,7 +544,7 @@ const content = {
           { title: 'Select your GSC property', text: 'After connecting, your verified GSC properties will appear. Select the website you want to track.' },
           { title: 'Add your GA4 Property ID (optional)', text: 'In Settings → Properties, enter your GA4 Property ID (the plain number from Guide 2, Step 6).', path: '→ Settings → Properties → GA4 Property ID', tip: 'You can add the GA4 ID at any time. It will appear in your next monthly report.' },
           { title: 'Choose a plan', text: 'Your first month is completely free. After that, choose Basic (1 domain), Pro (3 domains + AI), or Agency (10 domains + white-label).' },
-          { title: 'Wait for your first report', text: 'Reports are generated on the 1st of each month at 6:00 AM. You'll receive an email with your PDF.', path: '→ 1st of the month · 06:00 AM · PDF in your inbox', tip: '✓ All reports are also available in your RankBrief dashboard.' },
+          { title: 'Wait for your first report', text: "Reports are generated on the 1st of each month at 6:00 AM. You'll receive an email with your PDF.", path: '→ 1st of the month · 06:00 AM · PDF in your inbox', tip: '✓ All reports are also available in your RankBrief dashboard.' },
         ],
       },
     },
