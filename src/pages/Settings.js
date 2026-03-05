@@ -739,6 +739,8 @@ export default function Settings({ user }) {
   const planInfo = PLAN_LIMITS[plan];
   const isFree = plan === 'free';
   const isPaid = ['basic', 'pro', 'agency'].includes(plan);
+  const isPro  = ['pro', 'agency'].includes(plan);
+  const activeFontFF = FONTS.find(f => f.key === branding.brand_font)?.ff || 'Inter, sans-serif';
 
   if (loading) return (
     <Layout>
