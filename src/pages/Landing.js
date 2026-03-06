@@ -846,7 +846,7 @@ const i18n = {
     howSub: 'Four steps between you and automated monthly SEO reporting.',
     featLabel: 'Features',
     featTitle: 'Everything you need.\nNothing you don\'t.',
-    featSub: 'Built for freelancers and small agencies who bill hourly and hate manual reporting.',
+    featSub: 'No more time wasted on manual reports. Connect Google once, and RankBrief takes care of the rest.',
     sampleLabel: 'Sample Reports',
     sampleTitle: 'See exactly what\nyour clients receive.',
     sampleSub: 'Real report previews – generated from actual data, delivered as a PDF every month.',
@@ -912,7 +912,7 @@ const i18n = {
     howSub: 'Vier Schritte bis zu deinem automatischen monatlichen SEO-Report.',
     featLabel: 'Features',
     featTitle: 'Alles was du brauchst.\nNichts was du nicht brauchst.',
-    featSub: 'Gebaut für Freelancer und kleine Agenturen, die stundensatz abrechnen und manuelle Reports hassen.',
+    featSub: 'Schluss mit stundenlanger Report-Arbeit. Verbinde einmal Google, und RankBrief erledigt den Rest.',
     sampleLabel: 'Beispiel-Reports',
     sampleTitle: 'Sieh genau was\ndeine Kunden erhalten.',
     sampleSub: 'Echte Report-Vorschauen – aus realen Daten generiert, jeden Monat als PDF geliefert.',
@@ -1060,7 +1060,7 @@ export default function Landing({ lang = 'en' }) {
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </BtnPrimary>
-          <BtnGhost to="#features">{t.heroSeeHow}</BtnGhost>
+          <BtnGhost to="/docs">{t.heroSeeHow}</BtnGhost>
         </HeroCTA>
 
         <TrustRow>
