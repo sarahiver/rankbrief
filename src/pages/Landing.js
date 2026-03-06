@@ -784,6 +784,55 @@ const PlanCTA = styled(Link)`
   }
 `;
 
+// ── Billing Toggle ────────────────────────────────────────────────────────────
+const BillingToggleWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+`;
+
+const BillingToggleTrack = styled.div`
+  display: flex;
+  background: ${({ theme }) => theme.colors.bgCard};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 100px;
+  padding: 4px;
+  gap: 2px;
+`;
+
+const BillingToggleBtn = styled.button`
+  padding: 0.4rem 1.1rem;
+  border-radius: 100px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: ${({ $active, theme }) => $active ? theme.colors.accent : 'transparent'};
+  color: ${({ $active, theme }) => $active ? '#fff' : theme.colors.textDim};
+`;
+
+const AnnualBadge = styled.span`
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+`;
+
+const PriceStrike = styled.span`
+  font-size: 1rem;
+  color: ${({ theme }) => theme.colors.textDim};
+  text-decoration: line-through;
+  margin-right: 0.25rem;
+  font-weight: 400;
+`;
+
 // ── FAQ ───────────────────────────────────────────────────────────────────────
 const FaqList = styled.div`
   display: flex;
@@ -884,9 +933,9 @@ const i18n = {
       { icon: '🔒', title: 'GDPR Compliant', text: 'EU servers, AES-256 token encryption, minimal data retention. Built for European privacy requirements from day one.' },
     ],
     plans: [
-      { name: 'Basic', price: '19', period: '/mo', features: ['1 domain', 'Monthly PDF report', 'GSC + GA4 data', 'AI summary', 'Email delivery'] },
-      { name: 'Pro', price: '39', period: '/mo', featured: true, features: ['3 domains', 'Everything in Basic', 'White-label reports', 'Custom logo', 'Priority delivery'] },
-      { name: 'Agency', price: '79', period: '/mo', features: ['10 domains', 'Everything in Pro', 'Client management', 'Bulk reporting', 'Agency branding'] },
+      { name: 'Basic',  price: '19', priceAnnual: '16', period: '/mo', features: ['1 domain', 'Monthly PDF report', 'GSC + GA4 data', 'AI summary', 'Email delivery'] },
+      { name: 'Pro',    price: '39', priceAnnual: '32', period: '/mo', featured: true, features: ['3 domains', 'Everything in Basic', 'White-label reports', 'Custom logo', 'Priority delivery'] },
+      { name: 'Agency', price: '79', priceAnnual: '66', period: '/mo', features: ['10 domains', 'Everything in Pro', 'Client management', 'Bulk reporting', 'Agency branding'] },
     ],
     faqs: [
       { q: 'Is my Google data safe?', a: 'Yes. We request read-only access to your Search Console and Analytics data. OAuth tokens are encrypted using AES-256-GCM and stored on EU servers (Frankfurt). We never access your data beyond what\'s needed to generate your report.' },
@@ -950,9 +999,9 @@ const i18n = {
       { icon: '🔒', title: 'DSGVO-konform', text: 'EU-Server, AES-256 Token-Verschlüsselung, minimale Datenspeicherung. Von Anfang an für europäische Datenschutzanforderungen gebaut.' },
     ],
     plans: [
-      { name: 'Basic', price: '19', period: '/Monat', features: ['1 Domain', 'Monatlicher PDF-Report', 'GSC + GA4 Daten', 'KI-Zusammenfassung', 'Email-Versand'] },
-      { name: 'Pro', price: '39', period: '/Monat', featured: true, features: ['3 Domains', 'Alles in Basic', 'White-Label Reports', 'Eigenes Logo', 'Priority Delivery'] },
-      { name: 'Agency', price: '79', period: '/Monat', features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Bulk Reporting', 'Agency Branding'] },
+      { name: 'Basic',  price: '19', priceAnnual: '16', period: '/Monat', features: ['1 Domain', 'Monatlicher PDF-Report', 'GSC + GA4 Daten', 'KI-Zusammenfassung', 'Email-Versand'] },
+      { name: 'Pro',    price: '39', priceAnnual: '32', period: '/Monat', featured: true, features: ['3 Domains', 'Alles in Basic', 'White-Label Reports', 'Eigenes Logo', 'Priority Delivery'] },
+      { name: 'Agency', price: '79', priceAnnual: '66', period: '/Monat', features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Bulk Reporting', 'Agency Branding'] },
     ],
     faqs: [
       { q: 'Sind meine Google-Daten sicher?', a: 'Ja. Wir fordern nur lesenden Zugriff auf deine Search Console und Analytics-Daten. OAuth-Tokens werden mit AES-256-GCM verschlüsselt und auf EU-Servern (Frankfurt) gespeichert.' },
@@ -968,6 +1017,7 @@ const i18n = {
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Landing({ lang = 'en' }) {
   const [openFaq, setOpenFaq] = React.useState(null);
+  const [annual, setAnnual] = React.useState(false);
   const [sampleOpen, setSampleOpen] = React.useState(null);
   const [pdfLoading, setPdfLoading] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 700);
@@ -1215,20 +1265,39 @@ export default function Landing({ lang = 'en' }) {
         <SectionLabel>{t.pricingLabel}</SectionLabel>
         <SectionTitle>{t.pricingTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>)}</SectionTitle>
         <SectionSub>{t.pricingSub}</SectionSub>
+
+        <BillingToggleWrap>
+          <BillingToggleTrack>
+            <BillingToggleBtn $active={!annual} onClick={() => setAnnual(false)}>
+              {lang === 'de' ? 'Monatlich' : 'Monthly'}
+            </BillingToggleBtn>
+            <BillingToggleBtn $active={annual} onClick={() => setAnnual(true)}>
+              {lang === 'de' ? 'Jährlich' : 'Yearly'}
+            </BillingToggleBtn>
+          </BillingToggleTrack>
+          {annual && <AnnualBadge>{lang === 'de' ? '2 Monate gratis 🎉' : '2 months free 🎉'}</AnnualBadge>}
+        </BillingToggleWrap>
+
         <PricingGrid>
           {t.plans.map(p => (
             <PricingCard key={p.name} $featured={p.featured}>
               <PlanBadge $featured={p.featured}>{p.name}</PlanBadge>
               <PlanPrice $featured={p.featured}>
-                <span className="amount">€{p.price}</span>
+                {annual && <PriceStrike>€{p.price}</PriceStrike>}
+                <span className="amount">€{annual ? p.priceAnnual : p.price}</span>
                 <span className="period">{p.period}</span>
               </PlanPrice>
+              {annual && (
+                <div style={{ fontSize: '0.75rem', color: p.featured ? 'rgba(255,255,255,0.7)' : '#10B981', marginBottom: '0.75rem', fontWeight: 600 }}>
+                  {lang === 'de' ? `€${parseInt(p.priceAnnual) * 12} / Jahr` : `€${parseInt(p.priceAnnual) * 12} / year`}
+                </div>
+              )}
               <PlanFeatures>
                 {p.features.map(f => (
                   <PlanFeature key={f} $featured={p.featured}>{f}</PlanFeature>
                 ))}
               </PlanFeatures>
-              <PlanCTA to="/register" $featured={p.featured}>{t.planCta}</PlanCTA>
+              <PlanCTA to={`/register?plan=${p.name.toLowerCase()}&billing=${annual ? 'yearly' : 'monthly'}`} $featured={p.featured}>{t.planCta}</PlanCTA>
             </PricingCard>
           ))}
         </PricingGrid>
