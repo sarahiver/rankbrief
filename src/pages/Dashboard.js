@@ -1071,20 +1071,19 @@ export default function Dashboard({ user }) {
                             <UpgradeHintText>
                               <h3>🚀 Mit Pro bekommst du noch mehr</h3>
                               <ul>
-                                <li><strong>GA4-Daten:</strong> Sieh wie viele Besucher wirklich auf deiner Website ankommen und was sie dort tun</li>
-                                <li><strong>KI-Zusammenfassung:</strong> Klare Erklärung was sich verbessert hat – kein SEO-Wissen nötig</li>
+                                <li><strong>3 Domains:</strong> Mehrere Websites in einem Account verwalten</li>
                                 <li><strong>SEO-Empfehlungen:</strong> Konkrete Maßnahmen was du diese Woche tun kannst um besser gefunden zu werden</li>
-                                <li><strong>3 Domains:</strong> Mehrere Websites in einem Account</li>
+                                <li><strong>White-Label Reports:</strong> Reports mit eigenem Logo und Branding versenden</li>
                               </ul>
                             </UpgradeHintText>
                             <UpgradeHintBtn onClick={() => handleUpgrade('pro')} disabled={upgrading}>
-                              {upgrading ? 'Lädt...' : 'Upgrade auf Pro – ab 29,17 €/Monat →'}
+                              {upgrading ? 'Lädt...' : 'Upgrade auf Pro – 39 €/Monat →'}
                             </UpgradeHintBtn>
                           </UpgradeHint>
                         )}
 
-                        {/* KI-Zusammenfassung nur für Pro/Agency */}
-                        {['pro', 'agency'].includes(profile?.plan) && (
+                        {/* KI-Zusammenfassung für Basic/Pro/Agency */}
+                        {['basic', 'pro', 'agency'].includes(profile?.plan) && (
                           <>
                             <SectionTitle>KI-Zusammenfassung</SectionTitle>
                             <SummaryCard>
@@ -1131,7 +1130,7 @@ export default function Dashboard({ user }) {
                           </TableCard>
                         </TableGrid>
 
-                        {report.sessions === 0 && ['pro', 'agency'].includes(profile?.plan) && (
+                        {report.sessions === 0 && ['basic', 'pro', 'agency'].includes(profile?.plan) && (
                           <Alert $type="info">
                             <strong>GA4-Daten fehlen</strong><br />
                             <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
@@ -1140,17 +1139,6 @@ export default function Dashboard({ user }) {
                                 GA4 kostenlos einrichten →
                               </a>
                               {' '}(dauert ca. 5 Minuten)
-                            </span>
-                          </Alert>
-                        )}
-                        {report.sessions === 0 && profile?.plan === 'basic' && (
-                          <Alert $type="info">
-                            <strong>Was machen Besucher auf deiner Website?</strong><br />
-                            <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
-                              Mit dem Pro-Plan siehst du GA4-Daten: Sessions, Engagement Rate und ob Besucher zu Kunden werden.{' '}
-                              <button onClick={() => handleUpgrade('pro', 'yearly')} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}>
-                                Jetzt upgraden →
-                              </button>
                             </span>
                           </Alert>
                         )}
