@@ -13,9 +13,9 @@ import Docs from './pages/Docs';
 import Settings from './pages/Settings';
 import { PrivacyEN, PrivacyDE, TermsEN, TermsDE } from './pages/Legal';
 import CookieBanner from './components/CookieBanner';
+import usePageTracking from './components/usePageTracking';
 
 function AuthCallback() {
-  const navigate = React.useRef(null);
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -27,7 +27,6 @@ function AuthCallback() {
   }, []);
   return null;
 }
-import usePageTracking from './components/usePageTracking';
 
 const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings'];
 const noFooterRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings'];
