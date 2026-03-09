@@ -212,6 +212,40 @@ const SuccessMsg = styled.div`
   color: ${({ theme }) => theme.colors.success};
 `;
 
+const PromoField = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: -0.25rem;
+`;
+
+const PromoInput = styled.input`
+  background: ${({ theme }) => theme.colors.bgElevated};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.md};
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  color: ${({ theme }) => theme.colors.text};
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: border-color 0.2s;
+  outline: none;
+  &:focus {
+    border-color: ${({ theme }) => theme.colors.accent};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.accentDim};
+  }
+  &::placeholder { color: ${({ theme }) => theme.colors.textDim}; text-transform: none; }
+`;
+
+const PromoLabel = styled.label`
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textMuted};
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+`;
+
 export default function Auth({ mode = 'login' }) {
   const [isLogin, setIsLogin] = useState(mode === 'login');
   const [email, setEmail] = useState('');
@@ -219,6 +253,8 @@ export default function Auth({ mode = 'login' }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [promoCode, setPromoCode] = useState('');
+  const [promoStatus, setPromoStatus] = useState(null); // null | 'checking' | 'valid' | 'invalid'
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
@@ -231,9 +267,31 @@ export default function Auth({ mode = 'login' }) {
         if (error) throw error;
         navigate('/dashboard');
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data: signUpData, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        setSuccess('Check your email to confirm your account.');
+
+        // Promo code einloesen falls angegeben
+        if (promoCode.trim() && signUpData?.user?.id) {
+          const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+          const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
+          const res = await fetch(`${SUPABASE_URL}/functions/v1/redeem-promo`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${SUPABASE_ANON}`,
+              'apikey': SUPABASE_ANON,
+            },
+            body: JSON.stringify({ code: promoCode.trim(), user_id: signUpData.user.id }),
+          });
+          const promoResult = await res.json();
+          if (promoResult.success) {
+            setSuccess(`✅ Account created & promo code activated! Your ${promoResult.plan} plan is ready. Check your email to confirm your account.`);
+          } else {
+            setSuccess('Check your email to confirm your account. (Promo code could not be applied – please contact support.)');
+          }
+        } else {
+          setSuccess('Check your email to confirm your account.');
+        }
       }
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
@@ -285,6 +343,20 @@ export default function Auth({ mode = 'login' }) {
               onKeyDown={handleKey}
             />
           </Field>
+
+          {!isLogin && (
+            <PromoField>
+              <PromoLabel>
+                🎟️ Promo code <span style={{ fontWeight: 300, fontSize: '0.75rem', color: '#999' }}>(optional)</span>
+              </PromoLabel>
+              <PromoInput
+                type="text"
+                placeholder="e.g. AGENCY-SARAH"
+                value={promoCode}
+                onChange={e => setPromoCode(e.target.value.toUpperCase())}
+              />
+            </PromoField>
+          )}
 
           <BtnSubmit onClick={handleSubmit} disabled={loading}>
             {loading ? 'Please wait…' : isLogin ? 'Sign in' : 'Create account'}
