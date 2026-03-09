@@ -648,6 +648,38 @@ const ReportPeriod = styled.div`
   color: ${({ theme }) => theme.colors.textDim};
   margin-bottom: 1.5rem;
   font-family: ${({ theme }) => theme.fonts.mono};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+`;
+
+const ReportPeriodLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+`;
+
+const DownloadBtn = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: ${({ theme }) => theme.fonts.display};
+  color: ${({ theme }) => theme.colors.accent};
+  background: ${({ theme }) => theme.colors.accentDim};
+  border: 1px solid rgba(108,99,255,0.25);
+  padding: 0.375rem 0.875rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  text-decoration: none;
+  transition: all 0.2s;
+  &:hover {
+    background: rgba(108,99,255,0.18);
+    border-color: rgba(108,99,255,0.4);
+    transform: translateY(-1px);
+  }
 `;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -981,21 +1013,26 @@ export default function Dashboard({ user }) {
                     {report ? (
                       <>
                         <ReportPeriod>
-                          Report: {reportMonth}
-                          {profile?.plan === 'free' && !profile?.promo_code_used && (
-                            <span style={{
-                              marginLeft: '0.75rem',
-                              fontSize: '11px',
-                              fontWeight: 700,
-                              background: 'rgba(108,99,255,0.12)',
-                              color: '#6C63FF',
-                              padding: '2px 8px',
-                              borderRadius: '20px',
-                              border: '1px solid rgba(108,99,255,0.3)',
-                              verticalAlign: 'middle'
-                            }}>
-                              ✨ Pro-Preview
-                            </span>
+                          <ReportPeriodLeft>
+                            Report: {reportMonth}
+                            {profile?.plan === 'free' && !profile?.promo_code_used && (
+                              <span style={{
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                background: 'rgba(108,99,255,0.12)',
+                                color: '#6C63FF',
+                                padding: '2px 8px',
+                                borderRadius: '20px',
+                                border: '1px solid rgba(108,99,255,0.3)',
+                              }}>
+                                ✨ Pro-Preview
+                              </span>
+                            )}
+                          </ReportPeriodLeft>
+                          {report.pdf_url && ['basic', 'pro', 'agency'].includes(profile?.plan) && (
+                            <DownloadBtn href={report.pdf_url} target="_blank" rel="noreferrer" download>
+                              ↓ PDF herunterladen
+                            </DownloadBtn>
                           )}
                         </ReportPeriod>
 
