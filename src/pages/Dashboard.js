@@ -12,6 +12,14 @@ const spin = keyframes`
   to { transform: rotate(360deg); }
 `;
 
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to   { opacity: 1; }
+`;
+
+// ── Plan limits ────────────────────────────────────────────────────────────────
+const PLAN_LIMITS = { free: 1, basic: 1, pro: 3, agency: 10 };
+
 // ── Layout ────────────────────────────────────────────────────────────────────
 const Layout = styled.div`
   min-height: 100vh;
@@ -441,16 +449,201 @@ const PropertyList = styled.div`
 
 const PropertyCard = styled.div`
   background: ${({ theme }) => theme.colors.bgCard};
-  border: 1px solid ${({ $active, theme }) => $active ? 'rgba(108,99,255,0.3)' : theme.colors.border};
+  border: 1px solid ${({ $active, theme }) => $active ? 'rgba(108,99,255,0.4)' : theme.colors.border};
   border-radius: ${({ theme }) => theme.radius.lg};
+  overflow: hidden;
+  transition: border-color 0.2s;
+  box-shadow: ${({ $active }) => $active ? '0 0 0 2px rgba(108,99,255,0.08)' : 'none'};
+`;
+
+const PropertyHeader = styled.div`
   padding: 1.25rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   cursor: pointer;
+  &:hover { background: rgba(108,99,255,0.03); }
+`;
+
+const PropertyChevron = styled.span`
+  font-size: 0.75rem;
+  color: ${({ theme }) => theme.colors.textDim};
+  transition: transform 0.2s;
+  display: inline-block;
+  transform: ${({ $open }) => $open ? 'rotate(180deg)' : 'rotate(0deg)'};
+`;
+
+const PropertyBody = styled.div`
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
+  padding: 1.5rem;
+`;
+
+// ── Recipient Email ───────────────────────────────────────────────────────────
+const RecipientRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+`;
+const RecipientLabel = styled.label`
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.textMuted};
+  white-space: nowrap;
+`;
+const RecipientInput = styled.input`
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem 0.875rem;
+  background: ${({ theme }) => theme.colors.bg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.md};
+  font-size: 0.875rem;
+  color: ${({ theme }) => theme.colors.text};
+  transition: border-color 0.2s;
+  &:focus { outline: none; border-color: rgba(108,99,255,0.4); }
+  &::placeholder { color: ${({ theme }) => theme.colors.textDim}; }
+`;
+const RecipientSaveBtn = styled.button`
+  padding: 0.5rem 1rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  font-size: 0.8125rem;
+  font-weight: 700;
+  background: ${({ theme }) => theme.colors.accent};
+  color: #fff;
   transition: all 0.2s;
-  &:hover { border-color: ${({ theme }) => theme.colors.borderLight}; }
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  &:hover { background: ${({ theme }) => theme.colors.accentHover}; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+`;
+const RecipientHint = styled.div`
+  font-size: 0.75rem;
+  color: ${({ theme }) => theme.colors.textDim};
+  font-weight: 300;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+`;
+
+// ── Report History ────────────────────────────────────────────────────────────
+const ReportHistoryTitle = styled.div`
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: ${({ theme }) => theme.colors.textDim};
+  margin-bottom: 0.875rem;
+`;
+const ReportHistoryList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+`;
+const ReportHistoryRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  background: ${({ $active, theme }) => $active ? theme.colors.accentDim : theme.colors.bg};
+  border: 1px solid ${({ $active }) => $active ? 'rgba(108,99,255,0.2)' : 'transparent'};
+  cursor: pointer;
+  transition: all 0.15s;
+  gap: 1rem;
+  &:hover { background: ${({ theme }) => theme.colors.accentDim}; }
+`;
+const ReportHistoryMonth = styled.div`
+  font-size: 0.875rem;
+  font-weight: ${({ $active }) => $active ? '600' : '400'};
+  color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.text};
+`;
+const ReportHistoryMeta = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+`;
+const ReportHistoryClicks = styled.div`
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.textDim};
+  font-family: ${({ theme }) => theme.fonts.mono};
+`;
+const NoPdfBadge = styled.div`
+  font-size: 0.7rem;
+  color: ${({ theme }) => theme.colors.textDim};
+  padding: 0.25rem 0.625rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  background: ${({ theme }) => theme.colors.bg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+// ── Add Property Row ──────────────────────────────────────────────────────────
+const AddPropertyRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+`;
+const PropertyCountBadge = styled.div`
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.textDim};
+`;
+
+// ── Upgrade Modal ─────────────────────────────────────────────────────────────
+const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: ${fadeIn} 0.2s ease;
+`;
+const ModalBox = styled.div`
+  background: ${({ theme }) => theme.colors.bgCard};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.xl};
+  padding: 2rem;
+  max-width: 700px;
+  width: 100%;
+  animation: ${fadeUp} 0.25s ease;
+`;
+const ModalTitle = styled.h2`
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+`;
+const ModalSub = styled.p`
+  font-size: 0.875rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-weight: 300;
+  margin-bottom: 1.75rem;
+  line-height: 1.6;
+`;
+const ModalClose = styled.button`
+  float: right;
+  font-size: 1.25rem;
+  color: ${({ theme }) => theme.colors.textDim};
+  margin-top: -0.25rem;
+  &:hover { color: ${({ theme }) => theme.colors.text}; }
+`;
+
+const SpinnerSm = styled.div`
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ${spin} 0.7s linear infinite;
 `;
 
 const PropertyInfo = styled.div`
@@ -664,21 +857,21 @@ const ReportPeriodLeft = styled.div`
 const DownloadBtn = styled.a`
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  font-size: 0.8125rem;
+  gap: 0.3rem;
+  font-size: 0.75rem;
   font-weight: 600;
   font-family: ${({ theme }) => theme.fonts.display};
   color: ${({ theme }) => theme.colors.accent};
   background: ${({ theme }) => theme.colors.accentDim};
   border: 1px solid rgba(108,99,255,0.25);
-  padding: 0.375rem 0.875rem;
+  padding: 0.3rem 0.75rem;
   border-radius: ${({ theme }) => theme.radius.md};
   text-decoration: none;
   transition: all 0.2s;
+  white-space: nowrap;
   &:hover {
     background: rgba(108,99,255,0.18);
     border-color: rgba(108,99,255,0.4);
-    transform: translateY(-1px);
   }
 `;
 
@@ -757,6 +950,282 @@ function FrozenWallView({ onUpgrade, upgrading }) {
   );
 }
 
+function fmtMonth(dateStr) {
+  return new Date(dateStr).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+}
+
+// ── UpgradeModal ──────────────────────────────────────────────────────────────
+function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading }) {
+  const opts = currentPlan === 'pro'
+    ? [{ key: 'agency', name: 'Agency', price: '79', highlight: true, features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Endkunden-Email', 'Agency Branding'] }]
+    : [
+        { key: 'pro',    name: 'Pro',    price: '39', highlight: true, features: ['3 Domains', 'White-Label', 'SEO-Empfehlungen', 'Endkunden-Email'] },
+        { key: 'agency', name: 'Agency', price: '79', highlight: false, features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Endkunden-Email'] },
+      ];
+  return (
+    <ModalOverlay onClick={onClose}>
+      <ModalBox onClick={e => e.stopPropagation()}>
+        <ModalClose onClick={onClose}>✕</ModalClose>
+        <ModalTitle>Mehr Domains? Upgrade erforderlich</ModalTitle>
+        <ModalSub>
+          Du hast das Domain-Limit deines aktuellen Plans erreicht. Upgrade um weitere Websites zu verbinden.
+        </ModalSub>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${opts.length}, 1fr)`, gap: '1rem' }}>
+          {opts.map(p => (
+            <PlanCard key={p.key} $highlight={p.highlight}>
+              <PlanName $highlight={p.highlight}>{p.name}</PlanName>
+              <PlanPrice $highlight={p.highlight}>€{p.price}<span>/mo</span></PlanPrice>
+              {p.features.map(f => <PlanFeature key={f} $highlight={p.highlight}>{f}</PlanFeature>)}
+              <PlanBtn $highlight={p.highlight} onClick={() => onUpgrade(p.key)} disabled={upgrading}>
+                {upgrading ? 'Lädt...' : `Upgrade auf ${p.name} →`}
+              </PlanBtn>
+            </PlanCard>
+          ))}
+        </div>
+      </ModalBox>
+    </ModalOverlay>
+  );
+}
+
+// ── PropertyItem (expandable) ─────────────────────────────────────────────────
+function PropertyItem({ property, isAgency, plan }) {
+  const [open, setOpen]                       = useState(false);
+  const [reports, setReports]                 = useState([]);
+  const [reportsLoading, setReportsLoading]   = useState(false);
+  const [selectedReport, setSelectedReport]   = useState(null);
+  const [keywords, setKeywords]               = useState([]);
+  const [pages, setPages]                     = useState([]);
+  const [detailLoading, setDetailLoading]     = useState(false);
+  const [recipientEmail, setRecipientEmail]   = useState(property.recipient_email || '');
+  const [savingEmail, setSavingEmail]         = useState(false);
+  const [emailSaved, setEmailSaved]           = useState(false);
+  const loaded = React.useRef(false);
+
+  const loadReports = async () => {
+    if (loaded.current) return;
+    loaded.current = true;
+    setReportsLoading(true);
+    const { data } = await supabase
+      .from('reports')
+      .select('id, report_month, clicks, pdf_url, status')
+      .eq('property_id', property.id)
+      .eq('status', 'done')
+      .order('report_month', { ascending: false })
+      .limit(12);
+    const rows = data ?? [];
+    setReports(rows);
+    if (rows.length > 0) loadReportDetail(rows[0]);
+    setReportsLoading(false);
+  };
+
+  const loadReportDetail = async (report) => {
+    setDetailLoading(true);
+    setSelectedReport(report);
+    const [{ data: full }, { data: kw }, { data: pg }] = await Promise.all([
+      supabase.from('reports').select('*').eq('id', report.id).single(),
+      supabase.from('report_keywords').select('*').eq('report_id', report.id).order('rank'),
+      supabase.from('report_pages').select('*').eq('report_id', report.id).order('rank'),
+    ]);
+    setSelectedReport(full ?? report);
+    setKeywords(kw ?? []);
+    setPages(pg ?? []);
+    setDetailLoading(false);
+  };
+
+  const handleToggle = () => {
+    const next = !open;
+    setOpen(next);
+    if (next) loadReports();
+  };
+
+  const handleSaveEmail = async () => {
+    setSavingEmail(true);
+    await supabase.from('properties').update({ recipient_email: recipientEmail || null }).eq('id', property.id);
+    setSavingEmail(false);
+    setEmailSaved(true);
+    setTimeout(() => setEmailSaved(false), 2500);
+  };
+
+  return (
+    <PropertyCard $active={open}>
+      <PropertyHeader onClick={handleToggle}>
+        <PropertyInfo>
+          <PropertyDot $status={property.status} />
+          <div>
+            <PropertyName>{property.display_name}</PropertyName>
+            <PropertyUrl>{property.gsc_property_url}</PropertyUrl>
+          </div>
+        </PropertyInfo>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <PropertyMeta>Verbunden {new Date(property.created_at).toLocaleDateString('de-DE')}</PropertyMeta>
+          <PropertyChevron $open={open}>▾</PropertyChevron>
+        </div>
+      </PropertyHeader>
+
+      {open && (
+        <PropertyBody>
+          {/* Endkunden-Email – nur Agency */}
+          {isAgency && (
+            <>
+              <RecipientRow>
+                <RecipientLabel>📧 Endkunden-Email (optional):</RecipientLabel>
+                <RecipientInput
+                  type="email"
+                  placeholder="kunde@beispiel.de"
+                  value={recipientEmail}
+                  onChange={e => setRecipientEmail(e.target.value)}
+                />
+                <RecipientSaveBtn onClick={handleSaveEmail} disabled={savingEmail}>
+                  {savingEmail ? <SpinnerSm /> : emailSaved ? '✓ Gespeichert' : 'Speichern'}
+                </RecipientSaveBtn>
+              </RecipientRow>
+              <RecipientHint>
+                Wenn gesetzt, bekommt der Endkunde den Report zusätzlich zu dir – mit deinem White-Label Branding als PDF-Anhang. Leer lassen = nur du bekommst den Report.
+              </RecipientHint>
+            </>
+          )}
+
+          {/* Report-Verlauf */}
+          <ReportHistoryTitle>Report-Verlauf</ReportHistoryTitle>
+          {reportsLoading ? (
+            <Spinner />
+          ) : reports.length === 0 ? (
+            <EmptyState>
+              <EmptyIcon>📭</EmptyIcon>
+              <EmptyTitle>Noch kein Report vorhanden</EmptyTitle>
+              <EmptyText>Der erste Report wird automatisch am 1. des nächsten Monats generiert.</EmptyText>
+            </EmptyState>
+          ) : (
+            <>
+              <ReportHistoryList>
+                {reports.map(r => (
+                  <ReportHistoryRow
+                    key={r.id}
+                    $active={selectedReport?.id === r.id}
+                    onClick={() => loadReportDetail(r)}
+                  >
+                    <ReportHistoryMonth $active={selectedReport?.id === r.id}>
+                      {fmtMonth(r.report_month)}
+                    </ReportHistoryMonth>
+                    <ReportHistoryMeta>
+                      <ReportHistoryClicks>{fmt(r.clicks)} Klicks</ReportHistoryClicks>
+                      {r.pdf_url
+                        ? <DownloadBtn href={r.pdf_url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>↓ PDF</DownloadBtn>
+                        : <NoPdfBadge>kein PDF</NoPdfBadge>}
+                    </ReportHistoryMeta>
+                  </ReportHistoryRow>
+                ))}
+              </ReportHistoryList>
+
+              {/* Detail des ausgewählten Reports */}
+              {detailLoading ? (
+                <Spinner />
+              ) : selectedReport && (
+                <div style={{ marginTop: '0.5rem' }}>
+                  <div style={{ fontSize: '0.8125rem', color: 'var(--text-dim)', marginBottom: '1.25rem', fontFamily: 'monospace' }}>
+                    Details: {fmtMonth(selectedReport.report_month)}
+                  </div>
+                  <KpiGrid>
+                    <KpiCard>
+                      <KpiLabel>Clicks</KpiLabel>
+                      <KpiValue>{fmt(selectedReport.clicks)}</KpiValue>
+                      {selectedReport.clicks_delta != null
+                        ? <KpiDelta $up={selectedReport.clicks_delta >= 0}>{Math.abs(selectedReport.clicks_delta).toFixed(1)}% ggü. Vormonat</KpiDelta>
+                        : <KpiEmpty>Kein Vergleich</KpiEmpty>}
+                    </KpiCard>
+                    <KpiCard>
+                      <KpiLabel>Impressionen</KpiLabel>
+                      <KpiValue>{fmt(selectedReport.impressions)}</KpiValue>
+                      {selectedReport.impressions_delta != null
+                        ? <KpiDelta $up={selectedReport.impressions_delta >= 0}>{Math.abs(selectedReport.impressions_delta).toFixed(1)}%</KpiDelta>
+                        : <KpiEmpty>Kein Vergleich</KpiEmpty>}
+                    </KpiCard>
+                    <KpiCard>
+                      <KpiLabel>Ø CTR</KpiLabel>
+                      <KpiValue>{fmtPct(selectedReport.ctr)}</KpiValue>
+                      {selectedReport.ctr_delta != null
+                        ? <KpiDelta $up={selectedReport.ctr_delta >= 0}>{Math.abs(selectedReport.ctr_delta).toFixed(2)}%</KpiDelta>
+                        : <KpiEmpty>Kein Vergleich</KpiEmpty>}
+                    </KpiCard>
+                    <KpiCard>
+                      <KpiLabel>Ø Position</KpiLabel>
+                      <KpiValue>{fmtPos(selectedReport.avg_position)}</KpiValue>
+                      {selectedReport.position_delta != null
+                        ? <KpiDelta $up={selectedReport.position_delta <= 0}>{Math.abs(selectedReport.position_delta).toFixed(1)}</KpiDelta>
+                        : <KpiEmpty>Kein Vergleich</KpiEmpty>}
+                    </KpiCard>
+                  </KpiGrid>
+
+                  {plan === 'basic' && (
+                    <UpgradeHint>
+                      <UpgradeHintText>
+                        <h3>🚀 Mit Pro bekommst du noch mehr</h3>
+                        <ul>
+                          <li><strong>3 Domains:</strong> Mehrere Websites in einem Account verwalten</li>
+                          <li><strong>SEO-Empfehlungen:</strong> Konkrete Maßnahmen was du diese Woche tun kannst</li>
+                          <li><strong>White-Label Reports:</strong> Reports mit eigenem Logo und Branding</li>
+                        </ul>
+                      </UpgradeHintText>
+                    </UpgradeHint>
+                  )}
+
+                  {['basic', 'pro', 'agency'].includes(plan) && (
+                    <>
+                      <SectionTitle>KI-Zusammenfassung</SectionTitle>
+                      <SummaryCard>
+                        {selectedReport.summary_text
+                          ? <SummaryText>{selectedReport.summary_text}</SummaryText>
+                          : <SummaryEmpty>🤖 Noch keine KI-Zusammenfassung vorhanden. Wird automatisch beim nächsten Report generiert.</SummaryEmpty>}
+                      </SummaryCard>
+                    </>
+                  )}
+
+                  <TableGrid>
+                    <TableCard>
+                      <TableHeader>Top Keywords</TableHeader>
+                      {keywords.length > 0
+                        ? keywords.map(k => (
+                            <TableRow key={k.id}>
+                              <TableLabel title={k.keyword}>{k.keyword}</TableLabel>
+                              <TableVal>{k.clicks} Klicks</TableVal>
+                            </TableRow>
+                          ))
+                        : <TableEmpty>Keine Keyword-Daten.<br /><a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" style={{ color: '#6C63FF' }}>GSC einrichten →</a></TableEmpty>}
+                    </TableCard>
+                    <TableCard>
+                      <TableHeader>Top Seiten</TableHeader>
+                      {pages.length > 0
+                        ? pages.map(p => (
+                            <TableRow key={p.id}>
+                              <TableLabel title={p.page_url}>{p.page_url.replace(/^https?:\/\/[^/]+/, '') || '/'}</TableLabel>
+                              <TableVal>{p.clicks} Klicks</TableVal>
+                            </TableRow>
+                          ))
+                        : <TableEmpty>Keine Seiten-Daten.<br /><a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" style={{ color: '#6C63FF' }}>GSC einrichten →</a></TableEmpty>}
+                    </TableCard>
+                  </TableGrid>
+
+                  {selectedReport.sessions === 0 && ['basic', 'pro', 'agency'].includes(plan) && (
+                    <Alert $type="info">
+                      <strong>GA4-Daten fehlen</strong><br />
+                      <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
+                        Google Analytics 4 zeigt dir was Besucher auf deiner Website tun.{' '}
+                        <a href="https://analytics.google.com" target="_blank" rel="noreferrer" style={{ color: 'inherit', fontWeight: 600, textDecoration: 'underline' }}>
+                          GA4 kostenlos einrichten →
+                        </a>{' '}(ca. 5 Minuten)
+                      </span>
+                    </Alert>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </PropertyBody>
+      )}
+    </PropertyCard>
+  );
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Dashboard({ user }) {
   const navigate = useNavigate();
@@ -764,13 +1233,10 @@ export default function Dashboard({ user }) {
 
   const [properties, setProperties] = useState([]);
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [report, setReport] = useState(null);
-  const [keywords, setKeywords] = useState([]);
-  const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [reportLoading, setReportLoading] = useState(false);
   const [profile, setProfile] = useState(null);
   const [upgrading, setUpgrading] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const connected = new URLSearchParams(location.search).get('connected') === 'true';
   const upgraded = new URLSearchParams(location.search).get('upgraded') === 'true';
@@ -784,7 +1250,7 @@ export default function Dashboard({ user }) {
   const loadProfile = async () => {
     const { data } = await supabase
       .from('profiles')
-      .select('plan, plan_status, free_report_sent, trial_ends_at')
+      .select('plan, plan_status, free_report_sent, trial_ends_at, promo_code_used')
       .eq('id', user.id)
       .single();
     setProfile(data);
@@ -792,6 +1258,7 @@ export default function Dashboard({ user }) {
 
   const handleUpgrade = async (plan, billing = 'monthly') => {
     setUpgrading(true);
+    setShowUpgradeModal(false);
     try {
       const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
       const SUPABASE_ANON_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
@@ -811,10 +1278,6 @@ export default function Dashboard({ user }) {
     setUpgrading(false);
   };
 
-  useEffect(() => {
-    if (selectedProperty) loadLatestReport(selectedProperty.id);
-  }, [selectedProperty]);
-
   const loadProperties = async () => {
     setLoading(true);
     const { data } = await supabase
@@ -822,42 +1285,7 @@ export default function Dashboard({ user }) {
       .select('*')
       .order('created_at', { ascending: false });
     setProperties(data ?? []);
-    if (data?.length > 0) setSelectedProperty(data[0]);
     setLoading(false);
-  };
-
-  const loadLatestReport = async (propertyId) => {
-    setReportLoading(true);
-    const { data: reportRows } = await supabase
-      .from('reports')
-      .select('*')
-      .eq('property_id', propertyId)
-      .eq('status', 'done')
-      .order('report_month', { ascending: false })
-      .limit(1);
-
-    const reportData = reportRows?.[0] ?? null;
-
-    if (reportData) {
-      setReport(reportData);
-      const { data: kw } = await supabase
-        .from('report_keywords')
-        .select('*')
-        .eq('report_id', reportData.id)
-        .order('rank');
-      const { data: pg } = await supabase
-        .from('report_pages')
-        .select('*')
-        .eq('report_id', reportData.id)
-        .order('rank');
-      setKeywords(kw ?? []);
-      setPages(pg ?? []);
-    } else {
-      setReport(null);
-      setKeywords([]);
-      setPages([]);
-    }
-    setReportLoading(false);
   };
 
   const handleSignOut = async () => {
@@ -866,6 +1294,12 @@ export default function Dashboard({ user }) {
   };
 
   const handleConnectGoogle = () => {
+    const plan  = profile?.plan || 'free';
+    const limit = PLAN_LIMITS[plan] ?? 1;
+    if (properties.length >= limit) {
+      setShowUpgradeModal(true);
+      return;
+    }
     const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
     const REDIRECT_URI = 'https://ubexqxxkqjzhsgidsseh.supabase.co/functions/v1/google-oauth-callback';
     const SCOPES = [
@@ -884,11 +1318,12 @@ export default function Dashboard({ user }) {
     window.location.href = authUrl.toString();
   };
 
-  const reportMonth = report
-    ? new Date(report.report_month).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })
-    : null;
+  const plan     = profile?.plan || 'free';
+  const limit    = PLAN_LIMITS[plan] ?? 1;
+  const isAgency = plan === 'agency';
+  const canAdd   = properties.length < limit;
 
-  // ── Frozen Account: nur Upgrade-Wall zeigen ───────────────────────────────
+  // ── Frozen Account ──────────────────────────────────────────────────────────
   if (profile?.plan_status === 'frozen') {
     return (
       <Layout>
@@ -909,6 +1344,14 @@ export default function Dashboard({ user }) {
 
   return (
     <Layout>
+      {showUpgradeModal && (
+        <UpgradeModal
+          currentPlan={plan}
+          onUpgrade={handleUpgrade}
+          onClose={() => setShowUpgradeModal(false)}
+          upgrading={upgrading}
+        />
+      )}
       <TopBar>
         <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
         <TopBarRight>
@@ -966,6 +1409,33 @@ export default function Dashboard({ user }) {
 
         {loading ? <Spinner /> : (
           <>
+            {/* Header row with count + connect button */}
+            <AddPropertyRow>
+              <SectionTitle style={{ margin: 0 }}>
+                {properties.length === 0 ? 'Erste Website verbinden' : 'Deine Properties'}
+              </SectionTitle>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                {properties.length > 0 && (
+                  <PropertyCountBadge>
+                    {properties.length} / {limit} ({plan === 'free' ? 'Free' : plan.charAt(0).toUpperCase() + plan.slice(1)})
+                  </PropertyCountBadge>
+                )}
+                <BtnConnect
+                  onClick={handleConnectGoogle}
+                  disabled={upgrading}
+                  style={{ fontSize: '0.875rem', padding: '0.625rem 1.125rem' }}
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  {canAdd ? '+ Website verbinden' : `Limit erreicht (${limit}/${limit})`}
+                </BtnConnect>
+              </div>
+            </AddPropertyRow>
+
             {properties.length === 0 && (
               <ConnectBanner>
                 <ConnectText>
@@ -985,211 +1455,16 @@ export default function Dashboard({ user }) {
             )}
 
             {properties.length > 0 && (
-              <>
-                <SectionTitle>Deine Properties</SectionTitle>
-                <PropertyList>
-                  {properties.map(p => (
-                    <PropertyCard
-                      key={p.id}
-                      $active={selectedProperty?.id === p.id}
-                      onClick={() => setSelectedProperty(p)}
-                    >
-                      <PropertyInfo>
-                        <PropertyDot $status={p.status} />
-                        <div>
-                          <PropertyName>{p.display_name}</PropertyName>
-                          <PropertyUrl>{p.gsc_property_url}</PropertyUrl>
-                        </div>
-                      </PropertyInfo>
-                      <PropertyMeta>
-                        Verbunden {new Date(p.created_at).toLocaleDateString('de-DE')}
-                      </PropertyMeta>
-                    </PropertyCard>
-                  ))}
-                </PropertyList>
-
-                {reportLoading ? <Spinner /> : (
-                  <>
-                    {report ? (
-                      <>
-                        <ReportPeriod>
-                          <ReportPeriodLeft>
-                            Report: {reportMonth}
-                            {profile?.plan === 'free' && !profile?.promo_code_used && (
-                              <span style={{
-                                fontSize: '11px',
-                                fontWeight: 700,
-                                background: 'rgba(108,99,255,0.12)',
-                                color: '#6C63FF',
-                                padding: '2px 8px',
-                                borderRadius: '20px',
-                                border: '1px solid rgba(108,99,255,0.3)',
-                              }}>
-                                ✨ Pro-Preview
-                              </span>
-                            )}
-                          </ReportPeriodLeft>
-                          {report.pdf_url && ['basic', 'pro', 'agency'].includes(profile?.plan) && (
-                            <DownloadBtn href={report.pdf_url} target="_blank" rel="noreferrer" download>
-                              ↓ PDF herunterladen
-                            </DownloadBtn>
-                          )}
-                        </ReportPeriod>
-
-                        <KpiGrid>
-                          <KpiCard>
-                            <KpiLabel>Clicks</KpiLabel>
-                            <KpiValue>{fmt(report.clicks)}</KpiValue>
-                            {report.clicks_delta != null
-                              ? <KpiDelta $up={report.clicks_delta >= 0}>{Math.abs(report.clicks_delta).toFixed(1)}% ggü. Vormonat</KpiDelta>
-                              : <KpiEmpty>Kein Vergleich</KpiEmpty>}
-                          </KpiCard>
-                          <KpiCard>
-                            <KpiLabel>Impressionen</KpiLabel>
-                            <KpiValue>{fmt(report.impressions)}</KpiValue>
-                            {report.impressions_delta != null
-                              ? <KpiDelta $up={report.impressions_delta >= 0}>{Math.abs(report.impressions_delta).toFixed(1)}%</KpiDelta>
-                              : <KpiEmpty>Kein Vergleich</KpiEmpty>}
-                          </KpiCard>
-                          <KpiCard>
-                            <KpiLabel>Ø CTR</KpiLabel>
-                            <KpiValue>{fmtPct(report.ctr)}</KpiValue>
-                            {report.ctr_delta != null
-                              ? <KpiDelta $up={report.ctr_delta >= 0}>{Math.abs(report.ctr_delta).toFixed(2)}%</KpiDelta>
-                              : <KpiEmpty>Kein Vergleich</KpiEmpty>}
-                          </KpiCard>
-                          <KpiCard>
-                            <KpiLabel>Ø Position</KpiLabel>
-                            <KpiValue>{fmtPos(report.avg_position)}</KpiValue>
-                            {report.position_delta != null
-                              ? <KpiDelta $up={report.position_delta <= 0}>{Math.abs(report.position_delta).toFixed(1)}</KpiDelta>
-                              : <KpiEmpty>Kein Vergleich</KpiEmpty>}
-                          </KpiCard>
-                        </KpiGrid>
-
-                        {/* Was bedeuten diese Zahlen? */}
-                        <DataExplainCard>
-                          <DataExplainTitle>Was bedeuten diese Zahlen?</DataExplainTitle>
-                          <DataExplainGrid>
-                            <DataExplainItem>
-                              <DataExplainIcon $color="rgba(108,99,255,0.1)">👆</DataExplainIcon>
-                              <DataExplainBody>
-                                <strong>Clicks</strong>
-                                <span>Wie oft jemand auf deine Website in Google geklickt hat. Mehr = mehr Besucher.</span>
-                              </DataExplainBody>
-                            </DataExplainItem>
-                            <DataExplainItem>
-                              <DataExplainIcon $color="rgba(99,207,255,0.1)">👁</DataExplainIcon>
-                              <DataExplainBody>
-                                <strong>Impressionen</strong>
-                                <span>Wie oft deine Website in Google angezeigt wurde – egal ob jemand geklickt hat oder nicht.</span>
-                              </DataExplainBody>
-                            </DataExplainItem>
-                            <DataExplainItem>
-                              <DataExplainIcon $color="rgba(16,185,129,0.1)">🎯</DataExplainIcon>
-                              <DataExplainBody>
-                                <strong>CTR (Klickrate)</strong>
-                                <span>Von 100 Leuten die deine Website sahen, haben X% geklickt. Über 3% ist gut.</span>
-                              </DataExplainBody>
-                            </DataExplainItem>
-                            <DataExplainItem>
-                              <DataExplainIcon $color="rgba(245,158,11,0.1)">📍</DataExplainIcon>
-                              <DataExplainBody>
-                                <strong>Ø Position</strong>
-                                <span>Dein durchschnittlicher Platz in den Google-Suchergebnissen. Position 1–3 = erste Seite oben.</span>
-                              </DataExplainBody>
-                            </DataExplainItem>
-                          </DataExplainGrid>
-                        </DataExplainCard>
-
-                        {/* Upsell für Basic-User */}
-                        {profile?.plan === 'basic' && (
-                          <UpgradeHint>
-                            <UpgradeHintText>
-                              <h3>🚀 Mit Pro bekommst du noch mehr</h3>
-                              <ul>
-                                <li><strong>3 Domains:</strong> Mehrere Websites in einem Account verwalten</li>
-                                <li><strong>SEO-Empfehlungen:</strong> Konkrete Maßnahmen was du diese Woche tun kannst um besser gefunden zu werden</li>
-                                <li><strong>White-Label Reports:</strong> Reports mit eigenem Logo und Branding versenden</li>
-                              </ul>
-                            </UpgradeHintText>
-                            <UpgradeHintBtn onClick={() => handleUpgrade('pro')} disabled={upgrading}>
-                              {upgrading ? 'Lädt...' : 'Upgrade auf Pro – 39 €/Monat →'}
-                            </UpgradeHintBtn>
-                          </UpgradeHint>
-                        )}
-
-                        {/* KI-Zusammenfassung für Basic/Pro/Agency */}
-                        {['basic', 'pro', 'agency'].includes(profile?.plan) && (
-                          <>
-                            <SectionTitle>KI-Zusammenfassung</SectionTitle>
-                            <SummaryCard>
-                              {report.summary_text
-                                ? <SummaryText>{report.summary_text}</SummaryText>
-                                : <SummaryEmpty>
-                                    🤖 Noch keine KI-Zusammenfassung vorhanden. Wird automatisch beim nächsten Report generiert.
-                                  </SummaryEmpty>}
-                            </SummaryCard>
-                          </>
-                        )}
-
-                        <TableGrid>
-                          <TableCard>
-                            <TableHeader>Top Keywords</TableHeader>
-                            {keywords.length > 0
-                              ? keywords.map(k => (
-                                  <TableRow key={k.id}>
-                                    <TableLabel title={k.keyword}>{k.keyword}</TableLabel>
-                                    <TableVal>{k.clicks} Klicks</TableVal>
-                                  </TableRow>
-                                ))
-                              : <TableEmpty>
-                                  Keine Keyword-Daten.<br/>
-                                  <a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" style={{color: '#6C63FF'}}>GSC einrichten →</a>
-                                </TableEmpty>}
-                          </TableCard>
-
-                          <TableCard>
-                            <TableHeader>Top Seiten</TableHeader>
-                            {pages.length > 0
-                              ? pages.map(p => (
-                                  <TableRow key={p.id}>
-                                    <TableLabel title={p.page_url}>
-                                      {p.page_url.replace(/^https?:\/\/[^/]+/, '') || '/'}
-                                    </TableLabel>
-                                    <TableVal>{p.clicks} Klicks</TableVal>
-                                  </TableRow>
-                                ))
-                              : <TableEmpty>
-                                  Keine Seiten-Daten.<br/>
-                                  <a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" style={{color: '#6C63FF'}}>GSC einrichten →</a>
-                                </TableEmpty>}
-                          </TableCard>
-                        </TableGrid>
-
-                        {report.sessions === 0 && ['basic', 'pro', 'agency'].includes(profile?.plan) && (
-                          <Alert $type="info">
-                            <strong>GA4-Daten fehlen</strong><br />
-                            <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
-                              Google Analytics 4 zeigt dir was Besucher auf deiner Website tun – ob sie anfragen, kaufen oder wieder abspringen.{' '}
-                              <a href="https://analytics.google.com" target="_blank" rel="noreferrer" style={{color: 'inherit', fontWeight: 600, textDecoration: 'underline'}}>
-                                GA4 kostenlos einrichten →
-                              </a>
-                              {' '}(dauert ca. 5 Minuten)
-                            </span>
-                          </Alert>
-                        )}
-                      </>
-                    ) : (
-                      <EmptyState>
-                        <EmptyIcon>📭</EmptyIcon>
-                        <EmptyTitle>Noch kein Report vorhanden</EmptyTitle>
-                        <EmptyText>Der erste Report wird automatisch am 1. des nächsten Monats generiert und ist kostenlos.</EmptyText>
-                      </EmptyState>
-                    )}
-                  </>
-                )}
-              </>
+              <PropertyList>
+                {properties.map(p => (
+                  <PropertyItem
+                    key={p.id}
+                    property={p}
+                    isAgency={isAgency}
+                    plan={plan}
+                  />
+                ))}
+              </PropertyList>
             )}
           </>
         )}
