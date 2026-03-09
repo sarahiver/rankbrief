@@ -901,9 +901,9 @@ const i18n = {
     sampleSub: 'Real report previews – generated from actual data, delivered as a PDF every month.',
     samplePopular: 'Most popular',
     sampleCards: [
-      { plan: 'Basic',  slug: 'basic',  icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: '/samples/sample-basic.html', featured: false },
-      { plan: 'Pro',    slug: 'pro',    icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: '/samples/sample-pro.html', featured: true },
-      { plan: 'Agency', slug: 'agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: '/samples/sample-agency.html', featured: false },
+      { plan: 'Basic',  slug: 'basic',  icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: '/samples/sample-basic-en.html', featured: false },
+      { plan: 'Pro',    slug: 'pro',    icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: '/samples/sample-pro-en.html', featured: true },
+      { plan: 'Agency', slug: 'agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: '/samples/sample-agency-en.html', featured: false },
     ],
     sampleCta: 'View sample report',
     sampleClose: 'Close preview',

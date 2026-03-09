@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#1a1a2e;font-size:11px;line-height:1.5}
+.page{width:210mm;min-height:297mm;padding:13mm 14mm 10mm;display:flex;flex-direction:column}
+.content{flex:1}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:9px;border-bottom:3px solid #1A1A2E;margin-bottom:13px}
+.hdr-l{display:flex;align-items:center;gap:9px}
+.logo{height:32px;object-fit:contain}
+.logo-dot{width:9px;height:9px;border-radius:50%;background:#1A1A2E;flex-shrink:0}
+.co{font-size:15px;font-weight:700;color:#1A1A2E;letter-spacing:-0.02em}
+.hdr-r{text-align:right}
+.rt{font-size:9px;color:#999}
+.rp{font-size:12px;font-weight:600;color:#333}
+.prop{background:#f8f8fc;border-radius:7px;padding:6px 11px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;border:1px solid #ebebf5}
+.purl{font-family:monospace;font-size:9px;color:#444;font-weight:600}
+.plbl{font-size:8px;color:#999}
+.sec-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#1A1A2E;margin-bottom:6px;margin-top:12px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:1px;background:#1A1A2E25}
+.badge{font-size:7px;background:#10B98115;color:#059669;padding:1px 6px;border-radius:10px;text-transform:none;letter-spacing:0;font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.kpi{border-radius:7px;padding:9px 10px;background:#1A1A2E0d;border-left:3px solid #1A1A2E}
+.kl{font-size:7.5px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.kv{font-size:18px;font-weight:700;color:#111;line-height:1.1;margin-bottom:2px}
+.kd{font-size:8px;font-weight:600}
+.kd.up{color:#10B981}.kd.dn{color:#EF4444}.kd.neu{color:#aaa}
+.kd-sm{font-size:7.5px;color:#999;margin-top:1px}
+.ga4-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.ga4k{border-radius:7px;padding:9px 10px;background:#E945600d;border-left:3px solid #E94560}
+.sumbox{background:#1A1A2E07;border-left:3px solid #1A1A2E;border-radius:6px;padding:9px 12px;font-size:10px;color:#2a2a3e;line-height:1.7}
+.recs{display:flex;flex-direction:column;gap:5px}
+.rec{display:flex;align-items:flex-start;gap:9px;background:#f8f8fc;border-radius:7px;padding:8px 11px;border:1px solid #ebebf5}
+.rec-open{background:#fff8f0;border-color:#fed7aa}
+.rec-num{width:19px;height:19px;border-radius:50%;background:#1A1A2E;color:white;font-size:8.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.rec-num-open{background:#f97316}
+.rec-body{flex:1}
+.rec-title{font-size:9px;font-weight:700;color:#1a1a2e;margin-bottom:2px}
+.rec-text{font-size:9px;color:#4a4a6e;line-height:1.6}
+.chances-intro{font-size:8.5px;color:#555;margin-bottom:7px;margin-top:-3px;line-height:1.55}
+.chance-ctr{color:#f59e0b !important}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+table{width:100%;border-collapse:collapse}
+th{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1A1A2E;border-bottom:1.5px solid #1A1A2E35;padding:5px 7px;text-align:left}
+th.r{text-align:right}
+td{padding:4px 7px;font-size:9px;border-bottom:1px solid #f0f0f4;color:#2a2a3e}
+td.r{text-align:right;color:#1A1A2E;font-weight:600;font-variant-numeric:tabular-nums}
+td.mono{font-family:monospace;font-size:8px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#555}
+td.empty{color:#ccc;padding:8px 7px;font-style:italic;font-size:8.5px}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:#fafafa}
+.legende{background:#f8f8fc;border-radius:7px;padding:8px 11px;margin-top:12px;border:1px solid #ebebf5}
+.legende-title{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#bbb;margin-bottom:5px}
+.legende-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px}
+.legende-grid div{font-size:8px;color:#888;line-height:1.55}
+.legende-grid strong{color:#555}
+.foot{padding-top:8px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:flex-end;margin-top:11px}
+.foot-left{font-size:7.5px;color:#ccc;line-height:1.6}
+.foot-ai{font-size:7px;color:#ddd;margin-top:1px}
+.foot-brand{font-size:7.5px;color:#E94560;font-weight:600;white-space:nowrap}
+</style></head>
+<body><div class="page"><div class="content">
+<div class="hdr">
+  <div class="hdr-l"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzNiAzMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzYiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjMUExQTJFIi8+CiAgPHRleHQgeD0iNCIgeT0iMjEiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iODAwIiBmaWxsPSJ3aGl0ZSI+V0Q8L3RleHQ+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSI1IiByPSI0IiBmaWxsPSIjRTk0NTYwIi8+Cjwvc3ZnPg==" class="logo" style="height:28px"/><div class="co">Weber Digital GmbH</div></div>
+  <div class="hdr-r"><div class="rt">Monthly SEO Report</div><div class="rp">March 2025</div></div>
+</div>
+<div class="prop">
+  <span class="purl">autohaus-brenner.de</span>
+  <span class="plbl">Generated on 01.04.2025</span>
+</div>
+<div class="sec-label">Google Search Optimisation</div>
+<div class="kpis">
+  <div class="kpi"><div class="kl">Clicks</div><div class="kv">2.847</div><div class="kd up">▲ 9.2% vs. prev. month</div></div>
+  <div class="kpi"><div class="kl">Impressions</div><div class="kv">54.180</div><div class="kd up">▲ 6.8% vs. prev. month</div></div>
+  <div class="kpi"><div class="kl">CTR</div><div class="kv">5,3%</div><div class="kd up">▲ 0.2% vs. prev. month</div></div>
+  <div class="kpi"><div class="kl">Avg. Position</div><div class="kv">16,4</div><div class="kd up">▲ 1.4% vs. prev. month</div></div>
+</div>
+
+    <div class="sec-label">Visitor Statistics (Google Analytics)</div>
+    <div class="ga4-grid">
+      <div class="ga4k"><div class="kl">Total Visits</div><div class="kv">5.210</div><div class="kd-sm">▲ 7.4% prev. month</div></div>
+      <div class="ga4k"><div class="kl">Unique Visitors</div><div class="kv">3.890</div><div class="kd-sm">▲ 6.1% prev. month</div></div>
+      <div class="ga4k"><div class="kl">Engagement Rate</div><div class="kv">58,9%</div><div class="kd-sm">▲ 2.4% prev. month</div></div>
+    </div>
+<div class="sec-label">Summary</div><div class="sumbox">Autohaus Brenner gewinnt im March 2025 stetig mehr Besucher über Google: Die Clicks stiegen um 9,2&thinsp;%, und die Anfragen über die Website legten sogar um 31,2&thinsp;% zu. Das zeigt, dass die neuen Fahrzeug-Pagen aus dem prev. month wirken. Besonders die BMW-3er-Page hat sich stark verbessert und bringt jetzt 18&thinsp;% aller Besucher.</div>
+<div class="sec-label">Recommendations for Next Month</div><div class="recs"><div class="rec rec-open">
+          <div class="rec-num rec-num-open">!</div>
+          <div class="rec-body">
+            <div class="rec-title">⚠️ Noch offen: BMW-5er-Page verbessern</div>
+            <div class="rec-text">Diese Empfehlung aus dem prev. month ist noch offen – die CTR für "BMW 5er gebraucht Hamburg" liegt weiterhin bei nur 1,8&thinsp;% (2.840 Impressions). Ihre BMW-5er-Page wird häufig in Google angezeigt, aber kaum angeklickt. Ergänzen Sie konkrete Angebote, aktuelle Preise und ein Kontaktformular direkt auf der Page.</div>
+          </div>
+        </div><div class="rec ">
+          <div class="rec-num ">2</div>
+          <div class="rec-body">
+            <div class="rec-title">Google-Unternehmensprofil aktualisieren</div>
+            <div class="rec-text">Ihre Öffnungszeiten für Samstag sind auf Google veraltet, und 3 Kundenrezensionen aus März wurden noch nicht beantwortet. Beides beeinflusst direkt wie oft Google Sie in lokalen Suchen empfiehlt – eine kurze Antwort auf jede Bewertung reicht schon.</div>
+          </div>
+        </div><div class="rec ">
+          <div class="rec-num ">3</div>
+          <div class="rec-body">
+            <div class="rec-title">Fahrzeugseiten für Google ansprechender gestalten</div>
+            <div class="rec-text">Viele Ihrer Fahrzeugdetailseiten zeigen in den Google-Suchergebnissen nur den Titel ohne weitere Infos. Ergänzen Sie kurze Beschreibungen mit Preis und Kilometerstand – das erhöht die Chance, dass Interessenten direkt klicken, um bis zu 25&thinsp;%.</div>
+          </div>
+        </div></div>
+<div class="tgrid">
+  <div>
+    <div class="sec-label">Top Keywords</div>
+    <table><thead><tr><th>Keyword</th><th class="r">Clicks</th><th class="r">CTR</th><th class="r">Position</th></tr></thead>
+    <tbody><tr><td>autohaus hamburg</td><td class="r">487</td><td class="r">5,8%</td><td class="r">5,8</td></tr><tr><td>gebrauchtwagen hamburg</td><td class="r">398</td><td class="r">5,5%</td><td class="r">5,5</td></tr><tr><td>bmw 3er gebraucht hamburg</td><td class="r">312</td><td class="r">6,5%</td><td class="r">6,4</td></tr><tr><td>audi a4 gebraucht</td><td class="r">287</td><td class="r">5,5%</td><td class="r">5,5</td></tr><tr><td>auto finanzierung hamburg</td><td class="r">198</td><td class="r">4,8%</td><td class="r">4,8</td></tr><tr><td>vw golf gebraucht hamburg</td><td class="r">187</td><td class="r">4,8%</td><td class="r">4,8</td></tr><tr><td>werkstatt hamburg termin</td><td class="r">156</td><td class="r">5,2%</td><td class="r">5,2</td></tr><tr><td>bmw 5er gebraucht hamburg</td><td class="r">51</td><td class="r">1,8%</td><td class="r">9,2</td></tr></tbody></table>
+  </div>
+  <div>
+    <div class="sec-label">Top Pages</div>
+    <table><thead><tr><th>Page</th><th class="r">Clicks</th><th class="r">CTR</th></tr></thead>
+    <tbody><tr><td class="mono">/gebrauchtwagen/bmw-3er</td><td class="r">512</td><td class="r">6,4%</td></tr><tr><td class="mono">/gebrauchtwagen</td><td class="r">487</td><td class="r">5,8%</td></tr><tr><td class="mono">/finanzierung</td><td class="r">312</td><td class="r">4,8%</td></tr><tr><td class="mono">/gebrauchtwagen/audi-a4</td><td class="r">287</td><td class="r">5,5%</td></tr><tr><td class="mono">/werkstatt/termin</td><td class="r">241</td><td class="r">5,6%</td></tr><tr><td class="mono">/gebrauchtwagen/vw-golf</td><td class="r">198</td><td class="r">4,8%</td></tr><tr><td class="mono">/gebrauchtwagen/bmw-5er</td><td class="r">51</td><td class="r">1,8%</td></tr><tr><td class="mono">/homepage</td><td class="r">312</td><td class="r">6,1%</td></tr></tbody></table>
+  </div>
+</div>
+<div class="sec-label">Untapped Potential <span class="badge">Quick wins available</span></div>
+    <div class="chances-intro">Ihre Website erscheint für diese Search Queryn bereits häufig in Google – wird aber selten angeklickt. Mit einem besseren Pagentitel oder einer einladenderen Kurzbeschreibung können Sie hier ohne großen Aufwand mehr Besucher gewinnen.</div>
+    <table style="margin-bottom:4px"><thead><tr><th>Search Query</th><th class="r">Impressions</th><th class="r">Clicks</th><th class="r">CTR</th><th class="r">Position</th></tr></thead><tbody><tr><td>bmw 5er gebraucht hamburg</td><td class="r">2.840</td><td class="r">51</td><td class="r chance-ctr">1,8%</td><td class="r">9,2</td></tr><tr><td>jahreswagen hamburg günstig</td><td class="r">1.120</td><td class="r">24</td><td class="r chance-ctr">2,1%</td><td class="r">11,4</td></tr><tr><td>auto leasing hamburg privat</td><td class="r">780</td><td class="r">18</td><td class="r chance-ctr">2,3%</td><td class="r">13,1</td></tr></tbody></table>
+<div class="legende">
+  <div class="legende-title">What do these numbers mean?</div>
+  <div class="legende-grid">
+    <div><strong>Clicks</strong> – How often someone clicked your result in Google.</div>
+    <div><strong>Impressions</strong> – How often your website appeared in search results.</div>
+    <div><strong>CTR</strong> – Out of 100 people who saw your result, X% clicked.</div>
+    <div><strong>Avg. Position</strong> – Your average ranking in Google (1 = top position).</div>
+    
+    <div><strong>Besuche (Sessions)</strong> – Total number of website visits. One person can have multiple visits.</div>
+    <div><strong>Unique Visitors</strong> – How many unique people visited your website.</div>
+    <div><strong>Engagement Rate</strong> – Share of visits where someone actively engaged (scrolled, clicked, or stayed 10+ sec).</div>
+    <div><strong>▲ / ▼</strong> – Veränderung gegenüber dem prev. month.</div>
+  </div>
+</div>
+</div>
+<div class="foot">
+  <div class="foot-left">
+    <div>Weber Digital GmbH · Automated SEO Report · March 2025</div>
+    <div class="foot-ai">Summary und Empfehlungen werden mit Unterstützung von KI erstellt und basieren auf Ihren tatsächlichen Suchdaten.</div>
+  </div>
+  <div class="foot-brand">Weber Digital GmbH · weberdigital.de</div>
+</div>
+</div></body></html>
