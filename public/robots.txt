@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /onboarding
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://rankbrief.com/sitemap.xml
