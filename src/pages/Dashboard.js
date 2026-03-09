@@ -898,7 +898,24 @@ export default function Dashboard({ user }) {
                   <>
                     {report ? (
                       <>
-                        <ReportPeriod>Report: {reportMonth}</ReportPeriod>
+                        <ReportPeriod>
+                          Report: {reportMonth}
+                          {profile?.plan === 'free' && !profile?.promo_code_used && (
+                            <span style={{
+                              marginLeft: '0.75rem',
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              background: 'rgba(108,99,255,0.12)',
+                              color: '#6C63FF',
+                              padding: '2px 8px',
+                              borderRadius: '20px',
+                              border: '1px solid rgba(108,99,255,0.3)',
+                              verticalAlign: 'middle'
+                            }}>
+                              ✨ Pro-Preview
+                            </span>
+                          )}
+                        </ReportPeriod>
 
                         <KpiGrid>
                           <KpiCard>

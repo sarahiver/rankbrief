@@ -556,6 +556,8 @@ export default function Settings({ user }) {
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState(null);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [downgradeModal, setDowngradeModal] = useState(null); // { targetPlan, maxDomains }
+  const [selectedProperties, setSelectedProperties] = useState([]);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -662,6 +664,39 @@ export default function Settings({ user }) {
     } catch {
       showAlert('Fehler beim Laden des Checkouts.', 'error');
     }
+  };
+
+  // ── Downgrade with property selection ────────────────────────────────────
+  const handleDowngrade = (targetPlan) => {
+    const maxDomains = PLAN_LIMITS[targetPlan]?.domains ?? 1;
+    const activeProps = properties.filter(p => p.is_active !== false);
+    if (activeProps.length > maxDomains) {
+      setSelectedProperties(activeProps.slice(0, maxDomains).map(p => p.id));
+      setDowngradeModal({ targetPlan, maxDomains });
+    } else {
+      handleUpgrade(targetPlan);
+    }
+  };
+
+  const confirmDowngrade = async () => {
+    if (!downgradeModal) return;
+    const { targetPlan, maxDomains } = downgradeModal;
+    if (selectedProperties.length !== maxDomains) {
+      const lang = branding.report_language;
+      showAlert(lang === 'en'
+        ? `Please select exactly ${maxDomains} domain(s) to keep.`
+        : `Bitte genau ${maxDomains} Domain(s) auswählen.`, 'error');
+      return;
+    }
+    // Deactivate non-selected properties
+    const toDeactivate = properties
+      .filter(p => !selectedProperties.includes(p.id))
+      .map(p => p.id);
+    for (const pid of toDeactivate) {
+      await supabase.from('properties').update({ is_active: false }).eq('id', pid);
+    }
+    setDowngradeModal(null);
+    handleUpgrade(targetPlan);
   };
 
   // ── GA4 ID speichern ──────────────────────────────────────────────────────
@@ -836,6 +871,53 @@ export default function Settings({ user }) {
   return (
     <Layout>
       {/* Confirm Modal: Property löschen */}
+      {/* ── Downgrade Property Selection Modal ── */}
+      {downgradeModal && (
+        <ModalOverlay onClick={() => setDowngradeModal(null)}>
+          <ModalCard onClick={e => e.stopPropagation()} style={{ maxWidth: '480px' }}>
+            <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.1rem', fontWeight: 800 }}>
+              {branding.report_language === 'en'
+                ? `Downgrade to ${PLAN_LIMITS[downgradeModal.targetPlan]?.label}`
+                : `Wechsel zu ${PLAN_LIMITS[downgradeModal.targetPlan]?.label}`}
+            </h3>
+            <p style={{ margin: '0 0 1rem', fontSize: '13px', color: '#666' }}>
+              {branding.report_language === 'en'
+                ? `Your new plan supports ${downgradeModal.maxDomains} domain(s). Please select which domain(s) you want to keep active.`
+                : `Dein neuer Plan unterstützt ${downgradeModal.maxDomains} Domain(s). Bitte wähle aus, welche Domain(s) aktiv bleiben sollen.`}
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
+              {properties.map(p => (
+                <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.625rem 0.875rem', border: selectedProperties.includes(p.id) ? '2px solid #6C63FF' : '1px solid #e0e0e0', borderRadius: '8px', cursor: 'pointer', background: selectedProperties.includes(p.id) ? 'rgba(108,99,255,0.06)' : '#fff' }}>
+                  <input
+                    type="checkbox"
+                    checked={selectedProperties.includes(p.id)}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        if (selectedProperties.length < downgradeModal.maxDomains) {
+                          setSelectedProperties(s => [...s, p.id]);
+                        }
+                      } else {
+                        setSelectedProperties(s => s.filter(id => id !== p.id));
+                      }
+                    }}
+                    style={{ accentColor: '#6C63FF' }}
+                  />
+                  <span style={{ fontSize: '13px', fontWeight: 500 }}>{p.display_name || p.gsc_property_url}</span>
+                </label>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <Btn onClick={() => setDowngradeModal(null)}>
+                {branding.report_language === 'en' ? 'Cancel' : 'Abbrechen'}
+              </Btn>
+              <Btn $variant="primary" onClick={confirmDowngrade} disabled={selectedProperties.length !== downgradeModal.maxDomains}>
+                {branding.report_language === 'en' ? 'Confirm & Switch Plan →' : 'Bestätigen & Plan wechseln →'}
+              </Btn>
+            </div>
+          </ModalCard>
+        </ModalOverlay>
+      )}
+
       {deletePropertyId && (
         <ModalOverlay onClick={() => setDeletePropertyId(null)}>
           <ModalCard onClick={e => e.stopPropagation()}>
@@ -930,42 +1012,81 @@ export default function Settings({ user }) {
               </InfoRow>
             )}
 
-            <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-              {isPaid && (
-                <Btn $variant="primary" onClick={handlePortal} disabled={portalLoading}>
-                  {portalLoading ? 'Wird geladen...' : '↗ Billing Portal öffnen'}
+            {/* ── Primary Upsell CTA ── */}
+            {isFree && (
+              <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: '10px' }}>
+                <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>
+                  {branding.report_language === 'en' ? '🚀 Upgrade to Basic' : '🚀 Upgrade auf Basic'}
+                </div>
+                <div style={{ fontSize: '13px', color: 'var(--color-text-secondary, #666)', marginBottom: '0.75rem' }}>
+                  {branding.report_language === 'en'
+                    ? 'Get monthly SEO reports automatically – starting at €19/month.'
+                    : 'Monatliche SEO-Reports automatisch – ab €19/Monat.'}
+                </div>
+                <Btn $variant="primary" onClick={() => handleUpgrade('basic')}>
+                  {branding.report_language === 'en' ? 'Upgrade to Basic – €19/mo →' : 'Upgrade auf Basic – €19/mo →'}
                 </Btn>
-              )}
-              {isFree && (
-                <>
-                  <Btn $variant="primary" onClick={() => handleUpgrade('basic')}>
+              </div>
+            )}
+            {plan === 'basic' && (
+              <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: '10px' }}>
+                <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>
+                  {branding.report_language === 'en' ? '⚡ Upgrade to Pro' : '⚡ Upgrade auf Pro'}
+                </div>
+                <div style={{ fontSize: '13px', color: 'var(--color-text-secondary, #666)', marginBottom: '0.75rem' }}>
+                  {branding.report_language === 'en'
+                    ? '3 domains + AI recommendations – €39/month.'
+                    : '3 Domains + KI-Empfehlungen – €39/Monat.'}
+                </div>
+                <Btn $variant="primary" onClick={() => handleUpgrade('pro')}>
+                  {branding.report_language === 'en' ? 'Upgrade to Pro – €39/mo →' : 'Upgrade auf Pro – €39/mo →'}
+                </Btn>
+              </div>
+            )}
+            {plan === 'pro' && (
+              <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: '10px' }}>
+                <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>
+                  {branding.report_language === 'en' ? '🏆 Upgrade to Agency' : '🏆 Upgrade auf Agency'}
+                </div>
+                <div style={{ fontSize: '13px', color: 'var(--color-text-secondary, #666)', marginBottom: '0.75rem' }}>
+                  {branding.report_language === 'en'
+                    ? '10 domains + white-label reports – €79/month.'
+                    : '10 Domains + White-Label Reports – €79/Monat.'}
+                </div>
+                <Btn $variant="primary" onClick={() => handleUpgrade('agency')}>
+                  {branding.report_language === 'en' ? 'Upgrade to Agency – €79/mo →' : 'Upgrade auf Agency – €79/mo →'}
+                </Btn>
+              </div>
+            )}
+
+            {/* ── Other Plans ── */}
+            <div style={{ marginTop: '1.25rem' }}>
+              <FieldHint style={{ marginBottom: '0.5rem' }}>
+                {branding.report_language === 'en' ? 'Looking for a different plan?' : 'Anderen Plan wählen?'}
+              </FieldHint>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {plan !== 'basic' && (
+                  <Btn onClick={() => plan === 'free' ? handleUpgrade('basic') : handleDowngrade('basic')} style={{ fontSize: '13px', padding: '6px 14px' }}>
                     Basic – €19/mo
                   </Btn>
-                  <Btn onClick={() => handleUpgrade('pro')}>
+                )}
+                {plan !== 'pro' && (
+                  <Btn onClick={() => ['free','basic'].includes(plan) ? handleUpgrade('pro') : handleDowngrade('pro')} style={{ fontSize: '13px', padding: '6px 14px' }}>
                     Pro – €39/mo
                   </Btn>
-                  <Btn onClick={() => handleUpgrade('agency')}>
+                )}
+                {plan !== 'agency' && (
+                  <Btn onClick={() => plan === 'agency' ? handleDowngrade('agency') : handleUpgrade('agency')} style={{ fontSize: '13px', padding: '6px 14px' }}>
                     Agency – €79/mo
                   </Btn>
-                </>
-              )}
-              {plan === 'basic' && (
-                <Btn onClick={() => handleUpgrade('pro')}>
-                  Upgrade auf Pro – €39/mo →
-                </Btn>
-              )}
-              {plan === 'pro' && (
-                <Btn onClick={() => handleUpgrade('agency')}>
-                  Upgrade auf Agency – €79/mo →
-                </Btn>
-              )}
+                )}
+                {isPaid && (
+                  <Btn onClick={handlePortal} disabled={portalLoading} style={{ fontSize: '13px', padding: '6px 14px' }}>
+                    {portalLoading ? '...' : (branding.report_language === 'en' ? '↗ Billing Portal' : '↗ Billing Portal')}
+                  </Btn>
+                )}
+              </div>
             </div>
-
-            {isPaid && (
-              <FieldHint style={{ marginTop: '0.75rem' }}>
-                Im Billing Portal kannst du deinen Plan ändern, Zahlungsmethode aktualisieren und kündigen.
-              </FieldHint>
-            )}
           </SectionBody>
         </Section>
 
