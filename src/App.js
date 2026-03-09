@@ -13,6 +13,20 @@ import Docs from './pages/Docs';
 import Settings from './pages/Settings';
 import { PrivacyEN, PrivacyDE, TermsEN, TermsDE } from './pages/Legal';
 import CookieBanner from './components/CookieBanner';
+
+function AuthCallback() {
+  const navigate = React.useRef(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        window.location.replace('/dashboard');
+      } else {
+        window.location.replace('/login');
+      }
+    });
+  }, []);
+  return null;
+}
 import usePageTracking from './components/usePageTracking';
 
 const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings'];
@@ -66,6 +80,7 @@ function AppInner() {
         <Route path="/terms" element={<TermsEN />} />
         <Route path="/de/privacy" element={<PrivacyDE />} />
         <Route path="/de/terms" element={<TermsDE />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       {showFooter && <Footer />}
