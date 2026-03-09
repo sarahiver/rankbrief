@@ -163,6 +163,68 @@ const BtnConnect = styled.button`
   svg { width: 16px; height: 16px; }
 `;
 
+// ── Trial Upgrade Banner (Plan-Picker) ────────────────────────────────────────
+const TrialUpgradeBanner = styled.div`
+  background: linear-gradient(135deg, rgba(108,99,255,0.08) 0%, rgba(99,207,255,0.04) 100%);
+  border: 1px solid rgba(108,99,255,0.2);
+  border-radius: ${({ theme }) => theme.radius.xl};
+  padding: 2rem;
+  margin-bottom: 2rem;
+`;
+
+const TrialUpgradeTop = styled.div`
+  margin-bottom: 1.5rem;
+`;
+
+const TrialUpgradeTitle = styled.h2`
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.375rem;
+`;
+
+const TrialUpgradeSub = styled.p`
+  font-size: 0.875rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-weight: 300;
+`;
+
+const TrialPlanGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  @media (max-width: 680px) { grid-template-columns: 1fr; }
+`;
+
+const TrialPlanCard = styled.div`
+  background: ${({ theme, $highlight }) => $highlight ? theme.colors.accent : theme.colors.bgCard};
+  border: 1px solid ${({ theme, $highlight }) => $highlight ? 'transparent' : theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.xl};
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+  transform: ${({ $highlight }) => $highlight ? 'scale(1.03)' : 'none'};
+`;
+
+const TrialPlanBadge = styled.div`
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: ${({ theme }) => theme.colors.accent};
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+  white-space: nowrap;
+`;
+
 // ── Frozen Wall ───────────────────────────────────────────────────────────────
 const FrozenWall = styled.div`
   display: flex;
@@ -839,15 +901,35 @@ export default function Dashboard({ user }) {
 
         {/* Upgrade-Banner nur für Free-User MIT erstem Report (Trial läuft) */}
         {profile?.plan === 'free' && profile?.free_report_sent && properties.length > 0 && (
-          <ConnectBanner>
-            <ConnectText>
-              <h2>Dein kostenloser Monat läuft</h2>
-              <p>Wähle einen Plan um nach dem Freimonat weiterhin Reports zu erhalten.</p>
-            </ConnectText>
-            <BtnConnect onClick={() => handleUpgrade('basic')} disabled={upgrading}>
-              {upgrading ? 'Wird geladen...' : 'Jetzt upgraden →'}
-            </BtnConnect>
-          </ConnectBanner>
+          <TrialUpgradeBanner>
+            <TrialUpgradeTop>
+              <TrialUpgradeTitle>Dein kostenloser Monat läuft</TrialUpgradeTitle>
+              <TrialUpgradeSub>Wähle einen Plan um nach dem Freimonat weiterhin Reports zu erhalten.</TrialUpgradeSub>
+            </TrialUpgradeTop>
+            <TrialPlanGrid>
+              {[
+                { key: 'basic', name: 'Basic', price: '19', features: ['1 Domain', 'Monatlicher PDF-Report', 'GSC-Daten', 'KI-Zusammenfassung', 'Email-Versand'] },
+                { key: 'pro', name: 'Pro', price: '39', highlight: true, features: ['3 Domains', 'Alles in Basic', 'GA4-Daten', 'SEO-Empfehlungen', 'White-Label'] },
+                { key: 'agency', name: 'Agency', price: '79', features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Bulk Reporting', 'Agency Branding'] },
+              ].map(plan => (
+                <TrialPlanCard key={plan.key} $highlight={plan.highlight}>
+                  {plan.highlight && <TrialPlanBadge>Empfohlen</TrialPlanBadge>}
+                  <PlanName $highlight={plan.highlight}>{plan.name}</PlanName>
+                  <PlanPrice $highlight={plan.highlight}>€{plan.price}<span>/mo</span></PlanPrice>
+                  {plan.features.map(f => (
+                    <PlanFeature key={f} $highlight={plan.highlight}>{f}</PlanFeature>
+                  ))}
+                  <PlanBtn
+                    $highlight={plan.highlight}
+                    onClick={() => handleUpgrade(plan.key)}
+                    disabled={upgrading}
+                  >
+                    {upgrading ? 'Lädt...' : `${plan.name} wählen →`}
+                  </PlanBtn>
+                </TrialPlanCard>
+              ))}
+            </TrialPlanGrid>
+          </TrialUpgradeBanner>
         )}
 
         {loading ? <Spinner /> : (
