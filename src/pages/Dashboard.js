@@ -1338,6 +1338,7 @@ export default function Dashboard({ user }) {
     const SCOPES = [
       'https://www.googleapis.com/auth/webmasters.readonly',
       'https://www.googleapis.com/auth/analytics.readonly',
+      'https://www.googleapis.com/auth/userinfo.email',
     ].join(' ');
     const state = encodeURIComponent(`${user.id}|Meine Website|`);
     const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
