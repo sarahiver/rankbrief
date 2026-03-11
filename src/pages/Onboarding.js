@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 const fadeUp = keyframes`
@@ -189,16 +189,59 @@ const EmptyState = styled.div`
   line-height: 1.6;
 `;
 
+const CheckboxList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+`;
+
+const CheckboxItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  border: 1px solid ${({ $checked, theme }) => $checked ? theme.colors.accent : theme.colors.border};
+  background: ${({ $checked, theme }) => $checked ? theme.colors.accentDim : theme.colors.bg};
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: ${({ $checked, theme }) => $checked ? theme.colors.accent : theme.colors.text};
+  transition: all 0.15s;
+  user-select: none;
+  &:hover { border-color: ${({ theme }) => theme.colors.accent}; }
+`;
+
+const CheckboxBox = styled.div`
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid ${({ $checked, theme }) => $checked ? theme.colors.accent : theme.colors.border};
+  background: ${({ $checked, theme }) => $checked ? theme.colors.accent : 'transparent'};
+  color: #fff;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 700;
+  transition: all 0.15s;
+`;
+
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Onboarding({ user }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = useState(1); // 1 = GSC auswählen, 2 = GA4 eingeben
   const [pendingSites, setPendingSites] = useState([]);
-  const [selectedSite, setSelectedSite] = useState('');
+  const [selectedSites, setSelectedSites] = useState([]); // Multi-Select
   const [ga4Id, setGa4Id] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  // google_account_id aus URL lesen (von OAuth Callback mitgegeben)
+  const googleAccountId = new URLSearchParams(location.search).get('google_account_id');
 
   useEffect(() => {
     loadPendingSites();
@@ -207,20 +250,33 @@ export default function Onboarding({ user }) {
 
   const loadPendingSites = async () => {
     setLoading(true);
-    const { data } = await supabase
+    let query = supabase
       .from('properties')
-      .select('id, gsc_property_url, display_name')
+      .select('id, gsc_property_url, display_name, google_account_id')
       .eq('user_id', user.id)
       .eq('status', 'pending')
       .order('created_at', { ascending: true });
 
+    // Nur Properties dieses Google Accounts anzeigen
+    if (googleAccountId) {
+      query = query.eq('google_account_id', googleAccountId);
+    }
+
+    const { data } = await query;
     setPendingSites(data ?? []);
-    if (data?.length > 0) setSelectedSite(data[0].id);
+    // Standardmäßig erste Property vorausgewählt
+    if (data?.length > 0) setSelectedSites([data[0].id]);
     setLoading(false);
   };
 
+  const toggleSite = (id) => {
+    setSelectedSites(prev =>
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+    );
+  };
+
   const handleSelectProperty = async () => {
-    if (!selectedSite) return;
+    if (selectedSites.length === 0) return;
     setStep(2);
   };
 
@@ -228,7 +284,6 @@ export default function Onboarding({ user }) {
     setSaving(true);
     setError('');
 
-    // GA4 ID validieren (wenn nicht übersprungen)
     const ga4Value = skipGa4 ? null : ga4Id.trim() || null;
     if (!skipGa4 && ga4Id.trim() && !/^\d+$/.test(ga4Id.trim())) {
       setError('Die GA4 Property ID besteht nur aus Zahlen (z.B. 123456789). Nicht die G-XXX Measurement ID.');
@@ -237,7 +292,7 @@ export default function Onboarding({ user }) {
     }
 
     try {
-      // Ausgewählte Property auf "active" setzen + GA4 ID speichern
+      // Alle ausgewählten Properties auf "active" setzen
       const { error: updateError } = await supabase
         .from('properties')
         .update({
@@ -245,17 +300,23 @@ export default function Onboarding({ user }) {
           ga_property_id: ga4Value,
           last_synced_at: new Date().toISOString(),
         })
-        .eq('id', selectedSite)
+        .in('id', selectedSites)
         .eq('user_id', user.id);
 
       if (updateError) throw updateError;
 
-      // Alle anderen pending Properties dieses Users löschen
-      await supabase
+      // Nicht-ausgewählte pending Properties dieses Google Accounts löschen
+      let deleteQuery = supabase
         .from('properties')
         .delete()
         .eq('user_id', user.id)
         .eq('status', 'pending');
+
+      if (googleAccountId) {
+        deleteQuery = deleteQuery.eq('google_account_id', googleAccountId);
+      }
+
+      await deleteQuery;
 
       navigate('/dashboard?connected=true');
     } catch (err) {
@@ -295,26 +356,32 @@ export default function Onboarding({ user }) {
         {/* ── Step 1: GSC Property auswählen ── */}
         {step === 1 && (
           <>
-            <Title>Welche Website tracken?</Title>
+            <Title>Welche Websites tracken?</Title>
             <Subtitle>
-              Wir haben {pendingSites.length} {pendingSites.length === 1 ? 'Property' : 'Properties'} in deiner Google Search Console gefunden.
-              Wähle die Website aus, für die du monatliche Reports erhalten möchtest.
+              Wir haben {pendingSites.length} {pendingSites.length === 1 ? 'Property' : 'Properties'} in deinem Google-Konto gefunden.
+              Wähle alle Websites aus, für die du monatliche Reports erhalten möchtest.
             </Subtitle>
 
-            <Label>GSC Property</Label>
-            <Select
-              value={selectedSite}
-              onChange={e => setSelectedSite(e.target.value)}
-            >
+            <Label>GSC Properties</Label>
+            <CheckboxList>
               {pendingSites.map(site => (
-                <option key={site.id} value={site.id}>
-                  {site.gsc_property_url}
-                </option>
+                <CheckboxItem
+                  key={site.id}
+                  $checked={selectedSites.includes(site.id)}
+                  onClick={() => toggleSite(site.id)}
+                >
+                  <CheckboxBox $checked={selectedSites.includes(site.id)}>
+                    {selectedSites.includes(site.id) && '✓'}
+                  </CheckboxBox>
+                  <span>{site.gsc_property_url}</span>
+                </CheckboxItem>
               ))}
-            </Select>
+            </CheckboxList>
 
-            <BtnPrimary onClick={handleSelectProperty} disabled={!selectedSite}>
-              Weiter →
+            <BtnPrimary onClick={handleSelectProperty} disabled={selectedSites.length === 0}>
+              {selectedSites.length === 0
+                ? 'Mindestens eine Property wählen'
+                : `${selectedSites.length} ${selectedSites.length === 1 ? 'Property' : 'Properties'} verbinden →`}
             </BtnPrimary>
           </>
         )}
