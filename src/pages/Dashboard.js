@@ -1247,7 +1247,7 @@ function PropertyItem({ property, isAgency, plan }) {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function Dashboard({ user }) {
+export default function Dashboard({ user, onOpenModal }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -1327,7 +1327,6 @@ export default function Dashboard({ user }) {
   const handleConnectGoogle = () => {
     const plan  = profile?.plan || 'free';
     const limit = PLAN_LIMITS[plan] ?? 1;
-    // Nur aktive Properties zählen für das Limit
     const activeCount = properties.filter(p => p.status === 'active').length;
     if (activeCount >= limit) {
       setShowUpgradeModal(true);
@@ -1340,7 +1339,8 @@ export default function Dashboard({ user }) {
       'https://www.googleapis.com/auth/analytics.readonly',
       'https://www.googleapis.com/auth/userinfo.email',
     ].join(' ');
-    const state = encodeURIComponent(`${user.id}|Meine Website|`);
+    // state: user_id|display_name|  (display_name leer, wird im Modal nicht gebraucht)
+    const state = encodeURIComponent(`${user.id}||`);
     const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
     authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
