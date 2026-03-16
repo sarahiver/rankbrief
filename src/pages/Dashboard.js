@@ -1247,7 +1247,7 @@ function PropertyItem({ property, isAgency, plan }) {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function Dashboard({ user }) {
+export default function Dashboard({ user, onOpenModal }) {
   const navigate = useNavigate();
   const location = useLocation();
 
