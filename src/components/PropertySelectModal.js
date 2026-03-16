@@ -154,43 +154,54 @@ const GoogleIcon = () => (
 
 const PLAN_LIMITS = { free: 1, basic: 1, pro: 3, agency: 10 };
 
-export default function PropertySelectModal({ user, onDone, plan = 'free', activeCount = 0 }) {
+export default function PropertySelectModal({ user, onDone, onNewAccount, plan = 'free', activeCount = 0 }) {
   const limit = PLAN_LIMITS[plan] ?? 1;
   const remaining = Math.max(0, limit - activeCount); // wie viele Properties noch hinzugefügt werden dürfen
 
   const [step, setStep] = useState(1);
   const [pendingSites, setPendingSites] = useState([]);
   const [selected, setSelected] = useState([]);
+  const [realRemaining, setRealRemaining] = useState(limit);
   const [ga4Id, setGa4Id] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => { loadPending(remaining); }, [remaining]);
+  useEffect(() => { loadPending(); }, []);
 
-  const loadPending = async (slots) => {
+  const loadPending = async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from('properties')
-      .select('id, gsc_property_url, google_account_id')
-      .eq('user_id', user.id)
-      .eq('status', 'pending')
-      .order('created_at', { ascending: true });
+
+    // Aktive Properties + pending Properties parallel laden
+    const [{ data: activeProps }, { data }] = await Promise.all([
+      supabase.from('properties').select('id').eq('user_id', user.id).eq('status', 'active'),
+      supabase.from('properties')
+        .select('id, gsc_property_url, google_account_id')
+        .eq('user_id', user.id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: true }),
+    ]);
+
+    // Echtes remaining aus DB berechnen (nicht auf prop verlassen)
+    const realActiveCount = activeProps?.length ?? 0;
+    const computedRemaining = Math.max(0, limit - realActiveCount);
+    setRealRemaining(computedRemaining);
+
     const sites = data ?? [];
     setPendingSites(sites);
-    // Nur bis zum Plan-Limit vorauswählen (slots = wie viele noch erlaubt)
-    const allowed = slots > 0 ? slots : 1;
-    if (sites.length > 0) setSelected(sites.slice(0, allowed).map(s => s.id));
+    // Nur bis zum echten Limit vorauswählen
+    if (sites.length > 0) setSelected(sites.slice(0, Math.max(1, computedRemaining)).map(s => s.id));
     setLoading(false);
   };
 
   const toggle = (id) => setSelected(prev => {
     if (prev.includes(id)) return prev.filter(s => s !== id);
-    if (prev.length >= remaining) return prev; // Limit erreicht → kein weiteres Anklicken
+    if (prev.length >= realRemaining) return prev; // Limit erreicht
     return [...prev, id];
   });
 
   const handleConnectAnother = () => {
+    if (onNewAccount) { onNewAccount(); return; }
     const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
     const REDIRECT_URI = 'https://ubexqxxkqjzhsgidsseh.supabase.co/functions/v1/google-oauth-callback';
     const SCOPES = [
@@ -213,9 +224,9 @@ export default function PropertySelectModal({ user, onDone, plan = 'free', activ
   const handleSave = async (skipGa4 = false) => {
     if (selected.length === 0) return;
     // Sicherheits-Check: nie mehr als erlaubt speichern
-    const allowedSelected = selected.slice(0, Math.max(1, remaining));
+    const allowedSelected = selected.slice(0, Math.max(1, realRemaining));
     if (allowedSelected.length < selected.length) {
-      setError(`Dein Plan erlaubt nur ${remaining} weitere ${remaining === 1 ? 'Property' : 'Properties'}.`);
+      setError(`Dein Plan erlaubt nur ${realRemaining} weitere ${realRemaining === 1 ? 'Property' : 'Properties'}.`);
       setSelected(allowedSelected);
       return;
     }
@@ -271,7 +282,7 @@ export default function PropertySelectModal({ user, onDone, plan = 'free', activ
                 ? 'Keine neuen Properties gefunden.'
                 : <>
                     Wir haben {pendingSites.length} {pendingSites.length === 1 ? 'Property' : 'Properties'} gefunden.{' '}
-                    Du kannst noch <strong>{remaining}</strong> von {limit} {limit === 1 ? 'Property' : 'Properties'} hinzufügen ({plan === 'free' ? 'Free' : plan.charAt(0).toUpperCase() + plan.slice(1)}-Plan).
+                    Du kannst noch <strong>{realRemaining}</strong> von {limit} {limit === 1 ? 'Property' : 'Properties'} hinzufügen ({plan === 'free' ? 'Free' : plan.charAt(0).toUpperCase() + plan.slice(1)}-Plan).
                   </>}
             </Sub>
 

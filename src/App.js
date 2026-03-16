@@ -147,6 +147,23 @@ function AppInner() {
         <PropertySelectModal
           user={user}
           onDone={handleModalDone}
+          onNewAccount={() => {
+            setShowPropertyModal(false);
+            // OAuth starten – nach Callback öffnet sich Modal wieder
+            const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+            const REDIRECT_URI = 'https://ubexqxxkqjzhsgidsseh.supabase.co/functions/v1/google-oauth-callback';
+            const SCOPES = ['https://www.googleapis.com/auth/webmasters.readonly','https://www.googleapis.com/auth/analytics.readonly','https://www.googleapis.com/auth/userinfo.email'].join(' ');
+            const state = encodeURIComponent(`${user.id}||`);
+            const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+            authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
+            authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
+            authUrl.searchParams.set('response_type', 'code');
+            authUrl.searchParams.set('scope', SCOPES);
+            authUrl.searchParams.set('access_type', 'offline');
+            authUrl.searchParams.set('prompt', 'consent');
+            authUrl.searchParams.set('state', state);
+            window.location.href = authUrl.toString();
+          }}
           plan={modalContext.plan}
           activeCount={modalContext.activeCount}
         />

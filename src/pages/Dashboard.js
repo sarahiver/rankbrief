@@ -1252,6 +1252,7 @@ export default function Dashboard({ user }) {
   const location = useLocation();
 
   const [properties, setProperties] = useState([]);
+  const [googleAccounts, setGoogleAccounts] = useState([]);
 
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1265,8 +1266,14 @@ export default function Dashboard({ user }) {
   useEffect(() => {
     loadProperties();
     loadProfile();
+    loadGoogleAccounts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const loadGoogleAccounts = async () => {
+    const { data } = await supabase.from('google_accounts').select('id, google_email').eq('user_id', user.id);
+    setGoogleAccounts(data ?? []);
+  };
 
   const loadProfile = async () => {
     const { data } = await supabase
@@ -1315,15 +1322,7 @@ export default function Dashboard({ user }) {
     navigate('/');
   };
 
-  const handleConnectGoogle = () => {
-    const plan  = profile?.plan || 'free';
-    const limit = PLAN_LIMITS[plan] ?? 1;
-    // Nur aktive Properties zählen für das Limit
-    const activeCount = properties.filter(p => p.status === 'active').length;
-    if (activeCount >= limit) {
-      setShowUpgradeModal(true);
-      return;
-    }
+  const startGoogleOAuth = () => {
     const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
     const REDIRECT_URI = 'https://ubexqxxkqjzhsgidsseh.supabase.co/functions/v1/google-oauth-callback';
     const SCOPES = [
@@ -1331,7 +1330,7 @@ export default function Dashboard({ user }) {
       'https://www.googleapis.com/auth/analytics.readonly',
       'https://www.googleapis.com/auth/userinfo.email',
     ].join(' ');
-    const state = encodeURIComponent(`${user.id}|Meine Website|`);
+    const state = encodeURIComponent(`${user.id}||`);
     const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
     authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
@@ -1341,6 +1340,23 @@ export default function Dashboard({ user }) {
     authUrl.searchParams.set('prompt', 'consent');
     authUrl.searchParams.set('state', state);
     window.location.href = authUrl.toString();
+  };
+
+  const handleConnectGoogle = () => {
+    const plan  = profile?.plan || 'free';
+    const limit = PLAN_LIMITS[plan] ?? 1;
+    const activeCount = properties.filter(p => p.status === 'active').length;
+    if (activeCount >= limit) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    // Hat der User bereits Google-Konten? → Modal direkt öffnen (kein neues OAuth nötig)
+    // Kein Google-Konto → OAuth starten
+    if (googleAccounts.length > 0) {
+      if (onOpenModal) onOpenModal({ plan, activeCount });
+    } else {
+      startGoogleOAuth();
+    }
   };
 
   const plan     = profile?.plan || 'free';
