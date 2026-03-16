@@ -17,15 +17,66 @@ import usePageTracking from './components/usePageTracking';
 
 function AuthCallback() {
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+    const handleCallback = async () => {
+      // Supabase verarbeitet den ?code= Parameter automatisch beim client-seitigen Laden.
+      // Kurz warten bis die Session via PKCE-Exchange etabliert ist.
+      let { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        // Session noch nicht da → auf onAuthStateChange warten (max 5s)
+        session = await new Promise((resolve) => {
+          const timeout = setTimeout(() => {
+            listener.subscription.unsubscribe();
+            resolve(null);
+          }, 5000);
+
+          const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => {
+            if (s) {
+              clearTimeout(timeout);
+              listener.subscription.unsubscribe();
+              resolve(s);
+            }
+          });
+        });
+      }
+
+      if (!session) {
+        window.location.replace('/login');
+        return;
+      }
+
+      // Prüfen ob User bereits aktive Properties hat → Onboarding oder Dashboard
+      const { data: properties } = await supabase
+        .from('properties')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .eq('status', 'active')
+        .limit(1);
+
+      const hasProperties = properties && properties.length > 0;
+
+      if (hasProperties) {
         window.location.replace('/dashboard');
       } else {
-        window.location.replace('/login');
+        // Neuer User → Onboarding
+        // google_account_id aus URL weitergeben falls vorhanden
+        const params = new URLSearchParams(window.location.search);
+        const googleAccountId = params.get('google_account_id');
+        const target = googleAccountId
+          ? `/onboarding?google_account_id=${googleAccountId}`
+          : '/onboarding';
+        window.location.replace(target);
       }
-    });
+    };
+
+    handleCallback();
   }, []);
-  return null;
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ color: '#9898B8', fontSize: '0.875rem' }}>Verbindung wird hergestellt…</div>
+    </div>
+  );
 }
 
 const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings'];
