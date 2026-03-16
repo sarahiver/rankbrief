@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import PropertySelectModal from '../components/PropertySelectModal';
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(12px); }
@@ -553,6 +554,7 @@ export default function Settings({ user }) {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [googleAccounts, setGoogleAccounts] = useState([]);
+  const [showPropertyModal, setShowPropertyModal] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoResult, setPromoResult] = useState(null);
@@ -765,20 +767,15 @@ export default function Settings({ user }) {
   };
 
   // ── Neue Property verbinden ───────────────────────────────────────────────
-  const handleConnectNew = () => {
-    const plan = profile?.plan || 'free';
-    const limit = PLAN_LIMITS[plan]?.domains ?? 1;
-    if (properties.length >= limit) {
-      showAlert(`Dein ${PLAN_LIMITS[plan]?.label}-Plan erlaubt max. ${limit} Domain(s). Bitte upgraden.`, 'error');
-      return;
-    }
+  const startOAuth = () => {
     const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
     const REDIRECT_URI = `${process.env.REACT_APP_SUPABASE_URL}/functions/v1/google-oauth-callback`;
     const SCOPES = [
       'https://www.googleapis.com/auth/webmasters.readonly',
       'https://www.googleapis.com/auth/analytics.readonly',
+      'https://www.googleapis.com/auth/userinfo.email',
     ].join(' ');
-    const state = encodeURIComponent(`${user.id}|Neue Website|`);
+    const state = encodeURIComponent(`${user.id}||`);
     const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
     authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
@@ -788,6 +785,21 @@ export default function Settings({ user }) {
     authUrl.searchParams.set('prompt', 'consent');
     authUrl.searchParams.set('state', state);
     window.location.href = authUrl.toString();
+  };
+
+  const handleConnectNew = () => {
+    const plan = profile?.plan || 'free';
+    const planLimit = PLAN_LIMITS[plan]?.domains ?? 1;
+    if (properties.length >= planLimit) {
+      showAlert(`Dein ${PLAN_LIMITS[plan]?.label || plan}-Plan erlaubt max. ${planLimit} Domain(s). Bitte upgraden.`, 'error');
+      return;
+    }
+    // Hat der User bereits Google-Konten? → Modal öffnen (keine neues OAuth nötig)
+    if (googleAccounts.length > 0) {
+      setShowPropertyModal(true);
+    } else {
+      startOAuth();
+    }
   };
 
   // ── Branding speichern ───────────────────────────────────────────────────────
@@ -899,6 +911,7 @@ export default function Settings({ user }) {
   );
 
   return (
+    <>
     <Layout>
       {/* Confirm Modal: Property löschen */}
       {/* ── Downgrade Property Selection Modal ── */}
@@ -1558,5 +1571,16 @@ export default function Settings({ user }) {
         </Section>
       </Main>
     </Layout>
+
+      {showPropertyModal && (
+        <PropertySelectModal
+          user={user}
+          plan={profile?.plan || 'free'}
+          activeCount={properties.length}
+          onDone={() => { setShowPropertyModal(false); loadData(); }}
+          onNewAccount={() => { setShowPropertyModal(false); startOAuth(); }}
+        />
+      )}
+    </>
   );
 }

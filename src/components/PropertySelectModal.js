@@ -172,9 +172,9 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
   const loadPending = async () => {
     setLoading(true);
 
-    // Aktive Properties + pending Properties parallel laden
-    const [{ data: activeProps }, { data }] = await Promise.all([
-      supabase.from('properties').select('id').eq('user_id', user.id).eq('status', 'active'),
+    // Aktive Properties + pending + alle GSC-Properties parallel laden
+    const [{ data: activeProps }, { data: pendingProps }] = await Promise.all([
+      supabase.from('properties').select('id, gsc_property_url').eq('user_id', user.id).eq('status', 'active'),
       supabase.from('properties')
         .select('id, gsc_property_url, google_account_id')
         .eq('user_id', user.id)
@@ -182,21 +182,39 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
         .order('created_at', { ascending: true }),
     ]);
 
-    // Echtes remaining aus DB berechnen (nicht auf prop verlassen)
+    // Echtes remaining berechnen
     const realActiveCount = activeProps?.length ?? 0;
     const computedRemaining = Math.max(0, limit - realActiveCount);
     setRealRemaining(computedRemaining);
 
-    const sites = data ?? [];
+    // Pending Properties anzeigen falls vorhanden
+    // Falls keine pending → zeige aktive Properties damit User wechseln kann
+    const activeUrls = new Set((activeProps ?? []).map(p => p.gsc_property_url));
+    let sites = pendingProps ?? [];
+
+    // Wenn keine pending Properties: zeige alle aktiven als "wechselbar" an
+    if (sites.length === 0 && (activeProps ?? []).length > 0) {
+      sites = (activeProps ?? []).map(p => ({ ...p, status: 'active' }));
+    }
+
     setPendingSites(sites);
-    // Nur bis zum echten Limit vorauswählen
-    if (sites.length > 0) setSelected(sites.slice(0, Math.max(1, computedRemaining)).map(s => s.id));
+    if (sites.length > 0) {
+      // Aktive vorauswählen, maximal bis zum Limit
+      const preSelected = sites.filter(s => activeUrls.has(s.gsc_property_url)).slice(0, Math.max(1, computedRemaining));
+      if (preSelected.length > 0) {
+        setSelected(preSelected.map(s => s.id));
+      } else {
+        setSelected(sites.slice(0, Math.max(1, computedRemaining)).map(s => s.id));
+      }
+    }
     setLoading(false);
   };
 
   const toggle = (id) => setSelected(prev => {
     if (prev.includes(id)) return prev.filter(s => s !== id);
-    if (prev.length >= realRemaining) return prev; // Limit erreicht
+    // Bei Limit=1: alte Property automatisch abwählen (Radio-Button Verhalten)
+    if (realRemaining === 1) return [id];
+    if (prev.length >= realRemaining) return prev;
     return [...prev, id];
   });
 
