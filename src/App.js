@@ -78,6 +78,7 @@ function AppInner() {
   const [loading, setLoading] = useState(true);
   const [lang, setLang]     = useState(() => localStorage.getItem('rb_lang') || 'en');
   const [showPropertyModal, setShowPropertyModal] = useState(false);
+  const [modalContext, setModalContext] = useState({ plan: 'free', activeCount: 0 });
   const location = useLocation();
   const path = location.pathname;
   usePageTracking();
@@ -114,9 +115,10 @@ function AppInner() {
     window.location.replace('/dashboard?connected=true');
   };
 
-  // Auch vom Dashboard aus das Modal öffnen (wenn User "+ Konto verbinden" klickt
-  // und nach OAuth zurückkommt)
-  const handleOpenModal = () => setShowPropertyModal(true);
+  const handleOpenModal = (ctx = {}) => {
+    setModalContext({ plan: ctx.plan || 'free', activeCount: ctx.activeCount || 0 });
+    setShowPropertyModal(true);
+  };
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -131,7 +133,12 @@ function AppInner() {
     <>
       {/* Globales Property-Modal — liegt über allem */}
       {showPropertyModal && user && (
-        <PropertySelectModal user={user} onDone={handleModalDone} />
+        <PropertySelectModal
+          user={user}
+          onDone={handleModalDone}
+          plan={modalContext.plan}
+          activeCount={modalContext.activeCount}
+        />
       )}
 
       {showNav && <Navbar user={user} lang={lang} onLangChange={handleLangChange} />}

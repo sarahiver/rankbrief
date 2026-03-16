@@ -152,7 +152,12 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export default function PropertySelectModal({ user, onDone }) {
+const PLAN_LIMITS = { free: 1, basic: 1, pro: 3, agency: 10 };
+
+export default function PropertySelectModal({ user, onDone, plan = 'free', activeCount = 0 }) {
+  const limit = PLAN_LIMITS[plan] ?? 1;
+  const remaining = Math.max(0, limit - activeCount); // wie viele Properties noch hinzugefügt werden dürfen
+
   const [step, setStep] = useState(1);
   const [pendingSites, setPendingSites] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -177,9 +182,11 @@ export default function PropertySelectModal({ user, onDone }) {
     setLoading(false);
   };
 
-  const toggle = (id) => setSelected(prev =>
-    prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-  );
+  const toggle = (id) => setSelected(prev => {
+    if (prev.includes(id)) return prev.filter(s => s !== id);
+    if (prev.length >= remaining) return prev; // Limit erreicht → kein weiteres Anklicken
+    return [...prev, id];
+  });
 
   const handleConnectAnother = () => {
     const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -253,7 +260,10 @@ export default function PropertySelectModal({ user, onDone }) {
             <Sub>
               {pendingSites.length === 0
                 ? 'Keine neuen Properties gefunden.'
-                : `Wir haben ${pendingSites.length} ${pendingSites.length === 1 ? 'Property' : 'Properties'} gefunden. Wähle die Websites für monatliche Reports.`}
+                : <>
+                    Wir haben {pendingSites.length} {pendingSites.length === 1 ? 'Property' : 'Properties'} gefunden.{' '}
+                    Du kannst noch <strong>{remaining}</strong> von {limit} {limit === 1 ? 'Property' : 'Properties'} hinzufügen ({plan === 'free' ? 'Free' : plan.charAt(0).toUpperCase() + plan.slice(1)}-Plan).
+                  </>}
             </Sub>
 
             {pendingSites.length === 0 ? (

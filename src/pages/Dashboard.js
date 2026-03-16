@@ -895,6 +895,51 @@ const DownloadBtn = styled.a`
   }
 `;
 
+
+// ── Promo Code Box ────────────────────────────────────────────────────────────
+const PromoBox = styled.div`
+  background: linear-gradient(135deg, rgba(108,99,255,0.06) 0%, rgba(99,207,255,0.04) 100%);
+  border: 1px solid rgba(108,99,255,0.18);
+  border-radius: \${({ theme }) => theme.radius.xl};
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+`;
+const PromoBoxText = styled.div`
+  flex: 1;
+  h3 { font-family: \${({ theme }) => theme.fonts.display}; font-size: 0.9375rem; font-weight: 700; margin-bottom: 0.25rem; }
+  p  { font-size: 0.8125rem; color: \${({ theme }) => theme.colors.textMuted}; font-weight: 300; }
+`;
+const PromoInputRow = styled.div`display: flex; gap: 0.625rem; align-items: center; flex-wrap: wrap;`;
+const PromoInput = styled.input`
+  padding: 0.5rem 0.875rem;
+  background: \${({ theme }) => theme.colors.bg};
+  border: 1px solid \${({ theme }) => theme.colors.border};
+  border-radius: \${({ theme }) => theme.radius.md};
+  color: \${({ theme }) => theme.colors.text};
+  font-size: 0.875rem; letter-spacing: 0.06em; text-transform: uppercase; outline: none;
+  transition: border-color 0.2s; width: 180px;
+  &:focus { border-color: \${({ theme }) => theme.colors.accent}; }
+  &::placeholder { color: \${({ theme }) => theme.colors.textDim}; text-transform: none; }
+`;
+const PromoBtn = styled.button`
+  padding: 0.5rem 1.125rem;
+  border-radius: \${({ theme }) => theme.radius.md};
+  font-family: \${({ theme }) => theme.fonts.display};
+  font-weight: 700; font-size: 0.875rem;
+  background: \${({ theme }) => theme.colors.accent}; color: #fff;
+  transition: all 0.2s; white-space: nowrap;
+  &:hover:not(:disabled) { background: \${({ theme }) => theme.colors.accentHover}; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+`;
+const PromoMsg = styled.div`
+  font-size: 0.8125rem; font-weight: 500; margin-top: 0.5rem;
+  color: \${({ $success, theme }) => $success ? theme.colors.success : theme.colors.danger};
+`;
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function fmt(n) {
   if (n == null) return '–';
@@ -1258,6 +1303,9 @@ export default function Dashboard({ user, onOpenModal }) {
   const [profile, setProfile] = useState(null);
   const [upgrading, setUpgrading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoResult, setPromoResult] = useState(null); // null | { success, plan, message }
 
   const connected = new URLSearchParams(location.search).get('connected') === 'true';
   const upgraded = new URLSearchParams(location.search).get('upgraded') === 'true';
@@ -1324,6 +1372,30 @@ export default function Dashboard({ user, onOpenModal }) {
     navigate('/');
   };
 
+  const handleRedeemPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoLoading(true); setPromoResult(null);
+    try {
+      const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+      const SUPABASE_ANON_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/redeem-promo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'apikey': SUPABASE_ANON_KEY },
+        body: JSON.stringify({ code: promoCode.trim(), user_id: user.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPromoResult({ success: true, plan: data.plan });
+        setTimeout(() => window.location.replace('/dashboard?upgraded=true'), 1500);
+      } else {
+        setPromoResult({ success: false, message: data.error || 'Ungültiger oder bereits verwendeter Code.' });
+      }
+    } catch {
+      setPromoResult({ success: false, message: 'Fehler beim Einlösen. Bitte erneut versuchen.' });
+    }
+    setPromoLoading(false);
+  };
+
   const handleConnectGoogle = () => {
     const plan  = profile?.plan || 'free';
     const limit = PLAN_LIMITS[plan] ?? 1;
@@ -1339,7 +1411,6 @@ export default function Dashboard({ user, onOpenModal }) {
       'https://www.googleapis.com/auth/analytics.readonly',
       'https://www.googleapis.com/auth/userinfo.email',
     ].join(' ');
-    // state: user_id|display_name|  (display_name leer, wird im Modal nicht gebraucht)
     const state = encodeURIComponent(`${user.id}||`);
     const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
@@ -1349,6 +1420,8 @@ export default function Dashboard({ user, onOpenModal }) {
     authUrl.searchParams.set('access_type', 'offline');
     authUrl.searchParams.set('prompt', 'consent');
     authUrl.searchParams.set('state', state);
+    // Modal-Context mitgeben damit nach dem Return das Limit korrekt gesetzt ist
+    if (onOpenModal) onOpenModal({ plan, activeCount });
     window.location.href = authUrl.toString();
   };
 
@@ -1407,6 +1480,35 @@ export default function Dashboard({ user, onOpenModal }) {
           <Alert $type="success">
             🎉 Upgrade erfolgreich! Dein Plan wurde aktiviert.
           </Alert>
+        )}
+
+        {/* Promo Code – nur für Free-User ohne bereits eingelösten Code */}
+        {profile?.plan === 'free' && !profile?.promo_code_used && (
+          <PromoBox>
+            <PromoBoxText>
+              <h3>🎟️ Promo-Code einlösen</h3>
+              <p>Hast du einen Code? Hier upgraden ohne Kreditkarte.</p>
+              <PromoInputRow>
+                <PromoInput
+                  type="text"
+                  placeholder="z.B. 2026RANKBRIEFPROMO"
+                  value={promoCode}
+                  onChange={e => setPromoCode(e.target.value.toUpperCase())}
+                  onKeyDown={e => e.key === 'Enter' && handleRedeemPromo()}
+                />
+                <PromoBtn onClick={handleRedeemPromo} disabled={promoLoading || !promoCode.trim()}>
+                  {promoLoading ? 'Prüfe…' : 'Einlösen →'}
+                </PromoBtn>
+              </PromoInputRow>
+              {promoResult && (
+                <PromoMsg $success={promoResult.success}>
+                  {promoResult.success
+                    ? `✅ Code aktiviert! Dein ${promoResult.plan}-Plan ist jetzt aktiv.`
+                    : `❌ ${promoResult.message}`}
+                </PromoMsg>
+              )}
+            </PromoBoxText>
+          </PromoBox>
         )}
 
         {/* Upgrade-Banner nur für Free-User MIT erstem Report (Trial läuft) */}
