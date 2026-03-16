@@ -178,7 +178,8 @@ export default function PropertySelectModal({ user, onDone, plan = 'free', activ
       .order('created_at', { ascending: true });
     const sites = data ?? [];
     setPendingSites(sites);
-    if (sites.length > 0) setSelected([sites[0].id]);
+    // Nur bis zum Plan-Limit vorauswählen
+    if (sites.length > 0) setSelected(sites.slice(0, remaining).map(s => s.id));
     setLoading(false);
   };
 

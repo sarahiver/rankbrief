@@ -552,6 +552,10 @@ const PLAN_LIMITS = {
 export default function Settings({ user }) {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
+  const [googleAccounts, setGoogleAccounts] = useState([]);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoResult, setPromoResult] = useState(null);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState(null);
@@ -591,10 +595,12 @@ export default function Settings({ user }) {
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    const [{ data: prof }, { data: props }] = await Promise.all([
+    const [{ data: prof }, { data: props }, { data: gAccounts }] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
       supabase.from('properties').select('*').eq('user_id', user.id).order('created_at'),
+      supabase.from('google_accounts').select('id, google_email, created_at').eq('user_id', user.id).order('created_at'),
     ]);
+    setGoogleAccounts(gAccounts ?? []);
     setProfile(prof);
     setProperties(props ?? []);
     // Init branding from profile
@@ -621,6 +627,30 @@ export default function Settings({ user }) {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/');
+  };
+
+  const handleRedeemPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoLoading(true); setPromoResult(null);
+    try {
+      const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+      const SUPABASE_ANON_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/redeem-promo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'apikey': SUPABASE_ANON_KEY },
+        body: JSON.stringify({ code: promoCode.trim(), user_id: user.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPromoResult({ success: true, plan: data.plan });
+        setTimeout(() => window.location.replace('/dashboard?upgraded=true'), 1500);
+      } else {
+        setPromoResult({ success: false, message: data.error || 'Ungültiger oder bereits verwendeter Code.' });
+      }
+    } catch {
+      setPromoResult({ success: false, message: 'Fehler. Bitte erneut versuchen.' });
+    }
+    setPromoLoading(false);
   };
 
   // ── Stripe Customer Portal ────────────────────────────────────────────────
@@ -1379,7 +1409,99 @@ export default function Settings({ user }) {
           </SectionBody>
         </Section>
 
-        {/* ── Account ────────────────────────────────────────────────────── */}
+        {/* ── Promo Code ──────────────────────────────────────────────────── */}
+        {profile?.plan === 'free' && !profile?.promo_code_used && (
+          <Section>
+            <SectionHead>
+              <div>
+                <SectionTitle>🎟️ Promo-Code einlösen</SectionTitle>
+                <SectionSub>Hast du einen Code? Hier upgraden ohne Kreditkarte.</SectionSub>
+              </div>
+            </SectionHead>
+            <SectionBody>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  placeholder="z.B. 2026RANKBRIEFPROMO"
+                  value={promoCode}
+                  onChange={e => setPromoCode(e.target.value.toUpperCase())}
+                  onKeyDown={e => e.key === 'Enter' && handleRedeemPromo()}
+                  style={{
+                    padding: '0.625rem 1rem', borderRadius: '8px', fontSize: '0.875rem',
+                    letterSpacing: '0.06em', textTransform: 'uppercase', outline: 'none',
+                    border: '1px solid var(--border)', background: 'var(--bg)',
+                    color: 'var(--text)', width: '220px',
+                  }}
+                />
+                <button
+                  onClick={handleRedeemPromo}
+                  disabled={promoLoading || !promoCode.trim()}
+                  style={{
+                    padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700,
+                    fontSize: '0.875rem', background: '#6C63FF', color: '#fff',
+                    border: 'none', cursor: 'pointer', opacity: (promoLoading || !promoCode.trim()) ? 0.5 : 1,
+                  }}
+                >
+                  {promoLoading ? 'Prüfe…' : 'Einlösen →'}
+                </button>
+              </div>
+              {promoResult && (
+                <div style={{
+                  marginTop: '0.75rem', fontSize: '0.8125rem', fontWeight: 500,
+                  color: promoResult.success ? '#10B981' : '#EF4444',
+                }}>
+                  {promoResult.success
+                    ? `✅ Code aktiviert! Dein ${promoResult.plan}-Plan ist jetzt aktiv.`
+                    : `❌ ${promoResult.message}`}
+                </div>
+              )}
+            </SectionBody>
+          </Section>
+        )}
+
+        {/* ── Google-Konten ─────────────────────────────────────────────── */}
+        <Section>
+          <SectionHead>
+            <div>
+              <SectionTitle>Verbundene Google-Konten</SectionTitle>
+              <SectionSub>Diese Google-Accounts sind mit deinem RankBrief-Account verknüpft.</SectionSub>
+            </div>
+          </SectionHead>
+          <SectionBody>
+            {googleAccounts.length === 0 ? (
+              <div style={{ fontSize: '0.875rem', color: '#888', fontWeight: 300 }}>
+                Noch kein Google-Konto verbunden. Verbinde ein Konto über das Dashboard.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {googleAccounts.map(account => (
+                  <div key={account.id} style={{
+                    display: 'flex', alignItems: 'center', gap: '0.75rem',
+                    padding: '0.875rem 1rem',
+                    background: 'rgba(108,99,255,0.05)',
+                    border: '1px solid rgba(108,99,255,0.15)',
+                    borderRadius: '8px',
+                  }}>
+                    <svg viewBox="0 0 24 24" width="16" height="16" style={{ flexShrink: 0 }}>
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.9375rem', fontWeight: 500 }}>{account.google_email}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#888', fontWeight: 300 }}>
+                        Verbunden {new Date(account.created_at).toLocaleDateString('de-DE')}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </SectionBody>
+        </Section>
+
+        {/* ── Account ─────────────────────────────────────────────────────── */}
         <Section>
           <SectionHead>
             <div>
