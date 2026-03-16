@@ -166,9 +166,9 @@ export default function PropertySelectModal({ user, onDone, plan = 'free', activ
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => { loadPending(); }, []);
+  useEffect(() => { loadPending(remaining); }, [remaining]);
 
-  const loadPending = async () => {
+  const loadPending = async (slots) => {
     setLoading(true);
     const { data } = await supabase
       .from('properties')
@@ -178,8 +178,9 @@ export default function PropertySelectModal({ user, onDone, plan = 'free', activ
       .order('created_at', { ascending: true });
     const sites = data ?? [];
     setPendingSites(sites);
-    // Nur bis zum Plan-Limit vorauswählen
-    if (sites.length > 0) setSelected(sites.slice(0, remaining).map(s => s.id));
+    // Nur bis zum Plan-Limit vorauswählen (slots = wie viele noch erlaubt)
+    const allowed = slots > 0 ? slots : 1;
+    if (sites.length > 0) setSelected(sites.slice(0, allowed).map(s => s.id));
     setLoading(false);
   };
 
@@ -211,6 +212,13 @@ export default function PropertySelectModal({ user, onDone, plan = 'free', activ
 
   const handleSave = async (skipGa4 = false) => {
     if (selected.length === 0) return;
+    // Sicherheits-Check: nie mehr als erlaubt speichern
+    const allowedSelected = selected.slice(0, Math.max(1, remaining));
+    if (allowedSelected.length < selected.length) {
+      setError(`Dein Plan erlaubt nur ${remaining} weitere ${remaining === 1 ? 'Property' : 'Properties'}.`);
+      setSelected(allowedSelected);
+      return;
+    }
     setSaving(true); setError('');
     const ga4Value = skipGa4 ? null : ga4Id.trim() || null;
     if (!skipGa4 && ga4Id.trim() && !/^\d+$/.test(ga4Id.trim())) {
