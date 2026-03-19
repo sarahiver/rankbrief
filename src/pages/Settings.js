@@ -575,6 +575,8 @@ export default function Settings({ user }) {
   // GA4 edit state per property
   const [ga4Edits, setGa4Edits] = useState({});
   const [ga4Saving, setGa4Saving] = useState({});
+  const [ga4Status, setGa4Status] = useState({}); // { [propertyId]: null | 'checking' | {valid, message} }
+  const [ga4Timers, setGa4Timers] = useState({});
 
   // Branding state
   const [branding, setBranding] = useState({
@@ -731,15 +733,52 @@ export default function Settings({ user }) {
     handleUpgrade(targetPlan);
   };
 
-  // ── GA4 ID speichern ──────────────────────────────────────────────────────
-  const saveGa4 = async (propertyId) => {
-    setGa4Saving(s => ({ ...s, [propertyId]: true }));
-    const val = ga4Edits[propertyId]?.trim();
-    if (val && !/^\d+$/.test(val)) {
-      showAlert('GA4 Property ID muss eine reine Zahl sein (z.B. 123456789)', 'error');
-      setGa4Saving(s => ({ ...s, [propertyId]: false }));
+  // ── GA4 ID validieren (debounced) ────────────────────────────────────────
+  const validateGa4 = async (propertyId, val) => {
+    if (!val.trim()) { setGa4Status(s => ({ ...s, [propertyId]: null })); return; }
+    if (!/^\d+$/.test(val.trim())) {
+      setGa4Status(s => ({ ...s, [propertyId]: { valid: false, message: 'Nur Zahlen erlaubt — nicht die G-XXXXXXXX ID.' } }));
       return;
     }
+    setGa4Status(s => ({ ...s, [propertyId]: 'checking' }));
+    try {
+      const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+      const SUPABASE_ANON_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/validate-ga4`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+        body: JSON.stringify({ user_id: user.id, ga4_property_id: val.trim() }),
+      });
+      const data = await res.json();
+      setGa4Status(s => ({ ...s, [propertyId]: { valid: data.valid, message: data.message } }));
+    } catch {
+      setGa4Status(s => ({ ...s, [propertyId]: { valid: false, message: 'Validierung fehlgeschlagen.' } }));
+    }
+  };
+
+  const handleGa4Change = (propertyId, val) => {
+    setGa4Edits(eds => ({ ...eds, [propertyId]: val }));
+    setGa4Status(s => ({ ...s, [propertyId]: null }));
+    if (ga4Timers[propertyId]) clearTimeout(ga4Timers[propertyId]);
+    if (val.trim().length >= 6) {
+      const t = setTimeout(() => validateGa4(propertyId, val), 800);
+      setGa4Timers(ts => ({ ...ts, [propertyId]: t }));
+    }
+  };
+
+  // ── GA4 ID speichern ──────────────────────────────────────────────────────
+  const saveGa4 = async (propertyId) => {
+    const val = ga4Edits[propertyId]?.trim();
+    const status = ga4Status[propertyId];
+    if (val && status && status !== 'checking' && !status.valid) {
+      showAlert(status.message || 'Bitte überprüfe die GA4 Property ID.', 'error');
+      return;
+    }
+    if (val && status === 'checking') {
+      showAlert('GA4 ID wird noch geprüft. Bitte einen Moment warten.', 'error');
+      return;
+    }
+    setGa4Saving(s => ({ ...s, [propertyId]: true }));
     const { error } = await supabase
       .from('properties')
       .update({ ga_property_id: val || null })
@@ -1190,16 +1229,26 @@ export default function Settings({ user }) {
                         style={{ flex: 1 }}
                         placeholder="z.B. 123456789"
                         value={ga4Edits[prop.id] ?? ''}
-                        onChange={e => setGa4Edits(eds => ({ ...eds, [prop.id]: e.target.value }))}
+                        onChange={e => handleGa4Change(prop.id, e.target.value)}
                       />
                       <Btn
                         $variant="primary"
                         onClick={() => saveGa4(prop.id)}
-                        disabled={ga4Saving[prop.id]}
+                        disabled={ga4Saving[prop.id] || ga4Status[prop.id] === 'checking' || (ga4Edits[prop.id]?.trim() && ga4Status[prop.id] && !ga4Status[prop.id]?.valid)}
                       >
-                        {ga4Saving[prop.id] ? 'Speichert...' : 'Speichern'}
+                        {ga4Saving[prop.id] ? 'Speichert...' : ga4Status[prop.id] === 'checking' ? '⏳' : 'Speichern'}
                       </Btn>
                     </Row>
+                    {ga4Status[prop.id] && ga4Status[prop.id] !== 'checking' && (
+                      <div style={{
+                        fontSize: '0.8125rem', fontWeight: 600, marginTop: '0.5rem',
+                        padding: '0.375rem 0.75rem', borderRadius: '6px',
+                        color: ga4Status[prop.id].valid ? '#065F46' : '#991B1B',
+                        background: ga4Status[prop.id].valid ? '#D1FAE5' : '#FEE2E2',
+                      }}>
+                        {ga4Status[prop.id].message}
+                      </div>
+                    )}
                     <FieldHint>
                       Nur Ziffern – z.B. <code>123456789</code>. Zu finden in{' '}
                       <a href="https://analytics.google.com" target="_blank" rel="noreferrer">
