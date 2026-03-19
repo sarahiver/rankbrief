@@ -486,19 +486,25 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
               Zu finden in <a href="https://analytics.google.com" target="_blank" rel="noreferrer">Google Analytics</a> → Admin → Property Settings → Property ID. Nur Zahlen — nicht G-XXXXXXXX. Kann später in den Settings pro Property angepasst werden.
             </HelpText>
             {error && <ErrorText>{error}</ErrorText>}
-            <BtnPrimary
-              onClick={() => handleSave(false)}
-              disabled={
-                saving ||
-                ga4Status === 'checking' ||
-                (ga4Id.trim() && !ga4Status) ||          // eingegeben aber noch nicht validiert
-                (ga4Id.trim() && ga4Status && !ga4Status.valid)  // validiert aber invalid
-              }
-            >
-              {saving ? <Spinner /> : ga4Status === 'checking' || (ga4Id.trim() && !ga4Status) ? '⏳ GA4 wird geprüft…' : 'Einrichtung abschließen →'}
-            </BtnPrimary>
+            {/* "Einrichtung abschließen" nur wenn GA4 leer ODER erfolgreich validiert */}
+            {(!ga4Id.trim() || (ga4Status && ga4Status !== 'checking' && ga4Status.valid)) && (
+              <BtnPrimary onClick={() => handleSave(false)} disabled={saving}>
+                {saving ? <Spinner /> : 'Einrichtung abschließen →'}
+              </BtnPrimary>
+            )}
+
+            {/* Während Validierung läuft: deaktivierter Button */}
+            {ga4Id.trim() && (ga4Status === 'checking' || !ga4Status) && (
+              <BtnPrimary disabled={true}>
+                ⏳ GA4 wird geprüft…
+              </BtnPrimary>
+            )}
+
+            {/* Bei invalider ID: nur "Ohne GA4 fortfahren" */}
             <BtnGhost onClick={() => handleSave(true)} disabled={saving}>
-              Ohne GA4 fortfahren
+              {ga4Id.trim() && ga4Status && !ga4Status.valid
+                ? 'Ohne GA4 fortfahren (ID ungültig)'
+                : 'Ohne GA4 fortfahren'}
             </BtnGhost>
           </>
         )}
