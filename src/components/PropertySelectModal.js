@@ -282,16 +282,25 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
 
       // Neu ausgewählte aktivieren
       for (const [url, accountId] of Object.entries(selected)) {
-        if (currentActiveUrls.has(url)) {
-          if (ga4Value) await supabase.from('properties').update({ ga_property_id: ga4Value })
-            .eq('user_id', user.id).eq('gsc_property_url', url);
+        // Prüfen ob Property bereits in DB existiert (egal welcher Status)
+        const { data: existing } = await supabase
+          .from('properties').select('id, status')
+          .eq('user_id', user.id).eq('gsc_property_url', url)
+          .maybeSingle();
+
+        if (existing) {
+          // Existiert → status auf active setzen + optional GA4 updaten
+          const updates: any = { status: 'active', last_synced_at: new Date().toISOString() };
+          if (ga4Value) updates.ga_property_id = ga4Value;
+          await supabase.from('properties').update(updates).eq('id', existing.id);
         } else {
-          await supabase.from('properties').upsert({
+          // Existiert nicht → neu anlegen
+          await supabase.from('properties').insert({
             user_id: user.id, google_account_id: accountId,
             gsc_property_url: url, display_name: url,
             status: 'active', ga_property_id: ga4Value,
             last_synced_at: new Date().toISOString(),
-          }, { onConflict: 'user_id,gsc_property_url' });
+          });
         }
       }
 
@@ -398,10 +407,20 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
         {step === 2 && (
           <>
             <Title>Google Analytics verbinden</Title>
-            <Sub>Optional: GA4 Property ID für Sessions, Nutzer und Engagement Rate im Report.</Sub>
-            <Input type="text" placeholder="123456789" value={ga4Id} onChange={e => setGa4Id(e.target.value)} $error={!!error} />
+            <Sub>
+              GA4 ergänzt deinen Report um <strong>Sessions, Nutzer und Engagement Rate</strong> — also was Besucher auf deiner Website wirklich tun, nicht nur wie sie über Google kommen.
+            </Sub>
+
+            <InfoBox>
+              💡 <strong>Eine GA4 ID für alle Properties?</strong> Kein Problem — trag sie hier ein und sie gilt für alle verbundenen Properties. Hast du pro Domain eine eigene GA4 Property, kannst du das später in den <strong>Settings</strong> pro Property anpassen.
+            </InfoBox>
+
+            <Input
+              type="text" placeholder="z.B. 123456789"
+              value={ga4Id} onChange={e => setGa4Id(e.target.value)} $error={!!error}
+            />
             <HelpText>
-              Zu finden in <a href="https://analytics.google.com" target="_blank" rel="noreferrer">Google Analytics</a> → Admin → Property Settings → Property ID. Nur Zahlen — nicht G-XXXXXXXX.
+              Zu finden in <a href="https://analytics.google.com" target="_blank" rel="noreferrer">Google Analytics</a> → Admin → Property Settings → Property ID. Nur Zahlen — nicht G-XXXXXXXX. Kann später in den Settings pro Property angepasst werden.
             </HelpText>
             {error && <ErrorText>{error}</ErrorText>}
             <BtnPrimary onClick={() => handleSave(false)} disabled={saving}>
