@@ -368,6 +368,16 @@ export default function Auth({ mode = 'login' }) {
             </div>
           )}
 
+          {isLogin && (
+            <div style={{ textAlign: 'right', marginTop: '-0.25rem', marginBottom: '0.25rem' }}>
+              <a href="/forgot-password" style={{ fontSize: '0.8125rem', color: 'inherit', opacity: 0.6, textDecoration: 'none' }}
+                onMouseOver={e => e.target.style.opacity = 1}
+                onMouseOut={e => e.target.style.opacity = 0.6}>
+                Forgot password?
+              </a>
+            </div>
+          )}
+
           <BtnSubmit onClick={handleSubmit} disabled={loading}>
             {loading ? 'Please wait…' : isLogin ? 'Sign in' : 'Create account'}
           </BtnSubmit>

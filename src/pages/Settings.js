@@ -1142,11 +1142,18 @@ export default function Settings({ user }) {
                 {properties.length} / {planInfo?.domains} Domains verbunden
               </SectionSub>
             </div>
-            {properties.length < (planInfo?.domains ?? 1) && (
-              <Btn $variant="primary" onClick={handleConnectNew}>
-                + Property hinzufügen
-              </Btn>
-            )}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {googleAccounts.length > 0 && properties.length < (planInfo?.domains ?? 1) && (
+                <Btn $variant="secondary" onClick={handleConnectNew}>
+                  + Property hinzufügen
+                </Btn>
+              )}
+              {(googleAccounts.length === 0 || ['pro', 'agency'].includes(profile?.plan)) && properties.length < (planInfo?.domains ?? 1) && (
+                <Btn $variant="primary" onClick={startOAuth}>
+                  + Google-Konto verbinden
+                </Btn>
+              )}
+            </div>
           </SectionHead>
           <SectionBody>
             {properties.length === 0 && (
