@@ -199,6 +199,8 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [ga4Id, setGa4Id] = useState('');
+  const [ga4Status, setGa4Status] = useState(null); // null | 'checking' | { valid, message }
+  const [ga4Timer, setGa4Timer] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [openAccounts, setOpenAccounts] = useState({});
   const [selected, setSelected] = useState({}); // { url: google_account_id }
@@ -247,6 +249,37 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
       console.error('loadData error:', err);
     }
     setLoading(false);
+  };
+
+  const validateGa4 = async (id) => {
+    if (!id.trim() || !/^\d+$/.test(id.trim())) {
+      setGa4Status(id.trim() ? { valid: false, message: 'Nur Zahlen erlaubt — nicht die G-XXXXXXXX ID.' } : null);
+      return;
+    }
+    setGa4Status('checking');
+    try {
+      const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+      const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/validate-ga4`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON}` },
+        body: JSON.stringify({ user_id: user.id, ga4_property_id: id.trim() }),
+      });
+      const data = await res.json();
+      setGa4Status({ valid: data.valid, message: data.message });
+    } catch {
+      setGa4Status({ valid: false, message: 'Validierung fehlgeschlagen. Bitte manuell prüfen.' });
+    }
+  };
+
+  const handleGa4Change = (val) => {
+    setGa4Id(val);
+    setGa4Status(null);
+    if (ga4Timer) clearTimeout(ga4Timer);
+    if (val.trim().length >= 6) {
+      const t = setTimeout(() => validateGa4(val), 800); // 800ms debounce
+      setGa4Timer(t);
+    }
   };
 
   const toggleProperty = (url, googleAccountId) => {
@@ -417,8 +450,23 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
 
             <Input
               type="text" placeholder="z.B. 123456789"
-              value={ga4Id} onChange={e => setGa4Id(e.target.value)} $error={!!error}
+              value={ga4Id}
+              onChange={e => handleGa4Change(e.target.value)}
+              $error={ga4Status && !ga4Status.valid && ga4Status !== 'checking'}
             />
+            {ga4Status === 'checking' && (
+              <div style={{ fontSize: '0.8125rem', color: '#9898B8', marginBottom: '0.5rem' }}>
+                ⏳ Wird geprüft…
+              </div>
+            )}
+            {ga4Status && ga4Status !== 'checking' && (
+              <div style={{
+                fontSize: '0.8125rem', fontWeight: 500, marginBottom: '0.5rem',
+                color: ga4Status.valid ? '#10B981' : '#EF4444',
+              }}>
+                {ga4Status.message}
+              </div>
+            )}
             <HelpText>
               Zu finden in <a href="https://analytics.google.com" target="_blank" rel="noreferrer">Google Analytics</a> → Admin → Property Settings → Property ID. Nur Zahlen — nicht G-XXXXXXXX. Kann später in den Settings pro Property angepasst werden.
             </HelpText>
