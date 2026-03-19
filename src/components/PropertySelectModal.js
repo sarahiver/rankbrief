@@ -488,9 +488,14 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
             {error && <ErrorText>{error}</ErrorText>}
             <BtnPrimary
               onClick={() => handleSave(false)}
-              disabled={saving || ga4Status === 'checking' || (ga4Id.trim() && ga4Status && !ga4Status.valid)}
+              disabled={
+                saving ||
+                ga4Status === 'checking' ||
+                (ga4Id.trim() && !ga4Status) ||          // eingegeben aber noch nicht validiert
+                (ga4Id.trim() && ga4Status && !ga4Status.valid)  // validiert aber invalid
+              }
             >
-              {saving ? <Spinner /> : ga4Status === 'checking' ? '⏳ GA4 wird geprüft…' : 'Einrichtung abschließen →'}
+              {saving ? <Spinner /> : ga4Status === 'checking' || (ga4Id.trim() && !ga4Status) ? '⏳ GA4 wird geprüft…' : 'Einrichtung abschließen →'}
             </BtnPrimary>
             <BtnGhost onClick={() => handleSave(true)} disabled={saving}>
               Ohne GA4 fortfahren

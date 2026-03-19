@@ -1245,8 +1245,19 @@ export default function Settings({ user }) {
                         padding: '0.375rem 0.75rem', borderRadius: '6px',
                         color: ga4Status[prop.id].valid ? '#065F46' : '#991B1B',
                         background: ga4Status[prop.id].valid ? '#D1FAE5' : '#FEE2E2',
+                        border: `1px solid ${ga4Status[prop.id].valid ? '#6EE7B7' : '#FECACA'}`,
                       }}>
                         {ga4Status[prop.id].message}
+                      </div>
+                    )}
+                    {/* Persistenter Erfolgs-Hinweis nach Speichern */}
+                    {!ga4Status[prop.id] && (ga4Edits[prop.id] || prop.ga_property_id) && prop.ga_property_id && (
+                      <div style={{
+                        fontSize: '0.8125rem', fontWeight: 600, marginTop: '0.5rem',
+                        padding: '0.375rem 0.75rem', borderRadius: '6px',
+                        color: '#065F46', background: '#D1FAE5', border: '1px solid #6EE7B7',
+                      }}>
+                        ✅ GA4 verbunden: {prop.ga_property_id}
                       </div>
                     )}
                     <FieldHint>
