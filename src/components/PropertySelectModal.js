@@ -486,10 +486,15 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
               Zu finden in <a href="https://analytics.google.com" target="_blank" rel="noreferrer">Google Analytics</a> → Admin → Property Settings → Property ID. Nur Zahlen — nicht G-XXXXXXXX. Kann später in den Settings pro Property angepasst werden.
             </HelpText>
             {error && <ErrorText>{error}</ErrorText>}
-            <BtnPrimary onClick={() => handleSave(false)} disabled={saving}>
-              {saving ? <Spinner /> : 'Einrichtung abschließen →'}
+            <BtnPrimary
+              onClick={() => handleSave(false)}
+              disabled={saving || ga4Status === 'checking' || (ga4Id.trim() && ga4Status && !ga4Status.valid)}
+            >
+              {saving ? <Spinner /> : ga4Status === 'checking' ? '⏳ GA4 wird geprüft…' : 'Einrichtung abschließen →'}
             </BtnPrimary>
-            <BtnGhost onClick={() => handleSave(true)} disabled={saving}>Ohne GA4 fortfahren</BtnGhost>
+            <BtnGhost onClick={() => handleSave(true)} disabled={saving}>
+              Ohne GA4 fortfahren
+            </BtnGhost>
           </>
         )}
       </Box>
