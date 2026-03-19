@@ -300,9 +300,21 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
   const handleSave = async (skipGa4 = false) => {
     setSaving(true); setError('');
     const ga4Value = skipGa4 ? null : ga4Id.trim() || null;
-    if (!skipGa4 && ga4Id.trim() && !/^\d+$/.test(ga4Id.trim())) {
-      setError('Die GA4 Property ID besteht nur aus Zahlen (z.B. 123456789).');
-      setSaving(false); return;
+    if (!skipGa4 && ga4Id.trim()) {
+      if (!/^\d+$/.test(ga4Id.trim())) {
+        setError('Die GA4 Property ID besteht nur aus Zahlen (z.B. 123456789).');
+        setSaving(false); return;
+      }
+      // Blockieren wenn Validierung explizit fehlgeschlagen ist
+      if (ga4Status && ga4Status !== 'checking' && !ga4Status.valid) {
+        setError(ga4Status.message || 'Bitte überprüfe die GA4 Property ID.');
+        setSaving(false); return;
+      }
+      // Noch am Prüfen → warten
+      if (ga4Status === 'checking') {
+        setError('GA4 ID wird noch geprüft. Bitte einen Moment warten.');
+        setSaving(false); return;
+      }
     }
     try {
       const selectedUrls = Object.keys(selected);
@@ -337,7 +349,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
         }
       }
 
-      // Abgewählte → inactive (nicht löschen — damit User sie später wieder aktivieren kann)
+      // Abgewählte aktive Properties → inactive
       const deactivate = (currentActive ?? []).filter(p => !selectedUrls.includes(p.gsc_property_url));
       for (const p of deactivate) {
         await supabase.from('properties').update({ status: 'inactive' }).eq('id', p.id);
@@ -455,14 +467,17 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
               $error={ga4Status && !ga4Status.valid && ga4Status !== 'checking'}
             />
             {ga4Status === 'checking' && (
-              <div style={{ fontSize: '0.8125rem', color: '#9898B8', marginBottom: '0.5rem' }}>
-                ⏳ Wird geprüft…
+              <div style={{ fontSize: '0.8125rem', color: '#9898B8', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                ⏳ GA4 ID wird geprüft…
               </div>
             )}
             {ga4Status && ga4Status !== 'checking' && (
               <div style={{
-                fontSize: '0.8125rem', fontWeight: 500, marginBottom: '0.5rem',
-                color: ga4Status.valid ? '#10B981' : '#EF4444',
+                fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.75rem',
+                padding: '0.5rem 0.875rem', borderRadius: '8px',
+                color: ga4Status.valid ? '#065F46' : '#991B1B',
+                background: ga4Status.valid ? '#D1FAE5' : '#FEE2E2',
+                border: `1px solid ${ga4Status.valid ? '#6EE7B7' : '#FECACA'}`,
               }}>
                 {ga4Status.message}
               </div>

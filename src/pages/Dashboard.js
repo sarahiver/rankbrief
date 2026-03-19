@@ -1312,6 +1312,7 @@ export default function Dashboard({ user, onOpenModal }) {
     const { data } = await supabase
       .from('properties')
       .select('*')
+      .eq('status', 'active')
       .order('created_at', { ascending: false });
     setProperties(data ?? []);
     setLoading(false);
@@ -1512,6 +1513,12 @@ export default function Dashboard({ user, onOpenModal }) {
                 lineHeight: 1.6,
               }}>
                 Verbinde dein Google-Konto um GSC-Properties auszuwählen und monatliche Reports zu erhalten. <strong>Der erste Monat ist kostenlos.</strong>
+              </div>
+            )}
+
+            {activeProperties.length > 0 && (
+              <div style={{ fontSize: '0.75rem', color: '#9898B8', fontWeight: 300, marginBottom: '0.5rem', textAlign: 'right' }}>
+                Properties verwalten oder entfernen → <a href="/settings" style={{ color: '#6C63FF', textDecoration: 'none' }}>Einstellungen</a>
               </div>
             )}
 
