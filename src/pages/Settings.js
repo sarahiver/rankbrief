@@ -64,6 +64,19 @@ const TopBarLink = styled(Link)`
   &:hover { color: ${({ theme }) => theme.colors.text}; }
 `;
 
+const LangToggle = styled.button`
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.5rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  border: 1px solid ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.border};
+  color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.textDim};
+  background: ${({ $active, theme }) => $active ? theme.colors.accentDim : 'transparent'};
+  transition: all 0.15s;
+  &:hover { border-color: ${({ theme }) => theme.colors.accent}; color: ${({ theme }) => theme.colors.accent}; }
+`;
+
 const BtnSignOut = styled.button`
   font-size: 0.8125rem;
   color: ${({ theme }) => theme.colors.textDim};
@@ -551,7 +564,7 @@ const PLAN_LIMITS = {
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function Settings({ user, lang = 'en' }) {
+export default function Settings({ user, lang = 'en', onLangChange }) {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [googleAccounts, setGoogleAccounts] = useState([]);
@@ -1055,6 +1068,12 @@ export default function Settings({ user, lang = 'en' }) {
         <Logo to="/dashboard"><LogoDot />Rank<span>Brief</span></Logo>
         <TopBarRight>
           <TopBarLink to="/dashboard">← Dashboard</TopBarLink>
+          {onLangChange && (
+            <div style={{ display: 'flex', gap: '0.25rem' }}>
+              <LangToggle $active={lang === 'de'} onClick={() => onLangChange('de')}>DE</LangToggle>
+              <LangToggle $active={lang === 'en'} onClick={() => onLangChange('en')}>EN</LangToggle>
+            </div>
+          )}
           <BtnSignOut onClick={handleSignOut}>Sign out</BtnSignOut>
         </TopBarRight>
       </TopBar>

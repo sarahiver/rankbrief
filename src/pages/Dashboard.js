@@ -81,6 +81,19 @@ const BtnSignOut = styled.button`
   &:hover { color: ${({ theme }) => theme.colors.text}; border-color: ${({ theme }) => theme.colors.borderLight}; }
 `;
 
+const LangToggle = styled.button`
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.5rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  border: 1px solid ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.border};
+  color: ${({ $active, theme }) => $active ? theme.colors.accent : theme.colors.textDim};
+  background: ${({ $active, theme }) => $active ? theme.colors.accentDim : 'transparent'};
+  transition: all 0.15s;
+  &:hover { border-color: ${({ theme }) => theme.colors.accent}; color: ${({ theme }) => theme.colors.accent}; }
+`;
+
 const BtnSettings = styled(Link)`
   font-size: 0.8125rem;
   color: ${({ theme }) => theme.colors.textMuted};
@@ -1250,10 +1263,12 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
                       {fmtMonth(r.report_month)}
                     </ReportHistoryMonth>
                     <ReportHistoryMeta>
-                      <ReportHistoryClicks>{fmt(r.clicks)} Klicks</ReportHistoryClicks>
+                      <ReportHistoryClicks>{fmt(r.clicks)} {lang === 'de' ? 'Klicks' : 'clicks'}</ReportHistoryClicks>
                       {r.pdf_url
-                        ? <DownloadBtn href={r.pdf_url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>↓ PDF</DownloadBtn>
-                        : <NoPdfBadge>kein PDF</NoPdfBadge>}
+                        ? <DownloadBtn href={r.pdf_url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>
+                            ↓ PDF
+                          </DownloadBtn>
+                        : <NoPdfBadge>{lang === 'de' ? 'kein PDF' : 'no PDF'}</NoPdfBadge>}
                     </ReportHistoryMeta>
                   </ReportHistoryRow>
                 ))}
@@ -1473,17 +1488,41 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
                     </TableCard>
                   </TableGrid>
 
-                  {selectedReport.sessions === 0 && ['basic', 'pro', 'agency'].includes(plan) && (
-                    <Alert $type="info">
-                      <strong>GA4-Daten fehlen</strong><br />
-                      <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
-                        {t(lang, 'dash.ga4_hint')}{' '}
-                        <a href="https://analytics.google.com" target="_blank" rel="noreferrer" style={{ color: 'inherit', fontWeight: 600, textDecoration: 'underline' }}>
-                          GA4 kostenlos einrichten →
-                        </a>{' '}(ca. 5 Minuten)
-                      </span>
-                    </Alert>
-                  )}
+                  {['basic', 'pro', 'agency'].includes(plan) && (() => {
+                    const noGa4Setup = !property.ga_property_id;
+                    const ga4NoData  = property.ga_property_id && (selectedReport.sessions == null || selectedReport.sessions === 0);
+                    if (noGa4Setup) return (
+                      <Alert $type="info">
+                        <span style={{ fontWeight: 600 }}>
+                          {lang === 'de' ? '📊 Google Analytics nicht verbunden' : '📊 Google Analytics not connected'}
+                        </span><br />
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
+                          {lang === 'de'
+                            ? 'Verbinde GA4 in den Einstellungen um Sessions, Nutzer und Engagement Rate im Report zu sehen. '
+                            : 'Connect GA4 in Settings to see sessions, users and engagement rate in your report. '}
+                          <a href="/settings" style={{ color: 'inherit', fontWeight: 600, textDecoration: 'underline' }}>
+                            {lang === 'de' ? 'Jetzt einrichten →' : 'Set up now →'}
+                          </a>
+                        </span>
+                      </Alert>
+                    );
+                    if (ga4NoData) return (
+                      <Alert $type="info">
+                        <span style={{ fontWeight: 600 }}>
+                          {lang === 'de' ? '⚠️ GA4-Daten nicht verfügbar' : '⚠️ GA4 data not available'}
+                        </span><br />
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
+                          {lang === 'de'
+                            ? `GA4 Property ID ${property.ga_property_id} ist hinterlegt, aber für diesen Monat liegen keine Daten vor. Bitte prüfe die ID in den `
+                            : `GA4 Property ID ${property.ga_property_id} is configured, but no data is available for this month. Please verify the ID in `}
+                          <a href="/settings" style={{ color: 'inherit', fontWeight: 600, textDecoration: 'underline' }}>
+                            {lang === 'de' ? 'Einstellungen →' : 'Settings →'}
+                          </a>
+                        </span>
+                      </Alert>
+                    );
+                    return null;
+                  })()}
                 </div>
               )}
             </>
@@ -1495,7 +1534,7 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function Dashboard({ user, onOpenModal, lang = 'en' }) {
+export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -1623,6 +1662,12 @@ export default function Dashboard({ user, onOpenModal, lang = 'en' }) {
           <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
           <TopBarRight>
             <UserEmail>{user?.email}</UserEmail>
+            {onLangChange && (
+              <div style={{ display: 'flex', gap: '0.25rem' }}>
+                <LangToggle $active={lang === 'de'} onClick={() => onLangChange('de')}>DE</LangToggle>
+                <LangToggle $active={lang === 'en'} onClick={() => onLangChange('en')}>EN</LangToggle>
+              </div>
+            )}
             <BtnSettings to="/settings">⚙ Settings</BtnSettings>
             <BtnSignOut onClick={handleSignOut}>Sign out</BtnSignOut>
           </TopBarRight>
@@ -1648,6 +1693,12 @@ export default function Dashboard({ user, onOpenModal, lang = 'en' }) {
         <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
         <TopBarRight>
           <UserEmail>{user?.email}</UserEmail>
+          {onLangChange && (
+            <div style={{ display: 'flex', gap: '0.25rem' }}>
+              <LangToggle $active={lang === 'de'} onClick={() => onLangChange('de')}>DE</LangToggle>
+              <LangToggle $active={lang === 'en'} onClick={() => onLangChange('en')}>EN</LangToggle>
+            </div>
+          )}
           <BtnSettings to="/settings">⚙ Settings</BtnSettings>
           <BtnSignOut onClick={handleSignOut}>Sign out</BtnSignOut>
         </TopBarRight>
