@@ -909,7 +909,7 @@ export default function Settings({ user, lang = 'en' }) {
     setPwLoading(false);
   };
 
-  // ── {t(lang, 'set.delete_account')} ───────────────────────────────────────────────────────
+  // ── Account löschen ───────────────────────────────────────────────────────
   const handleDeleteAccount = async () => {
     // Block deletion if active paid subscription exists
     const hasActivePlan = ['basic', 'pro', 'agency'].includes(profile?.plan)
@@ -1026,7 +1026,7 @@ export default function Settings({ user, lang = 'en' }) {
               <>
                 <ModalText style={{ color: '#ef4444' }}>
                   ⚠️ Du hast noch ein aktives Abo ({profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1)}).
-                  Bitte kündige es zuerst im Billing Portal – danach kannst du deinen {t(lang, 'set.delete_account')}.
+                  Bitte kündige es zuerst im Billing Portal – danach kannst du deinen Account löschen.
                 </ModalText>
                 <ModalActions>
                   <Btn onClick={() => setDeleteConfirm(false)}>Abbrechen</Btn>
@@ -1042,7 +1042,7 @@ export default function Settings({ user, lang = 'en' }) {
                 <ModalActions>
                   <Btn onClick={() => setDeleteConfirm(false)}>Abbrechen</Btn>
                   <Btn $variant="danger" onClick={handleDeleteAccount} disabled={deleteLoading}>
-                    {deleteLoading ? t(lang, 'deleting') : '{t(lang, 'set.delete_account')}'}
+                    {deleteLoading ? t(lang, 'deleting') : t(lang, 'set.delete_account')}
                   </Btn>
                 </ModalActions>
               </>

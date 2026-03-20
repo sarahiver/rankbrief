@@ -332,13 +332,13 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
     try {
       const selectedUrls = Object.keys(selected);
 
-      // Aktuelle {t(lang, 'modal.active_badge')}e Properties
+      // Aktuelle aktive Properties
       const { data: currentActive } = await supabase
         .from('properties').select('id, gsc_property_url')
         .eq('user_id', user.id).eq('status', 'active');
       const currentActiveUrls = new Set((currentActive ?? []).map(p => p.gsc_property_url));
 
-      // Neu ausgewählte {t(lang, 'modal.active_badge')}ieren
+      // Neu ausgewählte aktivieren
       for (const [url, accountId] of Object.entries(selected)) {
         // Prüfen ob Property bereits in DB existiert (egal welcher Status)
         const { data: existing } = await supabase
@@ -361,7 +361,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
         }
       }
 
-      // Abgewählte {t(lang, 'modal.active_badge')}e Properties → inactive
+      // Abgewählte aktive Properties → inactive
       const deactivate = (currentActive ?? []).filter(p => !selectedUrls.includes(p.gsc_property_url));
       for (const p of deactivate) {
         await supabase.from('properties').update({ status: 'inactive' }).eq('id', p.id);
@@ -444,7 +444,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
 
             <div style={{ marginTop: '1.25rem' }}>
               <BtnPrimary onClick={() => setStep(2)} disabled={selectedCount === 0 || loading}>
-                {selectedCount === 0 ? '{t(lang, 'modal.min_one')}' : `${selectedCount} ${selectedCount === 1 ? 'Property' : 'Properties'} verbinden →`}
+                {selectedCount === 0 ? t(lang, 'modal.min_one') : `${selectedCount} ${selectedCount === 1 ? t(lang, 'modal.property') : t(lang, 'modal.properties')} ${t(lang, 'modal.connect_btn').split(' ').slice(-1)[0]}`}
               </BtnPrimary>
 
               {isPro && onNewAccount && (
@@ -532,11 +532,11 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
                 <>
                   {!anyInvalid && (
                     <BtnPrimary onClick={() => handleSave(false)} disabled={saving || anyChecking}>
-                      {saving ? <Spinner /> : anyChecking ? '{t(lang, 'modal.checking')}' : '{t(lang, 'modal.finish')}'}
+                      {saving ? <Spinner /> : anyChecking ? t(lang, 'modal.checking') : t(lang, 'modal.finish')}
                     </BtnPrimary>
                   )}
                   <BtnGhost onClick={() => handleSave(true)} disabled={saving}>
-                    {anyInvalid ? '{t(lang, 'modal.skip_ga4_invalid')}' : '{t(lang, 'modal.skip_ga4')}'}
+                    {anyInvalid ? t(lang, 'modal.skip_ga4_invalid') : t(lang, 'modal.skip_ga4')}
                   </BtnGhost>
                 </>
               );

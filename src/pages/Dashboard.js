@@ -914,7 +914,7 @@ function fmtPos(n) {
 }
 
 // ── Frozen Wall Component ─────────────────────────────────────────────────────
-function FrozenWallView({ onUpgrade, upgrading }) {
+function FrozenWallView({ onUpgrade, upgrading, lang = 'en' }) {
   const plans = [
     {
       key: 'basic',
@@ -1381,7 +1381,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en' }) {
           </TopBarRight>
         </TopBar>
         <Main>
-          <FrozenWallView onUpgrade={handleUpgrade} upgrading={upgrading} />
+          <FrozenWallView onUpgrade={handleUpgrade} upgrading={upgrading} lang={lang} />
         </Main>
       </Layout>
     );
