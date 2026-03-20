@@ -131,38 +131,39 @@ export default function Admin({ user }) {
       supabase.from('properties').select('id, user_id, gsc_property_url, display_name, status, ga_property_id, created_at').order('created_at', { ascending: false }),
     ]);
 
-    // ── Load emails: profiles.email first, then Edge Function for missing ──
-    // Build initial email map from profiles.email column
+    // ── Load emails via Edge Function (always — uses service role key) ────
     const emailMap = {};
-    (profiles || []).forEach(p => { if (p.email) emailMap[p.id] = p.email; });
 
-    // Also pull google_accounts emails as fallback
+    // 1. Seed from google_accounts (fast, no auth needed)
     const { data: gAccounts } = await supabase
       .from('google_accounts')
       .select('user_id, google_email');
-    (gAccounts || []).forEach(g => { if (!emailMap[g.user_id]) emailMap[g.user_id] = g.google_email; });
+    (gAccounts || []).forEach(g => { if (g.google_email) emailMap[g.user_id] = g.google_email; });
 
-    // If any profiles still missing email → call Edge Function (uses service role)
-    const missingEmails = (profiles || []).filter(p => !emailMap[p.id]);
-    if (missingEmails.length > 0) {
-      try {
-        const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
-        const { data: { session } } = await supabase.auth.getSession();
-        const res = await fetch(`${SUPABASE_URL}/functions/v1/get-admin-users`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`,
-            'apikey': process.env.REACT_APP_SUPABASE_ANON_KEY,
-          },
-        });
-        const result = await res.json();
-        if (result.emailMap) {
-          Object.assign(emailMap, result.emailMap);
-        }
-      } catch (e) {
-        console.warn('Could not load emails via Edge Function:', e);
+    // 2. Seed from profiles.email column (already backfilled)
+    (profiles || []).forEach(p => { if (p.email) emailMap[p.id] = p.email; });
+
+    // 3. Always call Edge Function to catch any missing (e.g. email/password signups)
+    try {
+      const SUPABASE_URL  = process.env.REACT_APP_SUPABASE_URL;
+      const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/get-admin-users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`,
+          'apikey': SUPABASE_ANON,
+        },
+      });
+      const result = await res.json();
+      if (result.emailMap) {
+        Object.assign(emailMap, result.emailMap); // overwrite with authoritative data
+      } else {
+        console.warn('get-admin-users returned:', result);
       }
+    } catch (e) {
+      console.warn('Could not load emails via Edge Function:', e);
     }
 
     const profilesWithEmail = (profiles || []).map(p => ({
