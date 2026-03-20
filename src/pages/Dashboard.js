@@ -1262,11 +1262,31 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
           {reportsLoading ? (
             <Spinner />
           ) : reports.length === 0 ? (
+            selectedProp?.last_no_data_at ? (
+              <div style={{
+                padding:'1rem',
+                borderRadius:'8px',
+                background:'rgba(245,158,11,0.07)',
+                borderLeft:'3px solid #F59E0B',
+                border:'1px solid rgba(245,158,11,0.15)',
+                borderLeft:'3px solid #F59E0B',
+              }}>
+                <div style={{ fontSize:'0.875rem', fontWeight:700, color:'#d97706', marginBottom:'0.375rem' }}>
+                  ⚠️ {lang === 'en' ? 'No GSC data available yet' : 'Noch keine GSC-Daten verfügbar'}
+                </div>
+                <div style={{ fontSize:'0.8125rem', color:'#92400e', lineHeight:1.6 }}>
+                  {lang === 'en'
+                    ? 'Google Search Console hasn't collected data for this domain yet. New domains typically need 2–4 weeks. You'll receive an email automatically once your first report is ready.'
+                    : 'Google Search Console hat für diese Domain noch keine Daten gesammelt. Neue Domains benötigen 2–4 Wochen. Du erhältst automatisch eine E-Mail sobald der erste Report verfügbar ist.'}
+                </div>
+              </div>
+            ) : (
             <EmptyState>
               <EmptyIcon>📭</EmptyIcon>
               <EmptyTitle>Noch kein Report vorhanden</EmptyTitle>
               <EmptyText>{t(lang, 'dash.first_report')}</EmptyText>
             </EmptyState>
+            )
           ) : (
             <>
               <ReportHistoryList>
