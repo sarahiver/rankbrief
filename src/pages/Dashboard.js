@@ -754,6 +754,46 @@ const SummaryCard = styled.div`
   margin-bottom: 2rem;
 `;
 
+// ── Recommendations ───────────────────────────────────────────────────────────
+const RecGrid = styled.div`
+  display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;
+`;
+const RecCard = styled.div`
+  border-radius: ${({ theme }) => theme.radius.lg};
+  padding: 1rem 1.25rem;
+  border-left: 3px solid ${({ $cat }) =>
+    $cat === 'quick_win' ? '#10B981' :
+    $cat === 'growth'    ? '#6C63FF' : '#EF4444'};
+  background: ${({ $cat }) =>
+    $cat === 'quick_win' ? 'rgba(16,185,129,0.06)' :
+    $cat === 'growth'    ? 'rgba(108,99,255,0.06)' : 'rgba(239,68,68,0.06)'};
+  border-top: 1px solid ${({ $cat }) =>
+    $cat === 'quick_win' ? 'rgba(16,185,129,0.15)' :
+    $cat === 'growth'    ? 'rgba(108,99,255,0.15)' : 'rgba(239,68,68,0.15)'};
+  border-right: 1px solid ${({ $cat }) =>
+    $cat === 'quick_win' ? 'rgba(16,185,129,0.15)' :
+    $cat === 'growth'    ? 'rgba(108,99,255,0.15)' : 'rgba(239,68,68,0.15)'};
+  border-bottom: 1px solid ${({ $cat }) =>
+    $cat === 'quick_win' ? 'rgba(16,185,129,0.15)' :
+    $cat === 'growth'    ? 'rgba(108,99,255,0.15)' : 'rgba(239,68,68,0.15)'};
+`;
+const RecBadge = styled.div`
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 0.375rem;
+  color: ${({ $cat }) =>
+    $cat === 'quick_win' ? '#10B981' :
+    $cat === 'growth'    ? '#6C63FF' : '#EF4444'};
+`;
+const RecTitle = styled.div`
+  font-size: 0.9375rem; font-weight: 700; color: ${({ theme }) => theme.colors.text};
+  margin-bottom: 0.375rem;
+`;
+const RecText = styled.div`
+  font-size: 0.8125rem; color: ${({ theme }) => theme.colors.textMuted};
+  font-weight: 300; line-height: 1.6;
+`;
+
 const SummaryText = styled.p`
   font-size: 0.9375rem;
   color: ${({ theme }) => theme.colors.textMuted};
@@ -1198,6 +1238,30 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
                           ? <SummaryText>{selectedReport.summary_text}</SummaryText>
                           : <SummaryEmpty>{t(lang, 'dash.no_summary')}</SummaryEmpty>}
                       </SummaryCard>
+                    </>
+                  )}
+
+                  {/* Business-Empfehlungen – nur Pro/Agency */}
+                  {['pro', 'agency'].includes(plan) && selectedReport.recommendations?.length > 0 && (
+                    <>
+                      <SectionTitle>
+                        {lang === 'de' ? '🎯 Strategische Empfehlungen' : '🎯 Strategic Recommendations'}
+                      </SectionTitle>
+                      <RecGrid>
+                        {selectedReport.recommendations.map((rec, i) => {
+                          const cat = rec.category || (i === 0 ? 'quick_win' : i === 1 ? 'growth' : 'risk');
+                          const catLabel = lang === 'de'
+                            ? { quick_win: '⚡ Quick Win', growth: '🚀 Strategisches Wachstum', risk: '⚠️ Risiko-Warnung' }[cat]
+                            : { quick_win: '⚡ Quick Win', growth: '🚀 Strategic Growth', risk: '⚠️ Risk Warning' }[cat];
+                          return (
+                            <RecCard key={i} $cat={cat}>
+                              <RecBadge $cat={cat}>{catLabel}</RecBadge>
+                              <RecTitle>{rec.title}</RecTitle>
+                              <RecText>{rec.text}</RecText>
+                            </RecCard>
+                          );
+                        })}
+                      </RecGrid>
                     </>
                   )}
 
