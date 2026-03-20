@@ -976,7 +976,7 @@ function fmtMonth(dateStr) {
 }
 
 // ── UpgradeModal ──────────────────────────────────────────────────────────────
-function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading }) {
+function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading, lang = 'en' }) {
   const opts = currentPlan === 'pro'
     ? [{ key: 'agency', name: 'Agency', price: '79', highlight: true, features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', 'Endkunden-Email', 'Agency Branding'] }]
     : [
@@ -1009,7 +1009,7 @@ function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading }) {
 }
 
 // ── PropertyItem (expandable) ─────────────────────────────────────────────────
-function PropertyItem({ property, isAgency, plan }) {
+function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
   const [open, setOpen]                       = useState(false);
   const [reports, setReports]                 = useState([]);
   const [reportsLoading, setReportsLoading]   = useState(false);
@@ -1532,6 +1532,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en' }) {
                     property={p}
                     isAgency={isAgency}
                     plan={plan}
+                    lang={lang}
                   />
                 ))}
               </PropertyList>
