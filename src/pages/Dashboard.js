@@ -1636,6 +1636,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
     const { data } = await supabase
       .from('properties')
       .select('*')
+      .eq('user_id', user.id)
       .eq('status', 'active')
       .order('created_at', { ascending: false });
     setProperties(data ?? []);
