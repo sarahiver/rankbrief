@@ -56,6 +56,16 @@ const BtnDanger = styled.button`padding:.625rem 1.25rem;background:rgba(239,68,6
 
 const Spinner   = styled.div`width:20px;height:20px;border:2px solid ${({theme})=>theme.colors.border};border-top-color:${({theme})=>theme.colors.accent};border-radius:50%;animation:${spin} .7s linear infinite;margin:3rem auto;`;
 
+// ── User Accordion ───────────────────────────────────────────────────────────
+const UserRow     = styled.div`background:${({theme})=>theme.colors.bgCard};border:1px solid ${({$open,theme})=>$open?theme.colors.accent:theme.colors.border};border-radius:${({theme})=>theme.radius.lg};overflow:hidden;transition:border-color .2s;margin-bottom:.5rem;`;
+const UserRowHead = styled.div`display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.25rem;cursor:pointer;gap:1rem;&:hover{background:rgba(108,99,255,.03)}`;
+const UserRowBody = styled.div`border-top:1px solid ${({theme})=>theme.colors.border};padding:1.25rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;@media(max-width:700px){grid-template-columns:1fr}`;
+const InfoBlock   = styled.div``;
+const InfoLabel2  = styled.div`font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:${({theme})=>theme.colors.textDim};margin-bottom:.25rem;`;
+const InfoVal     = styled.div`font-size:.875rem;color:${({theme})=>theme.colors.text};`;
+const Chevron     = styled.span`font-size:.75rem;color:${({theme})=>theme.colors.textDim};transition:transform .2s;display:inline-block;transform:${({$open})=>$open?'rotate(180deg)':'rotate(0)'};`;
+const ActionsRow  = styled.div`display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;padding-top:1rem;border-top:1px solid ${({theme})=>theme.colors.border};`;
+
 // ── Password Gate ─────────────────────────────────────────────────────────────
 const GatePage  = styled.div`min-height:100vh;display:flex;align-items:center;justify-content:center;background:${({theme})=>theme.colors.bg};`;
 const GateCard  = styled.div`background:${({theme})=>theme.colors.bgCard};border:1px solid ${({theme})=>theme.colors.border};border-radius:${({theme})=>theme.radius.xl};padding:2.5rem;width:100%;max-width:380px;animation:${fadeUp} .4s ease both;`;
@@ -98,6 +108,7 @@ export default function Admin({ user }) {
   const [saving, setSaving]     = useState(false);
   const [newPlan, setNewPlan]   = useState('free');
   const [promoForm, setPromoForm] = useState({ code: '', plan: 'pro', max_uses: 50, report_limit: 6, notes: '' });
+  const [openUser, setOpenUser]   = useState(null);
 
   // Guard: only admin
   useEffect(() => {
@@ -387,55 +398,89 @@ export default function Admin({ user }) {
           <>
             {/* ── USERS TAB ── */}
             {tab === 'users' && (
-              <TableWrap>
-                <THead $cols={COLS_USERS}>
-                  <div>E-Mail / ID</div><div>Plan</div><div>Status</div>
-                  <div>Properties</div><div>Reports</div><div>Promo</div><div>Erstellt</div><div>Aktionen</div>
-                </THead>
-                {filteredUsers.map(u => (
-                  <TRow key={u.id} $cols={COLS_USERS}>
-                    <div>
-                      <TCell style={{ fontWeight:500 }}>{u.email}</TCell>
-                      <TCellMono>{u.id.slice(0,12)}…</TCellMono>
-                    </div>
-                    <TCell><PlanBadge $plan={u.plan}>{u.plan}</PlanBadge></TCell>
-                    <TCell>
-                      <StatusDot $status={u.plan_status} />
-                      {u.plan_status}
-                      {u.promo_code_used && u.promo_code_used !== true && (
-                        <span style={{ marginLeft:'0.375rem', fontSize:'0.7rem', color:'#F59E0B', fontWeight:700, fontFamily:'monospace' }}>
-                          🎟 {u.promo_code_used}
-                        </span>
-                      )}
-                    </TCell>
-                    <TCell>{u.property_count}</TCell>
-                    <TCell>{u.report_count}</TCell>
-                    <TCell>
-                      {u.promo_code_used && u.promo_reports_limit ? (
-                        <div>
-                          <div style={{ fontSize:'.7rem', color:'var(--text-dim)', marginBottom:'2px' }}>
-                            {u.promo_reports_used ?? 0}/{u.promo_reports_limit} Reports
+              <div>
+                {filteredUsers.map(u => {
+                  const isOpen = openUser === u.id;
+                  const promoPct = u.promo_reports_limit
+                    ? Math.round(((u.promo_reports_used ?? 0) / u.promo_reports_limit) * 100)
+                    : 0;
+                  return (
+                    <UserRow key={u.id} $open={isOpen}>
+                      {/* ── Header (always visible) ── */}
+                      <UserRowHead onClick={() => setOpenUser(isOpen ? null : u.id)}>
+                        <div style={{ display:'flex', alignItems:'center', gap:'0.875rem', minWidth:0 }}>
+                          <StatusDot $status={u.plan_status} />
+                          <div style={{ minWidth:0 }}>
+                            <div style={{ fontWeight:600, fontSize:'.9375rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{u.email}</div>
+                            <div style={{ fontSize:'.75rem', color:'var(--color-text-secondary)', fontFamily:'monospace' }}>{u.id.slice(0,16)}…</div>
                           </div>
-                          <PromoBar>
-                            <PromoFill $pct={Math.round(((u.promo_reports_used ?? 0) / u.promo_reports_limit) * 100)} />
-                          </PromoBar>
                         </div>
-                      ) : u.promo_code_used ? (
-                        <span style={{ fontSize:'.7rem', color:'#10B981' }}>∞ unbegrenzt</span>
-                      ) : (
-                        <span style={{ fontSize:'.7rem', color:'var(--text-dim)' }}>–</span>
+                        <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', flexShrink:0 }}>
+                          <PlanBadge $plan={u.plan}>{u.plan}</PlanBadge>
+                          {u.promo_code_used && (
+                            <span style={{ fontSize:'.7rem', fontWeight:700, color:'#F59E0B', fontFamily:'monospace', background:'rgba(245,158,11,.1)', padding:'.15rem .5rem', borderRadius:99 }}>
+                              🎟 {u.promo_code_used !== true ? u.promo_code_used : 'PROMO'}
+                            </span>
+                          )}
+                          <Chevron $open={isOpen}>▾</Chevron>
+                        </div>
+                      </UserRowHead>
+
+                      {/* ── Body (expanded) ── */}
+                      {isOpen && (
+                        <UserRowBody>
+                          <InfoBlock>
+                            <InfoLabel2>Status</InfoLabel2>
+                            <InfoVal><StatusDot $status={u.plan_status} />{u.plan_status}</InfoVal>
+                          </InfoBlock>
+                          <InfoBlock>
+                            <InfoLabel2>Properties</InfoLabel2>
+                            <InfoVal>{u.property_count}</InfoVal>
+                          </InfoBlock>
+                          <InfoBlock>
+                            <InfoLabel2>Reports generiert</InfoLabel2>
+                            <InfoVal>{u.report_count}</InfoVal>
+                          </InfoBlock>
+                          <InfoBlock>
+                            <InfoLabel2>Registriert</InfoLabel2>
+                            <InfoVal>{fmtDate(u.created_at)}</InfoVal>
+                          </InfoBlock>
+                          <InfoBlock>
+                            <InfoLabel2>Sprache</InfoLabel2>
+                            <InfoVal>{u.report_language?.toUpperCase() || '–'}</InfoVal>
+                          </InfoBlock>
+                          {u.promo_code_used && (
+                            <InfoBlock>
+                              <InfoLabel2>Promo-Fortschritt</InfoLabel2>
+                              {u.promo_reports_limit ? (
+                                <div>
+                                  <InfoVal style={{ marginBottom:4 }}>
+                                    {u.promo_reports_used ?? 0} / {u.promo_reports_limit} Reports
+                                    {promoPct >= 100 && <span style={{ marginLeft:'.5rem', color:'#EF4444', fontSize:'.75rem' }}>Limit erreicht</span>}
+                                  </InfoVal>
+                                  <PromoBar style={{ width:'100%' }}>
+                                    <PromoFill $pct={promoPct} />
+                                  </PromoBar>
+                                </div>
+                              ) : (
+                                <InfoVal style={{ color:'#10B981' }}>∞ unbegrenzt</InfoVal>
+                              )}
+                            </InfoBlock>
+                          )}
+                          <ActionsRow style={{ gridColumn:'1 / -1' }}>
+                            <ActionBtn onClick={() => { setNewPlan(u.plan); setModal({ type:'plan', user:u }); }}>✏️ Plan ändern</ActionBtn>
+                            <ActionBtn onClick={() => handleFreeze(u)}>
+                              {u.plan_status === 'frozen' ? '▶ Reaktivieren' : '⏸ Einfrieren'}
+                            </ActionBtn>
+                            {u.promo_code_used && <ActionBtn onClick={() => handleResetPromo(u)}>🔄 Promo Reset</ActionBtn>}
+                            <ActionBtn $danger onClick={() => setModal({ type:'delete', user:u })}>🗑 Löschen</ActionBtn>
+                          </ActionsRow>
+                        </UserRowBody>
                       )}
-                    </TCell>
-                    <TCellMono>{fmtDate(u.created_at)}</TCellMono>
-                    <div style={{ display:'flex', gap:'0.375rem', flexWrap:'wrap' }}>
-                      <ActionBtn onClick={() => { setNewPlan(u.plan); setModal({ type:'plan', user:u }); }}>Plan</ActionBtn>
-                      <ActionBtn onClick={() => handleFreeze(u)}>{u.plan_status === 'frozen' ? '▶ Aktiv' : '⏸ Freeze'}</ActionBtn>
-                      {u.promo_code_used && <ActionBtn onClick={() => handleResetPromo(u)}>Promo ↺</ActionBtn>}
-                      <ActionBtn $danger onClick={() => setModal({ type:'delete', user:u })}>Löschen</ActionBtn>
-                    </div>
-                  </TRow>
-                ))}
-              </TableWrap>
+                    </UserRow>
+                  );
+                })}
+              </div>
             )}
 
             {/* ── PROPERTIES TAB ── */}
@@ -488,10 +533,10 @@ export default function Admin({ user }) {
             {tab === 'promos' && (
               <>
                 <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:'1rem' }}>
-                  <ActionBtn style={{ padding:'0.5rem 1rem', fontSize:'0.875rem', fontWeight:700, background:'var(--accent)', color:'#fff', borderColor:'transparent' }}
+                  <BtnPrimary style={{ width:'auto', padding:'0.5rem 1.25rem', fontSize:'0.875rem' }}
                     onClick={() => setModal({ type:'create_promo' })}>
                     + Neuer Code
-                  </ActionBtn>
+                  </BtnPrimary>
                 </div>
                 <TableWrap>
                   <THead $cols="1.5fr 1fr 1fr 1fr 1fr 1fr 1.5fr">
