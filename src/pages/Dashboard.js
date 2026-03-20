@@ -1262,7 +1262,7 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
           {reportsLoading ? (
             <Spinner />
           ) : reports.length === 0 ? (
-            selectedProperty?.last_no_data_at ? (
+            property?.last_no_data_at ? (
               <div style={{
                 padding:'1rem',
                 borderRadius:'8px',
