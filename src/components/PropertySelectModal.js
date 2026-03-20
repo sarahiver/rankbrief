@@ -423,7 +423,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
                       <EmptyNote>{t(lang, 'modal.no_sites')}</EmptyNote>
                     ) : (
                       <CheckboxList>
-                        {(account.sites ?? []).map(site => {
+                        {(account.sites ?? []).filter(site => site.url.startsWith('sc-domain:')).map(site => {
                           const isSelected = site.url in selected;
                           return (
                             <CheckboxItem key={site.url} $checked={isSelected} onClick={() => toggleProperty(site.url, account.google_account_id)}>
