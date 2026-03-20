@@ -5,46 +5,79 @@
 body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#1a1a2e;font-size:11px;line-height:1.5}
 .page{width:210mm;min-height:297mm;padding:13mm 14mm 10mm;display:flex;flex-direction:column}
 .content{flex:1}
-.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:9px;border-bottom:3px solid #1A1A2E;margin-bottom:13px}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:9px;border-bottom:3px solid #6C63FF;margin-bottom:13px}
 .hdr-l{display:flex;align-items:center;gap:9px}
-.logo{height:32px;object-fit:contain}
-.logo-dot{width:9px;height:9px;border-radius:50%;background:#1A1A2E;flex-shrink:0}
-.co{font-size:15px;font-weight:700;color:#1A1A2E;letter-spacing:-0.02em}
+.logo-dot{width:9px;height:9px;border-radius:50%;background:#6C63FF;flex-shrink:0}
+.co{font-size:15px;font-weight:700;color:#6C63FF;letter-spacing:-0.02em}
 .hdr-r{text-align:right}
 .rt{font-size:9px;color:#999}
 .rp{font-size:12px;font-weight:600;color:#333}
 .prop{background:#f8f8fc;border-radius:7px;padding:6px 11px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;border:1px solid #ebebf5}
 .purl{font-family:monospace;font-size:9px;color:#444;font-weight:600}
 .plbl{font-size:8px;color:#999}
-.sec-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#1A1A2E;margin-bottom:6px;margin-top:12px;display:flex;align-items:center;gap:6px}
-.sec-label::after{content:'';flex:1;height:1px;background:#1A1A2E25}
+.sec-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6C63FF;margin-bottom:6px;margin-top:12px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:1px;background:#6C63FF25}
 .badge{font-size:7px;background:#10B98115;color:#059669;padding:1px 6px;border-radius:10px;text-transform:none;letter-spacing:0;font-weight:700}
+.badge-warn{font-size:7px;background:#EF444415;color:#dc2626;padding:1px 6px;border-radius:10px;text-transform:none;letter-spacing:0;font-weight:700}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-.kpi{border-radius:7px;padding:9px 10px;background:#1A1A2E0d;border-left:3px solid #1A1A2E}
+.kpi{border-radius:7px;padding:9px 10px;background:#6C63FF0d;border-left:3px solid #6C63FF}
 .kl{font-size:7.5px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
 .kv{font-size:18px;font-weight:700;color:#111;line-height:1.1;margin-bottom:2px}
 .kd{font-size:8px;font-weight:600}
 .kd.up{color:#10B981}.kd.dn{color:#EF4444}.kd.neu{color:#aaa}
 .kd-sm{font-size:7.5px;color:#999;margin-top:1px}
 .ga4-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.ga4k{border-radius:7px;padding:9px 10px;background:#E945600d;border-left:3px solid #E94560}
-.sumbox{background:#1A1A2E07;border-left:3px solid #1A1A2E;border-radius:6px;padding:9px 12px;font-size:10px;color:#2a2a3e;line-height:1.7}
+.ga4k{border-radius:7px;padding:9px 10px;background:#A78BFA0d;border-left:3px solid #A78BFA}
+.sumbox{background:#6C63FF07;border-left:3px solid #6C63FF;border-radius:6px;padding:9px 12px;font-size:10px;color:#2a2a3e;line-height:1.7}
+/* Market Radar */
+.radar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.radar-card{border-radius:7px;overflow:hidden;border:1px solid #e8e8f0}
+.radar-hdr{padding:5px 9px;font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid}
+.radar-hdr.revier{background:#10B98110;color:#059669;border-color:#10B98125}
+.radar-hdr.angriff{background:#6C63FF10;color:#5b52e0;border-color:#6C63FF25}
+.radar-hdr.potenzial{background:#F59E0B10;color:#d97706;border-color:#F59E0B25}
+.radar-row{padding:4px 9px;border-bottom:1px solid #f4f4f8}
+.radar-row:last-child{border-bottom:none}
+.radar-kw{font-size:8.5px;font-weight:600;color:#1a1a2e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.radar-meta{font-size:7.5px;color:#999;font-family:monospace}
+.radar-empty{padding:8px;font-size:8px;color:#ccc;text-align:center;font-style:italic}
+/* Conversion Signal */
+.conv-box{border-radius:7px;padding:8px 11px;margin-bottom:4px;border-left:3px solid}
+.conv-box.warn{background:#EF444408;border-color:#EF4444;border:1px solid #EF444425;border-left:3px solid #EF4444}
+.conv-box.ok{background:#10B98108;border-color:#10B981;border:1px solid #10B98125;border-left:3px solid #10B981}
+.conv-title{font-size:8.5px;font-weight:700;margin-bottom:3px}
+.conv-title.warn{color:#dc2626}
+.conv-title.ok{color:#059669}
+.conv-text{font-size:8.5px;color:#4a4a6e;line-height:1.6;margin-bottom:5px}
+.conv-tags{display:flex;flex-wrap:wrap;gap:3px}
+.conv-tag{font-size:7px;font-weight:700;padding:1px 5px;border-radius:99px;background:#6C63FF0f;color:#6C63FF;border:1px solid #6C63FF20}
+/* Business Recommendations */
+.recs-new{display:flex;flex-direction:column;gap:5px}
+.rec-new{border-radius:7px;padding:7px 10px;border-left:3px solid}
+.rec-new.quick_win{background:#10B98108;border-color:#10B981;border:1px solid #10B98120;border-left:3px solid #10B981}
+.rec-new.growth{background:#6C63FF08;border-color:#6C63FF;border:1px solid #6C63FF20;border-left:3px solid #6C63FF}
+.rec-new.risk{background:#EF444408;border-color:#EF4444;border:1px solid #EF444420;border-left:3px solid #EF4444}
+.rec-cat{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.rec-cat.quick_win{color:#059669}
+.rec-cat.growth{color:#5b52e0}
+.rec-cat.risk{color:#dc2626}
+.rec-title{font-size:8.5px;font-weight:700;color:#1a1a2e;margin-bottom:2px}
+.rec-text{font-size:8.5px;color:#4a4a6e;line-height:1.6}
+/* Legacy recs for basic */
 .recs{display:flex;flex-direction:column;gap:5px}
 .rec{display:flex;align-items:flex-start;gap:9px;background:#f8f8fc;border-radius:7px;padding:8px 11px;border:1px solid #ebebf5}
-.rec-open{background:#fff8f0;border-color:#fed7aa}
-.rec-num{width:19px;height:19px;border-radius:50%;background:#1A1A2E;color:white;font-size:8.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.rec-num-open{background:#f97316}
+.rec-num{width:19px;height:19px;border-radius:50%;background:#6C63FF;color:white;font-size:8.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 .rec-body{flex:1}
-.rec-title{font-size:9px;font-weight:700;color:#1a1a2e;margin-bottom:2px}
-.rec-text{font-size:9px;color:#4a4a6e;line-height:1.6}
+.rec-title-old{font-size:9px;font-weight:700;color:#1a1a2e;margin-bottom:2px}
+.rec-text-old{font-size:9px;color:#4a4a6e;line-height:1.6}
 .chances-intro{font-size:8.5px;color:#555;margin-bottom:7px;margin-top:-3px;line-height:1.55}
 .chance-ctr{color:#f59e0b !important}
 .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 table{width:100%;border-collapse:collapse}
-th{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#1A1A2E;border-bottom:1.5px solid #1A1A2E35;padding:5px 7px;text-align:left}
+th{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6C63FF;border-bottom:1.5px solid #6C63FF35;padding:5px 7px;text-align:left}
 th.r{text-align:right}
 td{padding:4px 7px;font-size:9px;border-bottom:1px solid #f0f0f4;color:#2a2a3e}
-td.r{text-align:right;color:#1A1A2E;font-weight:600;font-variant-numeric:tabular-nums}
+td.r{text-align:right;color:#6C63FF;font-weight:600;font-variant-numeric:tabular-nums}
 td.mono{font-family:monospace;font-size:8px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#555}
 td.empty{color:#ccc;padding:8px 7px;font-style:italic;font-size:8.5px}
 tr:last-child td{border-bottom:none}
@@ -57,86 +90,142 @@ tr:nth-child(even) td{background:#fafafa}
 .foot{padding-top:8px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:flex-end;margin-top:11px}
 .foot-left{font-size:7.5px;color:#ccc;line-height:1.6}
 .foot-ai{font-size:7px;color:#ddd;margin-top:1px}
-.foot-brand{font-size:7.5px;color:#E94560;font-weight:600;white-space:nowrap}
+.foot-brand{font-size:7.5px;color:#A78BFA;font-weight:600;white-space:nowrap}
+.hdr{border-bottom-color:#1a1a2e}
+.logo-dot{background:#1a1a2e}
+.co{color:#1a1a2e}
 </style></head>
 <body><div class="page"><div class="content">
 <div class="hdr">
-  <div class="hdr-l"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzYiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzNiAzMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzYiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjMUExQTJFIi8+CiAgPHRleHQgeD0iNCIgeT0iMjEiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iODAwIiBmaWxsPSJ3aGl0ZSI+V0Q8L3RleHQ+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSI1IiByPSI0IiBmaWxsPSIjRTk0NTYwIi8+Cjwvc3ZnPg==" class="logo" style="height:28px"/><div class="co">Weber Digital GmbH</div></div>
+  <div class="hdr-l"><div class="logo-dot"></div><div class="co">Digital Marketing Agency</div></div>
   <div class="hdr-r"><div class="rt">Monatlicher SEO-Report</div><div class="rp">März 2025</div></div>
 </div>
 <div class="prop">
-  <span class="purl">autohaus-brenner.de</span>
+  <span class="purl">naturkosmetik-shop.de</span>
   <span class="plbl">Generiert am 01.04.2025</span>
 </div>
 <div class="sec-label">Google Suchmaschinenoptimierung</div>
 <div class="kpis">
-  <div class="kpi"><div class="kl">Klicks</div><div class="kv">2.847</div><div class="kd up">▲ 9.2% ggü. Vormonat</div></div>
-  <div class="kpi"><div class="kl">Sichtbarkeit</div><div class="kv">54.180</div><div class="kd up">▲ 6.8% ggü. Vormonat</div></div>
-  <div class="kpi"><div class="kl">Klickrate</div><div class="kv">5,3%</div><div class="kd up">▲ 0.2% ggü. Vormonat</div></div>
-  <div class="kpi"><div class="kl">Ø Position</div><div class="kv">16,4</div><div class="kd up">▲ 1.4% ggü. Vormonat</div></div>
+  <div class="kpi"><div class="kl">Klicks</div><div class="kv">4.821</div><div class="kd up">▲ 12,4% ggü. Vormonat</div></div>
+  <div class="kpi"><div class="kl">Sichtbarkeit</div><div class="kv">89.340</div><div class="kd up">▲ 8,1% ggü. Vormonat</div></div>
+  <div class="kpi"><div class="kl">Klickrate</div><div class="kv">5,4%</div><div class="kd dn">▼ 0,3% ggü. Vormonat</div></div>
+  <div class="kpi"><div class="kl">Ø Position</div><div class="kv">12,1</div><div class="kd up">▲ 1,8 ggü. Vormonat</div></div>
 </div>
-
-    <div class="sec-label">Besucher-Statistik (Google Analytics)</div>
-    <div class="ga4-grid">
-      <div class="ga4k"><div class="kl">Besuche gesamt</div><div class="kv">5.210</div><div class="kd-sm">▲ 7.4% Vormonat</div></div>
-      <div class="ga4k"><div class="kl">Einzelne Besucher</div><div class="kv">3.890</div><div class="kd-sm">▲ 6.1% Vormonat</div></div>
-      <div class="ga4k"><div class="kl">Engagement Rate</div><div class="kv">58,9%</div><div class="kd-sm">▲ 2.4% Vormonat</div></div>
-    </div>
-<div class="sec-label">Zusammenfassung</div><div class="sumbox">Autohaus Brenner gewinnt im März 2025 stetig mehr Besucher über Google: Die Klicks stiegen um 9,2&thinsp;%, und die Anfragen über die Website legten sogar um 31,2&thinsp;% zu. Das zeigt, dass die neuen Fahrzeug-Seiten aus dem Vormonat wirken. Besonders die BMW-3er-Seite hat sich stark verbessert und bringt jetzt 18&thinsp;% aller Besucher.</div>
-<div class="sec-label">Empfehlungen für nächsten Monat</div><div class="recs"><div class="rec rec-open">
-          <div class="rec-num rec-num-open">!</div>
-          <div class="rec-body">
-            <div class="rec-title">⚠️ Noch offen: BMW-5er-Seite verbessern</div>
-            <div class="rec-text">Diese Empfehlung aus dem Vormonat ist noch offen – die Klickrate für "BMW 5er gebraucht Hamburg" liegt weiterhin bei nur 1,8&thinsp;% (2.840 Zeigungen). Ihre BMW-5er-Seite wird häufig in Google angezeigt, aber kaum angeklickt. Ergänzen Sie konkrete Angebote, aktuelle Preise und ein Kontaktformular direkt auf der Seite.</div>
-          </div>
-        </div><div class="rec ">
-          <div class="rec-num ">2</div>
-          <div class="rec-body">
-            <div class="rec-title">Google-Unternehmensprofil aktualisieren</div>
-            <div class="rec-text">Ihre Öffnungszeiten für Samstag sind auf Google veraltet, und 3 Kundenrezensionen aus März wurden noch nicht beantwortet. Beides beeinflusst direkt wie oft Google Sie in lokalen Suchen empfiehlt – eine kurze Antwort auf jede Bewertung reicht schon.</div>
-          </div>
-        </div><div class="rec ">
-          <div class="rec-num ">3</div>
-          <div class="rec-body">
-            <div class="rec-title">Fahrzeugseiten für Google ansprechender gestalten</div>
-            <div class="rec-text">Viele Ihrer Fahrzeugdetailseiten zeigen in den Google-Suchergebnissen nur den Titel ohne weitere Infos. Ergänzen Sie kurze Beschreibungen mit Preis und Kilometerstand – das erhöht die Chance, dass Interessenten direkt klicken, um bis zu 25&thinsp;%.</div>
-          </div>
-        </div></div>
+<div class="sec-label">Besucher-Statistik (Google Analytics)</div>
+<div class="ga4-grid">
+  <div class="ga4k"><div class="kl">Besuche gesamt</div><div class="kv">8.940</div><div class="kd-sm">▲ 9,7% Vormonat</div></div>
+  <div class="ga4k"><div class="kl">Einzelne Besucher</div><div class="kv">6.210</div><div class="kd-sm">▲ 8,2% Vormonat</div></div>
+  <div class="ga4k"><div class="kl">Engagement Rate</div><div class="kv">41,2%</div><div class="kd-sm">▼ 4,1% Vormonat</div></div>
+</div>
+<div class="sec-label">Zusammenfassung</div>
+<div class="sumbox">Ihr Shop hatte im März 2025 mit 4.821 Klicks (+12,4%) ein Rekordmonat – getragen von starkem Wachstum bei veganer Naturkosmetik. Allerdings sinkt die Engagement Rate auf 41,2% (▼4,1%), was auf ein Conversion-Problem hinweist: Besucher finden die Seite, verlassen sie aber zu schnell. Gleichzeitig entgehen Ihnen monatlich 312 Klicks weil drei Keywords trotz Top-10-Positionen unter dem Branchenschnitt von 5% CTR bleiben.</div>
+<div class="sec-label">Conversion-Analyse</div>
+<div class="conv-box warn">
+  <div class="conv-title warn">⚠️ Conversion-Warnung: 41,2% Engagement Rate</div>
+  <div class="conv-text">Ihre Besucher finden die Seite, verlassen sie aber zu schnell. Bei 8.940 monatlichen Sessions und sinkender Engagement Rate (▼ 4,1%) verlieren Sie potenzielle Kunden bereits auf der Einstiegsseite. Psychologische Trigger können die Verweildauer deutlich erhöhen:</div>
+  <div class="conv-tags">
+    <span class="conv-tag">Trust-Badges</span>
+    <span class="conv-tag">Kundenbewertungen</span>
+    <span class="conv-tag">Klare Preisangaben</span>
+    <span class="conv-tag">Garantie-Siegel</span>
+    <span class="conv-tag">Live-Chat</span>
+    <span class="conv-tag">Verknappung</span>
+  </div>
+</div>
 <div class="tgrid">
   <div>
     <div class="sec-label">Top Suchbegriffe</div>
-    <table><thead><tr><th>Suchbegriff</th><th class="r">Klicks</th><th class="r">Klickrate</th><th class="r">Position</th></tr></thead>
-    <tbody><tr><td>autohaus hamburg</td><td class="r">487</td><td class="r">5,8%</td><td class="r">5,8</td></tr><tr><td>gebrauchtwagen hamburg</td><td class="r">398</td><td class="r">5,5%</td><td class="r">5,5</td></tr><tr><td>bmw 3er gebraucht hamburg</td><td class="r">312</td><td class="r">6,5%</td><td class="r">6,4</td></tr><tr><td>audi a4 gebraucht</td><td class="r">287</td><td class="r">5,5%</td><td class="r">5,5</td></tr><tr><td>auto finanzierung hamburg</td><td class="r">198</td><td class="r">4,8%</td><td class="r">4,8</td></tr><tr><td>vw golf gebraucht hamburg</td><td class="r">187</td><td class="r">4,8%</td><td class="r">4,8</td></tr><tr><td>werkstatt hamburg termin</td><td class="r">156</td><td class="r">5,2%</td><td class="r">5,2</td></tr><tr><td>bmw 5er gebraucht hamburg</td><td class="r">51</td><td class="r">1,8%</td><td class="r">9,2</td></tr></tbody></table>
+    <table><thead><tr><th>Suchbegriff</th><th class="r">Klicks</th><th class="r">CTR</th><th class="r">Position</th></tr></thead>
+    <tbody>
+      <tr><td>naturkosmetik online shop</td><td class="r">642</td><td class="r">18,4%</td><td class="r">1,8</td></tr>
+      <tr><td>naturkosmetik vegan</td><td class="r">498</td><td class="r">15,2%</td><td class="r">2,3</td></tr>
+      <tr><td>gesichtscreme naturkosmetik</td><td class="r">387</td><td class="r">12,1%</td><td class="r">3,1</td></tr>
+      <tr><td>bio sonnencreme</td><td class="r">312</td><td class="r">4,8%</td><td class="r">5,5</td></tr>
+      <tr><td>vegane lippenpflege</td><td class="r">276</td><td class="r">3,9%</td><td class="r">6,2</td></tr>
+      <tr><td>shampoo ohne sulfate</td><td class="r">241</td><td class="r">3,1%</td><td class="r">8,4</td></tr>
+      <tr><td>naturkosmetik baby</td><td class="r">198</td><td class="r">2,8%</td><td class="r">9,7</td></tr>
+      <tr><td>naturkosmetik ohne mikroplastik</td><td class="r">38</td><td class="r">2,1%</td><td class="r">14,2</td></tr>
+    </tbody></table>
   </div>
   <div>
     <div class="sec-label">Meistbesuchte Seiten</div>
-    <table><thead><tr><th>Seite</th><th class="r">Klicks</th><th class="r">Klickrate</th></tr></thead>
-    <tbody><tr><td class="mono">/gebrauchtwagen/bmw-3er</td><td class="r">512</td><td class="r">6,4%</td></tr><tr><td class="mono">/gebrauchtwagen</td><td class="r">487</td><td class="r">5,8%</td></tr><tr><td class="mono">/finanzierung</td><td class="r">312</td><td class="r">4,8%</td></tr><tr><td class="mono">/gebrauchtwagen/audi-a4</td><td class="r">287</td><td class="r">5,5%</td></tr><tr><td class="mono">/werkstatt/termin</td><td class="r">241</td><td class="r">5,6%</td></tr><tr><td class="mono">/gebrauchtwagen/vw-golf</td><td class="r">198</td><td class="r">4,8%</td></tr><tr><td class="mono">/gebrauchtwagen/bmw-5er</td><td class="r">51</td><td class="r">1,8%</td></tr><tr><td class="mono">/startseite</td><td class="r">312</td><td class="r">6,1%</td></tr></tbody></table>
+    <table><thead><tr><th>Seite</th><th class="r">Klicks</th><th class="r">CTR</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">/kategorien/gesichtspflege</td><td class="r">1.284</td><td class="r">5,4%</td></tr>
+      <tr><td class="mono">/kategorien/naturkosmetik-vegan</td><td class="r">741</td><td class="r">5,6%</td></tr>
+      <tr><td class="mono">/produkte/bio-sonnencreme-lsf50</td><td class="r">487</td><td class="r">4,9%</td></tr>
+      <tr><td class="mono">/blog/naturkosmetik-inhaltsstoffe</td><td class="r">312</td><td class="r">3,7%</td></tr>
+      <tr><td class="mono">/kategorien/sonnenschutz</td><td class="r">241</td><td class="r">2,9%</td></tr>
+      <tr><td class="mono">/kategorien/babypflege</td><td class="r">287</td><td class="r">5,2%</td></tr>
+    </tbody></table>
   </div>
 </div>
 <div class="sec-label">Ungenutztes Potenzial <span class="badge">Schnelle Gewinne möglich</span></div>
-    <div class="chances-intro">Ihre Website erscheint für diese Suchanfragen bereits häufig in Google – wird aber selten angeklickt. Mit einem besseren Seitentitel oder einer einladenderen Kurzbeschreibung können Sie hier ohne großen Aufwand mehr Besucher gewinnen.</div>
-    <table style="margin-bottom:4px"><thead><tr><th>Suchanfrage</th><th class="r">Zeigungen</th><th class="r">Klicks</th><th class="r">Klickrate</th><th class="r">Position</th></tr></thead><tbody><tr><td>bmw 5er gebraucht hamburg</td><td class="r">2.840</td><td class="r">51</td><td class="r chance-ctr">1,8%</td><td class="r">9,2</td></tr><tr><td>jahreswagen hamburg günstig</td><td class="r">1.120</td><td class="r">24</td><td class="r chance-ctr">2,1%</td><td class="r">11,4</td></tr><tr><td>auto leasing hamburg privat</td><td class="r">780</td><td class="r">18</td><td class="r chance-ctr">2,3%</td><td class="r">13,1</td></tr></tbody></table>
+<div class="chances-intro">Ihre Website erscheint für diese Suchanfragen bereits häufig – wird aber selten angeklickt. Bei einem Branchenschnitt von 5% CTR entgehen Ihnen <strong>monatlich 312 Besucher</strong> an die Konkurrenz.</div>
+<table style="margin-bottom:4px"><thead><tr><th>Suchanfrage</th><th class="r">Einblendungen</th><th class="r">Klicks</th><th class="r">Aktuelle CTR</th><th class="r">Entgangene Klicks</th><th class="r">Position</th></tr></thead>
+<tbody>
+  <tr><td>naturkosmetik ohne mikroplastik</td><td class="r">1.840</td><td class="r">38</td><td class="r chance-ctr">2,1%</td><td class="r" style="color:#EF4444;font-weight:700">−54 / Monat</td><td class="r">14,2</td></tr>
+  <tr><td>bio sonnencreme gesicht</td><td class="r">1.240</td><td class="r">31</td><td class="r chance-ctr">2,5%</td><td class="r" style="color:#EF4444;font-weight:700">−31 / Monat</td><td class="r">8,4</td></tr>
+  <tr><td>vegane tagescreme test</td><td class="r">890</td><td class="r">19</td><td class="r chance-ctr">2,1%</td><td class="r" style="color:#EF4444;font-weight:700">−26 / Monat</td><td class="r">6,2</td></tr>
+</tbody></table>
+<div class="sec-label">🎯 Markt-Radar</div>
+<div class="radar-grid">
+  <div class="radar-card">
+    <div class="radar-hdr revier">🏆 Revier-Verteidigung</div>
+    <div class="radar-row"><div class="radar-kw">naturkosmetik online shop</div><div class="radar-meta">Pos. 1,8 · 642 Klicks · 18,4% CTR</div></div>
+    <div class="radar-row"><div class="radar-kw">naturkosmetik vegan</div><div class="radar-meta">Pos. 2,3 · 498 Klicks · 15,2% CTR</div></div>
+    <div class="radar-row"><div class="radar-kw">gesichtscreme naturkosmetik</div><div class="radar-meta">Pos. 3,1 · 387 Klicks · 12,1% CTR</div></div>
+  </div>
+  <div class="radar-card">
+    <div class="radar-hdr angriff">⚡ Angriffs-Modus</div>
+    <div class="radar-row"><div class="radar-kw">bio sonnencreme</div><div class="radar-meta">Pos. 5,5 · 1.240 Einbl. · 4,8% CTR</div></div>
+    <div class="radar-row"><div class="radar-kw">vegane lippenpflege</div><div class="radar-meta">Pos. 6,2 · 890 Einbl. · 3,9% CTR</div></div>
+    <div class="radar-row"><div class="radar-kw">shampoo ohne sulfate</div><div class="radar-meta">Pos. 8,4 · 640 Einbl. · 3,1% CTR</div></div>
+  </div>
+  <div class="radar-card">
+    <div class="radar-hdr potenzial">💤 Schlafende Riesen</div>
+    <div class="radar-row"><div class="radar-kw">naturkosmetik ohne mikroplastik</div><div class="radar-meta">Pos. 14,2 · 1.840 Einbl.</div></div>
+    <div class="radar-row"><div class="radar-kw">naturkosmetik nachhaltig</div><div class="radar-meta">Pos. 16,8 · 1.120 Einbl.</div></div>
+    <div class="radar-row"><div class="radar-kw">zero waste kosmetik</div><div class="radar-meta">Pos. 18,4 · 740 Einbl.</div></div>
+  </div>
+</div>
+<div class="sec-label">🎯 Strategische Empfehlungen</div>
+<div class="recs-new">
+  <div class="rec-new quick_win">
+    <div class="rec-cat quick_win">⚡ Quick Win – Sofort-Umsatz</div>
+    <div class="rec-title">54 Besucher/Monat zurückholen</div>
+    <div class="rec-text">Für "naturkosmetik ohne mikroplastik" gehen aktuell 54 Besucher/Monat an die Konkurrenz – Ihre CTR liegt bei nur 2,1% bei 1.840 Einblendungen auf Position 14,2. Ein überarbeiteter Title-Tag mit konkretem Nutzen ("Zertifiziert plastikfrei · ab 12,90€") kann das diese Woche ändern.</div>
+  </div>
+  <div class="rec-new growth">
+    <div class="rec-cat growth">🚀 Strategisches Wachstum</div>
+    <div class="rec-title">Zero-Waste-Trend nutzen</div>
+    <div class="rec-text">"zero waste kosmetik" wird mit 740 Einblendungen auf Position 18,4 gezeigt – Sie sind auf Seite 2, knapp vor dem Durchbruch. Eine dedizierte Seite mit echten Produkten, die plastikfrei verpackt sind, würde diese schlafenden Riesen in top-10 Positionen verwandeln.</div>
+  </div>
+  <div class="rec-new risk">
+    <div class="rec-cat risk">⚠️ Risiko-Warnung</div>
+    <div class="rec-title">Conversion-Gefahr: Engagement sinkt</div>
+    <div class="rec-text">Ihre Engagement Rate fiel um 4,1% auf 41,2% – bei 8.940 Sessions bedeutet das rund 2.700 Besucher die die Seite ohne Interaktion verlassen. Kombiniert mit der gesunkenen CTR ist das ein Frühzeichen für nachlassende Seitenrelevanz. Trust-Elemente und Ladezeit-Optimierung sind dringend empfohlen.</div>
+  </div>
+</div>
 <div class="legende">
   <div class="legende-title">Was bedeuten diese Zahlen?</div>
   <div class="legende-grid">
     <div><strong>Klicks</strong> – Wie oft jemand auf Ihr Suchergebnis in Google geklickt hat.</div>
     <div><strong>Sichtbarkeit</strong> – Wie oft Ihre Website in den Suchergebnissen erschienen ist.</div>
-    <div><strong>Klickrate</strong> – Von 100 Personen die Ihr Ergebnis sahen, haben X% geklickt.</div>
+    <div><strong>Klickrate (CTR)</strong> – Von 100 Personen die Ihr Ergebnis sahen, haben X% geklickt.</div>
     <div><strong>Ø Position</strong> – Ihr durchschnittlicher Rang in Google (1 = ganz oben).</div>
-    
-    <div><strong>Besuche (Sessions)</strong> – Gesamtanzahl der Website-Besuche. Eine Person kann mehrere Besuche haben.</div>
-    <div><strong>Einzelne Besucher</strong> – Wie viele verschiedene Personen Ihre Website besucht haben.</div>
-    <div><strong>Engagement Rate</strong> – Anteil der Besuche bei denen jemand wirklich interagiert hat (gescrollt, geklickt oder mind. 10 Sek. geblieben).</div>
+    <div><strong>Engagement Rate</strong> – Anteil der Besuche mit echter Interaktion (Scrollen, Klicken, ≥10 Sek.).</div>
+    <div><strong>Entgangene Klicks</strong> – Klicks die Sie bei 5% CTR (Branchenschnitt) zusätzlich erhalten würden.</div>
+    <div><strong>Markt-Radar</strong> – Revier (Top 1–3), Angriff (4–10), Schlafende Riesen (11–20).</div>
     <div><strong>▲ / ▼</strong> – Veränderung gegenüber dem Vormonat.</div>
   </div>
 </div>
 </div>
 <div class="foot">
   <div class="foot-left">
-    <div>Weber Digital GmbH · Automatischer SEO-Report · März 2025</div>
-    <div class="foot-ai">Zusammenfassung und Empfehlungen werden mit Unterstützung von KI erstellt und basieren auf Ihren tatsächlichen Suchdaten.</div>
+    <div>Digital Marketing Agency · SEO-Report · März 2025</div>
+    <div class="foot-ai">Erstellt mit RankBrief · Powered by AI</div>
   </div>
-  <div class="foot-brand">Weber Digital GmbH · weberdigital.de</div>
+  <div class="foot-brand" style="color:#1a1a2e">Digital Marketing Agency</div>
 </div>
 </div></body></html>

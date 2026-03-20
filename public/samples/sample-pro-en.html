@@ -7,7 +7,6 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#1a1a2e;
 .content{flex:1}
 .hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:9px;border-bottom:3px solid #6C63FF;margin-bottom:13px}
 .hdr-l{display:flex;align-items:center;gap:9px}
-.logo{height:32px;object-fit:contain}
 .logo-dot{width:9px;height:9px;border-radius:50%;background:#6C63FF;flex-shrink:0}
 .co{font-size:15px;font-weight:700;color:#6C63FF;letter-spacing:-0.02em}
 .hdr-r{text-align:right}
@@ -19,6 +18,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#1a1a2e;
 .sec-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6C63FF;margin-bottom:6px;margin-top:12px;display:flex;align-items:center;gap:6px}
 .sec-label::after{content:'';flex:1;height:1px;background:#6C63FF25}
 .badge{font-size:7px;background:#10B98115;color:#059669;padding:1px 6px;border-radius:10px;text-transform:none;letter-spacing:0;font-weight:700}
+.badge-warn{font-size:7px;background:#EF444415;color:#dc2626;padding:1px 6px;border-radius:10px;text-transform:none;letter-spacing:0;font-weight:700}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
 .kpi{border-radius:7px;padding:9px 10px;background:#6C63FF0d;border-left:3px solid #6C63FF}
 .kl{font-size:7.5px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
@@ -29,14 +29,47 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#1a1a2e;
 .ga4-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .ga4k{border-radius:7px;padding:9px 10px;background:#A78BFA0d;border-left:3px solid #A78BFA}
 .sumbox{background:#6C63FF07;border-left:3px solid #6C63FF;border-radius:6px;padding:9px 12px;font-size:10px;color:#2a2a3e;line-height:1.7}
+/* Market Radar */
+.radar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.radar-card{border-radius:7px;overflow:hidden;border:1px solid #e8e8f0}
+.radar-hdr{padding:5px 9px;font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid}
+.radar-hdr.revier{background:#10B98110;color:#059669;border-color:#10B98125}
+.radar-hdr.angriff{background:#6C63FF10;color:#5b52e0;border-color:#6C63FF25}
+.radar-hdr.potenzial{background:#F59E0B10;color:#d97706;border-color:#F59E0B25}
+.radar-row{padding:4px 9px;border-bottom:1px solid #f4f4f8}
+.radar-row:last-child{border-bottom:none}
+.radar-kw{font-size:8.5px;font-weight:600;color:#1a1a2e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.radar-meta{font-size:7.5px;color:#999;font-family:monospace}
+.radar-empty{padding:8px;font-size:8px;color:#ccc;text-align:center;font-style:italic}
+/* Conversion Signal */
+.conv-box{border-radius:7px;padding:8px 11px;margin-bottom:4px;border-left:3px solid}
+.conv-box.warn{background:#EF444408;border-color:#EF4444;border:1px solid #EF444425;border-left:3px solid #EF4444}
+.conv-box.ok{background:#10B98108;border-color:#10B981;border:1px solid #10B98125;border-left:3px solid #10B981}
+.conv-title{font-size:8.5px;font-weight:700;margin-bottom:3px}
+.conv-title.warn{color:#dc2626}
+.conv-title.ok{color:#059669}
+.conv-text{font-size:8.5px;color:#4a4a6e;line-height:1.6;margin-bottom:5px}
+.conv-tags{display:flex;flex-wrap:wrap;gap:3px}
+.conv-tag{font-size:7px;font-weight:700;padding:1px 5px;border-radius:99px;background:#6C63FF0f;color:#6C63FF;border:1px solid #6C63FF20}
+/* Business Recommendations */
+.recs-new{display:flex;flex-direction:column;gap:5px}
+.rec-new{border-radius:7px;padding:7px 10px;border-left:3px solid}
+.rec-new.quick_win{background:#10B98108;border-color:#10B981;border:1px solid #10B98120;border-left:3px solid #10B981}
+.rec-new.growth{background:#6C63FF08;border-color:#6C63FF;border:1px solid #6C63FF20;border-left:3px solid #6C63FF}
+.rec-new.risk{background:#EF444408;border-color:#EF4444;border:1px solid #EF444420;border-left:3px solid #EF4444}
+.rec-cat{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.rec-cat.quick_win{color:#059669}
+.rec-cat.growth{color:#5b52e0}
+.rec-cat.risk{color:#dc2626}
+.rec-title{font-size:8.5px;font-weight:700;color:#1a1a2e;margin-bottom:2px}
+.rec-text{font-size:8.5px;color:#4a4a6e;line-height:1.6}
+/* Legacy recs for basic */
 .recs{display:flex;flex-direction:column;gap:5px}
 .rec{display:flex;align-items:flex-start;gap:9px;background:#f8f8fc;border-radius:7px;padding:8px 11px;border:1px solid #ebebf5}
-.rec-open{background:#fff8f0;border-color:#fed7aa}
 .rec-num{width:19px;height:19px;border-radius:50%;background:#6C63FF;color:white;font-size:8.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.rec-num-open{background:#f97316}
 .rec-body{flex:1}
-.rec-title{font-size:9px;font-weight:700;color:#1a1a2e;margin-bottom:2px}
-.rec-text{font-size:9px;color:#4a4a6e;line-height:1.6}
+.rec-title-old{font-size:9px;font-weight:700;color:#1a1a2e;margin-bottom:2px}
+.rec-text-old{font-size:9px;color:#4a4a6e;line-height:1.6}
 .chances-intro{font-size:8.5px;color:#555;margin-bottom:7px;margin-top:-3px;line-height:1.55}
 .chance-ctr{color:#f59e0b !important}
 .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -58,6 +91,9 @@ tr:nth-child(even) td{background:#fafafa}
 .foot-left{font-size:7.5px;color:#ccc;line-height:1.6}
 .foot-ai{font-size:7px;color:#ddd;margin-top:1px}
 .foot-brand{font-size:7.5px;color:#A78BFA;font-weight:600;white-space:nowrap}
+.hdr{border-bottom-color:#6C63FF}
+.logo-dot{background:#6C63FF}
+.co{color:#6C63FF}
 </style></head>
 <body><div class="page"><div class="content">
 <div class="hdr">
@@ -65,77 +101,130 @@ tr:nth-child(even) td{background:#fafafa}
   <div class="hdr-r"><div class="rt">Monthly SEO Report</div><div class="rp">March 2025</div></div>
 </div>
 <div class="prop">
-  <span class="purl">organic-beauty-shop.com</span>
-  <span class="plbl">Generated on 01.04.2025</span>
+  <span class="purl">naturkosmetik-shop.de</span>
+  <span class="plbl">Generiert am 01/04/2025</span>
 </div>
-<div class="sec-label">Google Search Optimisation</div>
+<div class="sec-label">Google Search Performance</div>
 <div class="kpis">
-  <div class="kpi"><div class="kl">Clicks</div><div class="kv">4.821</div><div class="kd up">▲ 12.4% vs. prev. month</div></div>
-  <div class="kpi"><div class="kl">Impressions</div><div class="kv">89.340</div><div class="kd up">▲ 8.1% vs. prev. month</div></div>
-  <div class="kpi"><div class="kl">CTR</div><div class="kv">5,4%</div><div class="kd dn">▼ 0.3% vs. prev. month</div></div>
-  <div class="kpi"><div class="kl">Avg. Position</div><div class="kv">12,1</div><div class="kd up">▲ 1.8% vs. prev. month</div></div>
+  <div class="kpi"><div class="kl">Clicks</div><div class="kv">4,821</div><div class="kd up">▲ 12.4% vs. last month</div></div>
+  <div class="kpi"><div class="kl">Impressions</div><div class="kv">89,340</div><div class="kd up">▲ 8.1% vs. last month</div></div>
+  <div class="kpi"><div class="kl">CTR</div><div class="kv">5.4%</div><div class="kd dn">▼ 0.3% vs. last month</div></div>
+  <div class="kpi"><div class="kl">Avg. Position</div><div class="kv">12.1</div><div class="kd up">▲ 1.8 vs. last month</div></div>
 </div>
-
-    <div class="sec-label">Visitor Statistics (Google Analytics)</div>
-    <div class="ga4-grid">
-      <div class="ga4k"><div class="kl">Total Visits</div><div class="kv">8.940</div><div class="kd-sm">▲ 9.7% prev. month</div></div>
-      <div class="ga4k"><div class="kl">Unique Visitors</div><div class="kv">6.210</div><div class="kd-sm">▲ 8.2% prev. month</div></div>
-      <div class="ga4k"><div class="kl">Engagement Rate</div><div class="kv">64,2%</div><div class="kd-sm">▲ 3.1% prev. month</div></div>
-    </div>
-<div class="sec-label">Summary</div><div class="sumbox">Your shop had more Google visitors in March 2025 than ever before: 4,821 clicks – up 12.4%. Your vegan skincare and facial care pages attracted the most interest. Only CTR dipped slightly by 0.3%, suggesting your meta descriptions could be better aligned with what people are searching for.</div>
-<div class="sec-label">Recommendations for Next Month</div><div class="recs"><div class="rec ">
-          <div class="rec-num ">1</div>
-          <div class="rec-body">
-            <div class="rec-title">Improve Meta Descriptions for Your Skincare Pages</div>
-            <div class="rec-text">Your facial care and sun protection pages appear frequently in Google but are clicked less than they could be. Write an inviting meta description that makes your offering clear – e.g. "Certified organic skincare from €12.90 – vegan &amp; plastic-free".</div>
-          </div>
-        </div><div class="rec ">
-          <div class="rec-num ">2</div>
-          <div class="rec-body">
-            <div class="rec-title">Add Links Between Blog and Shop</div>
-            <div class="rec-text">Your blog article about organic skincare ingredients gets good traffic, but doesn't direct visitors to your products. Add 2–3 direct links to relevant category pages – this will move more visitors into your shop.</div>
-          </div>
-        </div><div class="rec ">
-          <div class="rec-num ">3</div>
-          <div class="rec-body">
-            <div class="rec-title">Create a Page for "Plastic-Free Organic Skincare"</div>
-            <div class="rec-text">Your website is shown 1,840 times for this query – but only 38 people click (2.1%). A dedicated page covering exactly this topic could significantly increase your click-through rate.</div>
-          </div>
-        </div></div>
+<div class="sec-label">Visitor Statistics (Google Analytics)</div>
+<div class="ga4-grid">
+  <div class="ga4k"><div class="kl">Total Sessions</div><div class="kv">8,940</div><div class="kd-sm">▲ 9.7% vs. last month</div></div>
+  <div class="ga4k"><div class="kl">Unique Users</div><div class="kv">6,210</div><div class="kd-sm">▲ 8.2% vs. last month</div></div>
+  <div class="ga4k"><div class="kl">Engagement Rate</div><div class="kv">41.2%</div><div class="kd-sm">▼ 4.1% vs. last month</div></div>
+</div>
+<div class="sec-label">Summary</div>
+<div class="sumbox">Your shop had a record month in March 2025 with 4,821 clicks (+12.4%) – driven by strong growth in vegan skincare. However, the engagement rate is dropping to 41.2% (▼4.1%), signalling a conversion issue: visitors find the page but leave too quickly. Meanwhile, you are missing 312 clicks per month because three keywords are underperforming the 5% CTR industry average despite top-10 positions.</div>
+<div class="sec-label">Conversion Analysis</div>
+<div class="conv-box warn">
+  <div class="conv-title warn">⚠️ Conversion Warning: 41.2% Engagement Rate</div>
+  <div class="conv-text">Visitors find your site but leave too quickly. With 8,940 monthly sessions and a declining engagement rate (▼ 4.1%), you are losing potential customers at the entry point. Psychological triggers can significantly increase time on page:</div>
+  <div class="conv-tags">
+    <span class="conv-tag">Trust badges</span>
+    <span class="conv-tag">Customer reviews</span>
+    <span class="conv-tag">Clear pricing</span>
+    <span class="conv-tag">Money-back guarantee</span>
+    <span class="conv-tag">Live chat</span>
+    <span class="conv-tag">Scarcity signals</span>
+  </div>
+</div>
 <div class="tgrid">
   <div>
-    <div class="sec-label">Top Keywords</div>
+    <div class="sec-label">Top Search Terms</div>
     <table><thead><tr><th>Keyword</th><th class="r">Clicks</th><th class="r">CTR</th><th class="r">Position</th></tr></thead>
-    <tbody><tr><td>organic skincare online shop</td><td class="r">642</td><td class="r">5,7%</td><td class="r">5,7</td></tr><tr><td>vegan organic skincare</td><td class="r">498</td><td class="r">5,7%</td><td class="r">5,6</td></tr><tr><td>natural face cream</td><td class="r">387</td><td class="r">5,3%</td><td class="r">5,3</td></tr><tr><td>organic sunscreen</td><td class="r">312</td><td class="r">5,5%</td><td class="r">5,5</td></tr><tr><td>vegan lip care</td><td class="r">276</td><td class="r">5,6%</td><td class="r">5,6</td></tr><tr><td>sulfate free shampoo</td><td class="r">241</td><td class="r">5,5%</td><td class="r">5,5</td></tr><tr><td>organic baby skincare</td><td class="r">198</td><td class="r">5,2%</td><td class="r">5,2</td></tr><tr><td>organic skincare microplastic free</td><td class="r">38</td><td class="r">2,1%</td><td class="r">4,2</td></tr></tbody></table>
+    <tbody>
+      <tr><td>natural cosmetics shop</td><td class="r">642</td><td class="r">18.4%</td><td class="r">1.8</td></tr>
+      <tr><td>vegan skincare products</td><td class="r">498</td><td class="r">15.2%</td><td class="r">2.3</td></tr>
+      <tr><td>organic face cream</td><td class="r">387</td><td class="r">12.1%</td><td class="r">3.1</td></tr>
+      <tr><td>natural sunscreen</td><td class="r">312</td><td class="r">4.8%</td><td class="r">5.5</td></tr>
+      <tr><td>vegan lip balm</td><td class="r">276</td><td class="r">3.9%</td><td class="r">6.2</td></tr>
+      <tr><td>sulfate free shampoo</td><td class="r">241</td><td class="r">3.1%</td><td class="r">8.4</td></tr>
+      <tr><td>natural baby skincare</td><td class="r">198</td><td class="r">2.8%</td><td class="r">9.7</td></tr>
+      <tr><td>plastic free cosmetics</td><td class="r">38</td><td class="r">2.1%</td><td class="r">14.2</td></tr>
+    </tbody></table>
   </div>
   <div>
     <div class="sec-label">Top Pages</div>
     <table><thead><tr><th>Page</th><th class="r">Clicks</th><th class="r">CTR</th></tr></thead>
-    <tbody><tr><td class="mono">/categories/facial-care</td><td class="r">1.284</td><td class="r">5,4%</td></tr><tr><td class="mono">/categories/vegan-skincare</td><td class="r">741</td><td class="r">5,6%</td></tr><tr><td class="mono">/products/organic-sunscreen-spf50</td><td class="r">487</td><td class="r">4,9%</td></tr><tr><td class="mono">/blog/organic-skincare-ingredients</td><td class="r">312</td><td class="r">3,7%</td></tr><tr><td class="mono">/categories/sun-protection</td><td class="r">241</td><td class="r">2,9%</td></tr><tr><td class="mono">/categories/baby-care</td><td class="r">287</td><td class="r">5,2%</td></tr><tr><td class="mono">/homepage</td><td class="r">198</td><td class="r">6,2%</td></tr><tr><td class="mono">/categories/body-care</td><td class="r">892</td><td class="r">5,3%</td></tr></tbody></table>
+    <tbody>
+      <tr><td class="mono">/categories/face-care</td><td class="r">1,284</td><td class="r">5.4%</td></tr>
+      <tr><td class="mono">/categories/vegan-cosmetics</td><td class="r">741</td><td class="r">5.6%</td></tr>
+      <tr><td class="mono">/products/organic-sunscreen-spf50</td><td class="r">487</td><td class="r">4.9%</td></tr>
+      <tr><td class="mono">/blog/natural-cosmetics-ingredients</td><td class="r">312</td><td class="r">3.7%</td></tr>
+      <tr><td class="mono">/categories/sun-protection</td><td class="r">241</td><td class="r">2.9%</td></tr>
+      <tr><td class="mono">/categories/baby-care</td><td class="r">287</td><td class="r">5.2%</td></tr>
+    </tbody></table>
   </div>
 </div>
 <div class="sec-label">Untapped Potential <span class="badge">Quick wins available</span></div>
-    <div class="chances-intro">Your website already appears frequently in Google for these queries – but is rarely clicked. A better page title or more inviting meta description could win you significantly more visitors with minimal effort.</div>
-    <table style="margin-bottom:4px"><thead><tr><th>Search Query</th><th class="r">Impressions</th><th class="r">Clicks</th><th class="r">CTR</th><th class="r">Position</th></tr></thead><tbody><tr><td>organic skincare microplastic free</td><td class="r">1.840</td><td class="r">38</td><td class="r chance-ctr">2,1%</td><td class="r">4,2</td></tr><tr><td>organic sunscreen gesicht</td><td class="r">1.240</td><td class="r">31</td><td class="r chance-ctr">2,5%</td><td class="r">6,1</td></tr><tr><td>vegan day cream review</td><td class="r">890</td><td class="r">19</td><td class="r chance-ctr">2,1%</td><td class="r">7,8</td></tr></tbody></table>
+<div class="chances-intro">Your site already appears frequently for these searches – but rarely gets clicked. At the industry average of 5% CTR, you are losing <strong>312 visitors per month</strong> to competitors.</div>
+<table style="margin-bottom:4px"><thead><tr><th>Search Term</th><th class="r">Impressions</th><th class="r">Clicks</th><th class="r">Current CTR</th><th class="r">Missed Clicks</th><th class="r">Position</th></tr></thead>
+<tbody>
+  <tr><td>plastic free cosmetics</td><td class="r">1,840</td><td class="r">38</td><td class="r chance-ctr">2.1%</td><td class="r" style="color:#EF4444;font-weight:700">−54 / month</td><td class="r">14.2</td></tr>
+  <tr><td>organic sunscreen face</td><td class="r">1,240</td><td class="r">31</td><td class="r chance-ctr">2.5%</td><td class="r" style="color:#EF4444;font-weight:700">−31 / month</td><td class="r">8.4</td></tr>
+  <tr><td>vegan day cream test</td><td class="r">890</td><td class="r">19</td><td class="r chance-ctr">2.1%</td><td class="r" style="color:#EF4444;font-weight:700">−26 / month</td><td class="r">6.2</td></tr>
+</tbody></table>
+<div class="sec-label">🎯 Market Radar</div>
+<div class="radar-grid">
+  <div class="radar-card">
+    <div class="radar-hdr revier">🏆 Your Territory</div>
+    <div class="radar-row"><div class="radar-kw">natural cosmetics shop</div><div class="radar-meta">Pos. 1.8 · 642 clicks · 18.4% CTR</div></div>
+    <div class="radar-row"><div class="radar-kw">vegan skincare products</div><div class="radar-meta">Pos. 2.3 · 498 clicks · 15.2% CTR</div></div>
+    <div class="radar-row"><div class="radar-kw">organic face cream</div><div class="radar-meta">Pos. 3.1 · 387 clicks · 12.1% CTR</div></div>
+  </div>
+  <div class="radar-card">
+    <div class="radar-hdr angriff">⚡ Attack Mode</div>
+    <div class="radar-row"><div class="radar-kw">natural sunscreen</div><div class="radar-meta">Pos. 5.5 · 1,240 impr. · 4.8% CTR</div></div>
+    <div class="radar-row"><div class="radar-kw">vegan lip balm</div><div class="radar-meta">Pos. 6.2 · 890 impr. · 3.9% CTR</div></div>
+    <div class="radar-row"><div class="radar-kw">sulfate free shampoo</div><div class="radar-meta">Pos. 8.4 · 640 impr. · 3.1% CTR</div></div>
+  </div>
+  <div class="radar-card">
+    <div class="radar-hdr potenzial">💤 Sleeping Giants</div>
+    <div class="radar-row"><div class="radar-kw">plastic free cosmetics</div><div class="radar-meta">Pos. 14.2 · 1,840 impr.</div></div>
+    <div class="radar-row"><div class="radar-kw">sustainable natural cosmetics</div><div class="radar-meta">Pos. 16.8 · 1,120 impr.</div></div>
+    <div class="radar-row"><div class="radar-kw">zero waste beauty</div><div class="radar-meta">Pos. 18.4 · 740 impr.</div></div>
+  </div>
+</div>
+<div class="sec-label">🎯 Strategic Recommendations</div>
+<div class="recs-new">
+  <div class="rec-new quick_win">
+    <div class="rec-cat quick_win">⚡ Quick Win – Immediate Revenue</div>
+    <div class="rec-title">Recover 54 visitors/month</div>
+    <div class="rec-text">For "plastic free cosmetics", 54 visitors/month are currently going to competitors – your CTR is only 2.1% with 1,840 impressions at position 14.2. A rewritten title tag with a clear benefit ("Certified plastic-free · from £12.90") can change that this week.</div>
+  </div>
+  <div class="rec-new growth">
+    <div class="rec-cat growth">🚀 Strategic Growth</div>
+    <div class="rec-title">Capture the zero-waste trend</div>
+    <div class="rec-text">"zero waste beauty" shows 740 impressions at position 18.4 – you're on page 2, right on the cusp. A dedicated page showcasing your plastic-free packaged products would turn these sleeping giants into top-10 rankings.</div>
+  </div>
+  <div class="rec-new risk">
+    <div class="rec-cat risk">⚠️ Risk Warning</div>
+    <div class="rec-title">Conversion threat: engagement declining</div>
+    <div class="rec-text">Your engagement rate dropped 4.1% to 41.2% – with 8,940 sessions that means roughly 2,700 visitors leaving without interaction. Combined with the CTR decline, this is an early signal of decreasing page relevance. Trust elements and page speed optimisation are strongly recommended.</div>
+  </div>
+</div>
 <div class="legende">
   <div class="legende-title">What do these numbers mean?</div>
   <div class="legende-grid">
-    <div><strong>Clicks</strong> – How often someone clicked your result in Google.</div>
-    <div><strong>Impressions</strong> – How often your website appeared in search results.</div>
-    <div><strong>CTR</strong> – Out of 100 people who saw your result, X% clicked.</div>
-    <div><strong>Avg. Position</strong> – Your average ranking in Google (1 = top position).</div>
-    
-    <div><strong>Sessions</strong> – Total number of website visits. One person can have multiple visits.</div>
-    <div><strong>Unique Visitors</strong> – How many unique people visited your website.</div>
-    <div><strong>Engagement Rate</strong> – Share of visits where someone actively engaged (scrolled, clicked, or stayed 10+ sec).</div>
-    <div><strong>▲ / ▼</strong> – Veränderung gegenüber dem prev. month.</div>
+    <div><strong>Clicks</strong> – How often someone clicked on your result in Google.</div>
+    <div><strong>Impressions</strong> – How often your site appeared in search results.</div>
+    <div><strong>CTR</strong> – Of 100 people who saw your result, X% clicked on it.</div>
+    <div><strong>Avg. Position</strong> – Your average rank in Google (1 = top).</div>
+    <div><strong>Engagement Rate</strong> – Share of visits with real interaction (scroll, click, ≥10 sec).</div>
+    <div><strong>Missed Clicks</strong> – Extra clicks you would get at 5% CTR (industry average).</div>
+    <div><strong>Market Radar</strong> – Territory (top 1–3), Attack (4–10), Sleeping Giants (11–20).</div>
+    <div><strong>▲ / ▼</strong> – Change vs. previous month.</div>
   </div>
 </div>
 </div>
 <div class="foot">
   <div class="foot-left">
     <div>RankBrief · Automated SEO Report · March 2025</div>
-    <div class="foot-ai">Summary and recommendations are generated with AI assistance, based on your actual search data.</div>
+    <div class="foot-ai">Summary and recommendations are AI-assisted and based on your actual search data.</div>
   </div>
   <div class="foot-brand">Powered by RankBrief</div>
 </div>
