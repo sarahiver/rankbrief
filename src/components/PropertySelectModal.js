@@ -240,12 +240,18 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
       // Aktive Properties vorauswählen + GA4 pro Property prefill
       const preSelected = {};
       const preGa4 = {};
+      const preStatuses = {};
       for (const p of activeProps ?? []) {
         preSelected[p.gsc_property_url] = p.google_account_id;
-        if (p.ga_property_id) preGa4[p.gsc_property_url] = p.ga_property_id;
+        if (p.ga_property_id) {
+          preGa4[p.gsc_property_url] = p.ga_property_id;
+          // Bereits gespeicherte IDs als valid markieren — wurden schon früher validiert
+          preStatuses[p.gsc_property_url] = { valid: true, message: `✅ GA4 bereits verbunden: ${p.ga_property_id}` };
+        }
       }
       setSelected(preSelected);
       setGa4Ids(preGa4);
+      setGa4Statuses(preStatuses);
 
     } catch (err) {
       console.error('loadData error:', err);
@@ -505,7 +511,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
             </div>
 
             <HelpText>
-              Zu finden in <a href="https://analytics.google.com" target="_blank" rel="noreferrer">Google Analytics</a> → Admin → Property Settings → Property ID. Nur Zahlen — nicht G-XXXXXXXX.
+              Zu finden in <a href="https://analytics.google.com" target="_blank" rel="noreferrer">Google Analytics</a> → Admin → Property Settings → Property ID. Nur Zahlen — nicht G-XXXXXXXX. Achte darauf dass die GA4 Property zur jeweiligen Domain passt.
             </HelpText>
             {error && <ErrorText>{error}</ErrorText>}
 
