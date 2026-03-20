@@ -277,8 +277,30 @@ export default function Admin({ user }) {
   };
 
   const handleResetPromo = async (u) => {
-    await supabase.from('profiles').update({ promo_code_used: false }).eq('id', u.id);
-    showAlert('Promo-Code zurückgesetzt.');
+    await supabase.from('profiles').update({ promo_code_used: null, promo_reports_used: 0, promo_reports_limit: null }).eq('id', u.id);
+    showAlert('Promo zurückgesetzt — User kann neuen Code einlösen.');
+    loadAll();
+  };
+
+  const handleAssignPromo = async (userId, promoCode) => {
+    if (!promoCode) return;
+    const promo = promos.find(p => p.code === promoCode);
+    if (!promo) return;
+    setSaving(true);
+    const { error } = await supabase.from('profiles').update({
+      plan:                promo.plan,
+      plan_status:         'active',
+      promo_code_used:     promo.code,
+      promo_reports_limit: promo.report_limit,
+      promo_reports_used:  0,
+    }).eq('id', userId);
+    if (!error) {
+      await supabase.from('promo_codes').update({ uses_count: (promo.uses_count || 0) + 1 }).eq('id', promo.id);
+    }
+    setSaving(false);
+    if (error) { showAlert('Fehler: ' + error.message, true); return; }
+    showAlert(`Code ${promo.code} zugewiesen → ${promo.plan}`);
+    setModal(null);
     loadAll();
   };
 
@@ -472,7 +494,7 @@ export default function Admin({ user }) {
                             <ActionBtn onClick={() => handleFreeze(u)}>
                               {u.plan_status === 'frozen' ? '▶ Reaktivieren' : '⏸ Einfrieren'}
                             </ActionBtn>
-                            {u.promo_code_used && <ActionBtn onClick={() => handleResetPromo(u)}>🔄 Promo Reset</ActionBtn>}
+                            <ActionBtn onClick={() => { setModal({ type:'assign_promo', user:u }); }}>🎟 Code zuweisen</ActionBtn>
                             <ActionBtn $danger onClick={() => setModal({ type:'delete', user:u })}>🗑 Löschen</ActionBtn>
                           </ActionsRow>
                         </UserRowBody>
@@ -667,6 +689,43 @@ export default function Admin({ user }) {
           </ModalBox>
         </Overlay>
       )}
+      {modal?.type === 'assign_promo' && (
+        <Overlay onClick={() => setModal(null)}>
+          <ModalBox onClick={e => e.stopPropagation()}>
+            <ModalTitle>Code zuweisen</ModalTitle>
+            <ModalSub>
+              <strong>{modal.user.email}</strong><br />
+              Aktuell: {modal.user.promo_code_used
+                ? <><span style={{fontFamily:'monospace',fontWeight:700}}>{modal.user.promo_code_used}</span> → <PlanBadge $plan={modal.user.plan}>{modal.user.plan}</PlanBadge></>
+                : 'kein Code'}
+            </ModalSub>
+            <div style={{ marginBottom:'1rem' }}>
+              <div style={{ fontSize:'.8rem', fontWeight:600, color:'var(--color-text-secondary)', marginBottom:'.375rem' }}>Code auswählen</div>
+              <Select id="assign-select" defaultValue="">
+                <option value="" disabled>— Code wählen —</option>
+                {promos.filter(p => p.active).map(p => (
+                  <option key={p.id} value={p.code}>
+                    {p.code} · {p.plan}{p.report_limit ? ` · ${p.report_limit} Reports` : ' · ∞'} ({p.uses_count}/{p.max_uses} genutzt)
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div style={{ fontSize:'.8rem', color:'var(--color-text-secondary)', marginBottom:'1rem', fontWeight:300 }}>
+              Der alte Code wird überschrieben, Report-Zähler wird auf 0 zurückgesetzt.
+            </div>
+            <BtnRow>
+              <BtnGhost onClick={() => setModal(null)}>Abbrechen</BtnGhost>
+              <BtnPrimary
+                onClick={() => handleAssignPromo(modal.user.id, document.getElementById('assign-select').value)}
+                disabled={saving}
+              >
+                {saving ? 'Wird zugewiesen…' : 'Code zuweisen'}
+              </BtnPrimary>
+            </BtnRow>
+          </ModalBox>
+        </Overlay>
+      )}
+
     </Layout>
   );
 }
