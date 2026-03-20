@@ -754,6 +754,54 @@ const SummaryCard = styled.div`
   margin-bottom: 2rem;
 `;
 
+// ── Market Radar ─────────────────────────────────────────────────────────────
+const RadarGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+  @media (max-width: 700px) { grid-template-columns: 1fr; }
+`;
+const RadarCard = styled.div`
+  border-radius: ${({ theme }) => theme.radius.lg};
+  overflow: hidden;
+  border: 1px solid ${({ $type }) =>
+    $type === 'revier'   ? 'rgba(16,185,129,0.2)' :
+    $type === 'angriff'  ? 'rgba(108,99,255,0.2)' : 'rgba(245,158,11,0.2)'};
+  background: ${({ theme }) => theme.colors.bgCard};
+`;
+const RadarHeader = styled.div`
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 0.5rem;
+  background: ${({ $type }) =>
+    $type === 'revier'   ? 'rgba(16,185,129,0.08)' :
+    $type === 'angriff'  ? 'rgba(108,99,255,0.08)' : 'rgba(245,158,11,0.08)'};
+  color: ${({ $type }) =>
+    $type === 'revier'   ? '#10B981' :
+    $type === 'angriff'  ? '#6C63FF' : '#F59E0B'};
+  border-bottom: 1px solid ${({ $type }) =>
+    $type === 'revier'   ? 'rgba(16,185,129,0.15)' :
+    $type === 'angriff'  ? 'rgba(108,99,255,0.15)' : 'rgba(245,158,11,0.15)'};
+`;
+const RadarRow = styled.div`
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  &:last-child { border-bottom: none; }
+`;
+const RadarKeyword = styled.div`
+  font-size: 0.8125rem; font-weight: 500; color: ${({ theme }) => theme.colors.text};
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 0.125rem;
+`;
+const RadarMeta = styled.div`
+  font-size: 0.75rem; color: ${({ theme }) => theme.colors.textDim}; font-weight: 300;
+  font-family: ${({ theme }) => theme.fonts.mono};
+`;
+const RadarEmpty = styled.div`
+  padding: 1rem; font-size: 0.8125rem; color: ${({ theme }) => theme.colors.textDim};
+  font-weight: 300; text-align: center;
+`;
+
 // ── Recommendations ───────────────────────────────────────────────────────────
 const RecGrid = styled.div`
   display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;
@@ -1238,6 +1286,67 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
                           ? <SummaryText>{selectedReport.summary_text}</SummaryText>
                           : <SummaryEmpty>{t(lang, 'dash.no_summary')}</SummaryEmpty>}
                       </SummaryCard>
+                    </>
+                  )}
+
+                  {/* Markt-Radar – für alle Pläne */}
+                  {selectedReport.market_radar && (
+                    <>
+                      <SectionTitle>
+                        {lang === 'de' ? '🎯 Markt-Radar' : '🎯 Market Radar'}
+                      </SectionTitle>
+                      <RadarGrid>
+                        {/* Revier-Verteidigung */}
+                        <RadarCard $type="revier">
+                          <RadarHeader $type="revier">
+                            🏆 {lang === 'de' ? 'Revier-Verteidigung' : 'Your Territory'}
+                          </RadarHeader>
+                          {selectedReport.market_radar.revier?.length > 0 ? (
+                            selectedReport.market_radar.revier.map((k, i) => (
+                              <RadarRow key={i}>
+                                <RadarKeyword title={k.keyword}>{k.keyword}</RadarKeyword>
+                                <RadarMeta>Pos. {k.position} · {k.clicks} {lang === 'de' ? 'Klicks' : 'clicks'} · {k.ctr}% CTR</RadarMeta>
+                              </RadarRow>
+                            ))
+                          ) : (
+                            <RadarEmpty>{lang === 'de' ? 'Noch keine Top-3 Keywords' : 'No top-3 keywords yet'}</RadarEmpty>
+                          )}
+                        </RadarCard>
+
+                        {/* Angriffs-Modus */}
+                        <RadarCard $type="angriff">
+                          <RadarHeader $type="angriff">
+                            ⚡ {lang === 'de' ? 'Angriffs-Modus' : 'Attack Mode'}
+                          </RadarHeader>
+                          {selectedReport.market_radar.angriff?.length > 0 ? (
+                            selectedReport.market_radar.angriff.map((k, i) => (
+                              <RadarRow key={i}>
+                                <RadarKeyword title={k.keyword}>{k.keyword}</RadarKeyword>
+                                <RadarMeta>Pos. {k.position} · {k.impressions} {lang === 'de' ? 'Einbl.' : 'impr.'} · {k.ctr}% CTR</RadarMeta>
+                              </RadarRow>
+                            ))
+                          ) : (
+                            <RadarEmpty>{lang === 'de' ? 'Keine Keywords auf Seite 1 unten' : 'No keywords in positions 4-10'}</RadarEmpty>
+                          )}
+                        </RadarCard>
+
+                        {/* Potenzial-Wecker */}
+                        <RadarCard $type="potenzial">
+                          <RadarHeader $type="potenzial">
+                            💤 {lang === 'de' ? 'Schlafende Riesen' : 'Sleeping Giants'}
+                          </RadarHeader>
+                          {selectedReport.market_radar.potenzial?.length > 0 ? (
+                            selectedReport.market_radar.potenzial.map((k, i) => (
+                              <RadarRow key={i}>
+                                <RadarKeyword title={k.keyword}>{k.keyword}</RadarKeyword>
+                                <RadarMeta>Pos. {k.position} · {k.impressions} {lang === 'de' ? 'Einbl.' : 'impr.'}</RadarMeta>
+                              </RadarRow>
+                            ))
+                          ) : (
+                            <RadarEmpty>{lang === 'de' ? 'Keine Keywords auf Seite 2' : 'No page-2 keywords'}</RadarEmpty>
+                          )}
+                        </RadarCard>
+                      </RadarGrid>
                     </>
                   )}
 
