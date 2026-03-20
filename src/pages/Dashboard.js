@@ -35,9 +35,10 @@ const TopBar = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
+  padding: 0 1rem;
   background: ${({ theme }) => theme.colors.bgCard};
   position: sticky;
+  @media (max-width: 480px) { padding: 0 0.75rem; }
   top: 0;
   z-index: 10;
 `;
@@ -62,7 +63,8 @@ const LogoDot = styled.div`
 const TopBarRight = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
+  @media (max-width: 480px) { gap: 0.375rem; }
 `;
 
 const UserEmail = styled.span`
@@ -79,6 +81,7 @@ const BtnSignOut = styled.button`
   border: 1px solid ${({ theme }) => theme.colors.border};
   transition: all 0.2s;
   &:hover { color: ${({ theme }) => theme.colors.text}; border-color: ${({ theme }) => theme.colors.borderLight}; }
+  @media (max-width: 480px) { display: none; }
 `;
 
 const LangToggle = styled.button`
@@ -92,6 +95,7 @@ const LangToggle = styled.button`
   background: ${({ $active, theme }) => $active ? theme.colors.accentDim : 'transparent'};
   transition: all 0.15s;
   &:hover { border-color: ${({ theme }) => theme.colors.accent}; color: ${({ theme }) => theme.colors.accent}; }
+  @media (max-width: 480px) { font-size: 0.6875rem; padding: 0.2rem 0.375rem; }
 `;
 
 const BtnSettings = styled(Link)`
@@ -105,6 +109,7 @@ const BtnSettings = styled(Link)`
   align-items: center;
   gap: 0.375rem;
   &:hover { color: ${({ theme }) => theme.colors.text}; border-color: ${({ theme }) => theme.colors.borderLight}; }
+  @media (max-width: 480px) { padding: 0.375rem 0.5rem; font-size: 0; &::before { content: '⚙'; font-size: 1rem; } }
 `;
 
 const Main = styled.main`
@@ -114,6 +119,7 @@ const Main = styled.main`
   margin: 0 auto;
   padding: 2.5rem 2rem;
   animation: ${fadeUp} 0.4s ease both;
+  @media (max-width: 480px) { padding: 1.25rem 1rem; }
 `;
 
 // ── Alerts ────────────────────────────────────────────────────────────────────
@@ -144,13 +150,14 @@ const ConnectBanner = styled.div`
   background: linear-gradient(135deg, rgba(108,99,255,0.12) 0%, rgba(99,207,255,0.05) 100%);
   border: 1px solid rgba(108,99,255,0.2);
   border-radius: ${({ theme }) => theme.radius.xl};
-  padding: 2rem;
-  margin-bottom: 2rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
+  @media (max-width: 480px) { flex-direction: column; padding: 1.25rem; }
 `;
 
 const ConnectText = styled.div`
@@ -183,6 +190,7 @@ const BtnConnect = styled.button`
   white-space: nowrap;
   &:hover { background: ${({ theme }) => theme.colors.accentHover}; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,99,255,0.4); }
   svg { width: 16px; height: 16px; }
+  @media (max-width: 480px) { width: 100%; justify-content: center; }
 `;
 
 // ── Trial Upgrade Banner (Plan-Picker) ────────────────────────────────────────
@@ -475,9 +483,10 @@ const PropertyHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
   cursor: pointer;
   &:hover { background: rgba(108,99,255,0.03); }
+  @media (max-width: 480px) { padding: 1rem; }
 `;
 
 const PropertyChevron = styled.span`
@@ -491,6 +500,7 @@ const PropertyChevron = styled.span`
 const PropertyBody = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.border};
   padding: 1.5rem;
+  @media (max-width: 480px) { padding: 1rem; }
 `;
 
 // ── Recipient Email ───────────────────────────────────────────────────────────
@@ -601,8 +611,9 @@ const AddPropertyRow = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1rem;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
+  @media (max-width: 480px) { flex-direction: column; align-items: stretch; }
 `;
 const PropertyCountBadge = styled.div`
   font-size: 0.8125rem;
@@ -719,6 +730,7 @@ const KpiGrid = styled.div`
   gap: 1rem;
   margin-bottom: 2rem;
   @media (max-width: 700px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px) { gap: 0.5rem; }
 `;
 
 const KpiCard = styled.div`
@@ -726,6 +738,7 @@ const KpiCard = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radius.lg};
   padding: 1.25rem;
+  @media (max-width: 480px) { padding: 0.875rem 0.75rem; }
 `;
 
 const KpiLabel = styled.div`
@@ -744,6 +757,7 @@ const KpiValue = styled.div`
   color: ${({ theme }) => theme.colors.text};
   line-height: 1;
   margin-bottom: 0.375rem;
+  @media (max-width: 480px) { font-size: 1.375rem; }
 `;
 
 const KpiDelta = styled.div`
@@ -774,6 +788,7 @@ const RadarGrid = styled.div`
   gap: 1rem;
   margin-bottom: 2rem;
   @media (max-width: 700px) { grid-template-columns: 1fr; }
+  @media (max-width: 480px) { gap: 0.625rem; }
 `;
 const RadarCard = styled.div`
   border-radius: ${({ theme }) => theme.radius.lg};
@@ -850,7 +865,7 @@ const ConvTrigger = styled.span`
 
 // ── Recommendations ───────────────────────────────────────────────────────────
 const RecGrid = styled.div`
-  display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;
+  display: flex; flex-direction: column; gap: 0.625rem; margin-bottom: 1.5rem;
 `;
 const RecCard = styled.div`
   border-radius: ${({ theme }) => theme.radius.lg};
@@ -911,6 +926,7 @@ const TableGrid = styled.div`
   gap: 1.5rem;
   margin-bottom: 2rem;
   @media (max-width: 700px) { grid-template-columns: 1fr; }
+  @media (max-width: 480px) { gap: 0.75rem; }
 `;
 
 const TableCard = styled.div`
@@ -948,6 +964,7 @@ const TableLabel = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 160px;
+  @media (max-width: 480px) { max-width: 120px; font-size: 0.75rem; }
 `;
 
 const TableVal = styled.div`

@@ -25,10 +25,11 @@ const TopBar = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
+  padding: 0 1rem;
   background: ${({ theme }) => theme.colors.bgCard};
   position: sticky;
   top: 0;
+  @media (max-width: 480px) { padding: 0 0.75rem; }
   z-index: 10;
 `;
 
@@ -52,7 +53,8 @@ const LogoDot = styled.div`
 const TopBarRight = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  @media (max-width: 480px) { gap: 0.375rem; }
 `;
 
 const TopBarLink = styled(Link)`
@@ -94,6 +96,7 @@ const Main = styled.main`
   margin: 0 auto;
   padding: 2.5rem 2rem 4rem;
   animation: ${fadeUp} 0.4s ease both;
+  @media (max-width: 480px) { padding: 1.25rem 1rem 3rem; }
 `;
 
 const PageTitle = styled.h1`
@@ -138,6 +141,7 @@ const SectionSub = styled.p`
 
 const SectionBody = styled.div`
   padding: 1.5rem;
+  @media (max-width: 480px) { padding: 1rem; }
 `;
 
 // ── Form Elements ─────────────────────────────────────────────────────────────
