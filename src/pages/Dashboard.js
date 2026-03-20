@@ -802,6 +802,39 @@ const RadarEmpty = styled.div`
   font-weight: 300; text-align: center;
 `;
 
+// ── Conversion Signal ────────────────────────────────────────────────────────
+const ConvBox = styled.div`
+  border-radius: ${({ theme }) => theme.radius.lg};
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid ${({ $level }) =>
+    $level === 'critical' ? 'rgba(239,68,68,0.3)' :
+    $level === 'warning'  ? 'rgba(245,158,11,0.3)' : 'rgba(16,185,129,0.2)'};
+  background: ${({ $level }) =>
+    $level === 'critical' ? 'rgba(239,68,68,0.06)' :
+    $level === 'warning'  ? 'rgba(245,158,11,0.06)' : 'rgba(16,185,129,0.05)'};
+`;
+const ConvTitle = styled.div`
+  font-size: 0.9375rem; font-weight: 700; margin-bottom: 0.375rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  color: ${({ $level, theme }) =>
+    $level === 'critical' ? '#EF4444' :
+    $level === 'warning'  ? '#F59E0B' : '#10B981'};
+`;
+const ConvText = styled.div`
+  font-size: 0.8125rem; color: ${({ theme }) => theme.colors.textMuted};
+  font-weight: 300; line-height: 1.7; margin-bottom: 0.75rem;
+`;
+const ConvTriggers = styled.div`
+  display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 0.75rem;
+`;
+const ConvTrigger = styled.span`
+  font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.625rem;
+  border-radius: 99px;
+  background: rgba(108,99,255,0.1); color: #6C63FF;
+  border: 1px solid rgba(108,99,255,0.2);
+`;
+
 // ── Recommendations ───────────────────────────────────────────────────────────
 const RecGrid = styled.div`
   display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;
@@ -1287,6 +1320,47 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
                           : <SummaryEmpty>{t(lang, 'dash.no_summary')}</SummaryEmpty>}
                       </SummaryCard>
                     </>
+                  )}
+
+                  {/* Conversion-Signal – wenn GA4-Daten vorhanden */}
+                  {selectedReport.conversion_signal && (
+                    (() => {
+                      const cs = selectedReport.conversion_signal;
+                      const isGood = cs.level === 'good';
+                      const triggers = lang === 'de'
+                        ? { critical: ['Trust-Badges', 'Kundenbewertungen', 'Klare Preisangaben', 'Garantie-Siegel', 'Live-Chat', 'Verknappung'], warning: ['Social Proof', 'FAQ-Sektion', 'Klarer Call-to-Action', 'Ladezeit optimieren', 'Mobile UX prüfen'], good: [] }[cs.level]
+                        : { critical: ['Trust badges', 'Customer reviews', 'Clear pricing', 'Money-back guarantee', 'Live chat', 'Scarcity signals'], warning: ['Social proof', 'FAQ section', 'Clear CTA', 'Page speed', 'Mobile UX'], good: [] }[cs.level];
+                      const icon = cs.level === 'critical' ? '🚨' : cs.level === 'warning' ? '⚠️' : '✅';
+                      const title = lang === 'de'
+                        ? cs.level === 'critical' ? `${icon} Conversion-Alarm: ${cs.engagement_rate}% Engagement Rate`
+                          : cs.level === 'warning' ? `${icon} Verbesserungspotenzial: ${cs.engagement_rate}% Engagement Rate`
+                          : `${icon} Gute Conversion-Basis: ${cs.engagement_rate}% Engagement Rate`
+                        : cs.level === 'critical' ? `${icon} Conversion Alert: ${cs.engagement_rate}% Engagement Rate`
+                          : cs.level === 'warning' ? `${icon} Room for Improvement: ${cs.engagement_rate}% Engagement Rate`
+                          : `${icon} Strong Engagement: ${cs.engagement_rate}% Engagement Rate`;
+                      const body = lang === 'de'
+                        ? cs.level === 'critical'
+                          ? `Ihre Besucher finden die Seite, verlassen sie aber zu schnell. Bei ${cs.sessions?.toLocaleString('de-DE')} monatlichen Sessions${cs.trending_down ? ' – und die Engagement Rate sinkt weiter' : ''} verlieren Sie potenzielle Kunden bereits auf der Einstiegsseite. Psychologische Trigger können die Verweildauer deutlich erhöhen:`
+                          : cs.level === 'warning'
+                          ? `${cs.sessions?.toLocaleString('de-DE')} Sessions, aber die Engagement Rate liegt bei nur ${cs.engagement_rate}%${cs.trending_down ? ' und sinkt' : ''}. Besucher kommen – aber konvertieren noch nicht optimal. Diese Maßnahmen können helfen:`
+                          : `Mit ${cs.engagement_rate}% Engagement Rate und ${cs.sessions?.toLocaleString('de-DE')} Sessions liegt Ihre Website über dem Branchenschnitt. Weiterhin auf Qualität achten.`
+                        : cs.level === 'critical'
+                          ? `Visitors find your site but leave too quickly. With ${cs.sessions?.toLocaleString('en-US')} monthly sessions${cs.trending_down ? ' and a declining trend' : ''}, you are losing potential customers at the entry point. Psychological triggers can significantly increase time on page:`
+                          : cs.level === 'warning'
+                          ? `${cs.sessions?.toLocaleString('en-US')} sessions, but engagement rate is only ${cs.engagement_rate}%${cs.trending_down ? ' and dropping' : ''}. Visitors arrive but aren't converting optimally yet. These tactics can help:`
+                          : `With ${cs.engagement_rate}% engagement rate and ${cs.sessions?.toLocaleString('en-US')} sessions, your site is performing above average. Keep up the quality.`;
+                      return (
+                        <ConvBox $level={cs.level}>
+                          <ConvTitle $level={cs.level}>{title}</ConvTitle>
+                          <ConvText>{body}</ConvText>
+                          {triggers?.length > 0 && (
+                            <ConvTriggers>
+                              {triggers.map((t, i) => <ConvTrigger key={i}>{t}</ConvTrigger>)}
+                            </ConvTriggers>
+                          )}
+                        </ConvBox>
+                      );
+                    })()
                   )}
 
                   {/* Markt-Radar – für alle Pläne */}
