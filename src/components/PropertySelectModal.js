@@ -198,9 +198,9 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [ga4Id, setGa4Id] = useState('');
-  const [ga4Status, setGa4Status] = useState(null); // null | 'checking' | { valid, message }
-  const [ga4Timer, setGa4Timer] = useState(null);
+  const [ga4Ids, setGa4Ids] = useState({}); // { [url]: string }
+  const [ga4Statuses, setGa4Statuses] = useState({}); // { [url]: null | 'checking' | {valid, message} }
+  const [ga4Timers, setGa4Timers] = useState({});
   const [accounts, setAccounts] = useState([]);
   const [openAccounts, setOpenAccounts] = useState({});
   const [selected, setSelected] = useState({}); // { url: google_account_id }
@@ -237,13 +237,15 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
       const realActive = activeProps?.length ?? 0;
       setRealRemaining(Math.max(0, limit - realActive));
 
-      // Aktive Properties vorauswählen + GA4 prefill
+      // Aktive Properties vorauswählen + GA4 pro Property prefill
       const preSelected = {};
+      const preGa4 = {};
       for (const p of activeProps ?? []) {
         preSelected[p.gsc_property_url] = p.google_account_id;
-        if (p.ga_property_id) setGa4Id(p.ga_property_id);
+        if (p.ga_property_id) preGa4[p.gsc_property_url] = p.ga_property_id;
       }
       setSelected(preSelected);
+      setGa4Ids(preGa4);
 
     } catch (err) {
       console.error('loadData error:', err);
@@ -251,12 +253,12 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
     setLoading(false);
   };
 
-  const validateGa4 = async (id) => {
+  const validateGa4 = async (url, id) => {
     if (!id.trim() || !/^\d+$/.test(id.trim())) {
-      setGa4Status(id.trim() ? { valid: false, message: 'Nur Zahlen erlaubt — nicht die G-XXXXXXXX ID.' } : null);
+      setGa4Statuses(s => ({ ...s, [url]: id.trim() ? { valid: false, message: 'Nur Zahlen erlaubt — nicht die G-XXXXXXXX ID.' } : null }));
       return;
     }
-    setGa4Status('checking');
+    setGa4Statuses(s => ({ ...s, [url]: 'checking' }));
     try {
       const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
       const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
@@ -266,19 +268,19 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
         body: JSON.stringify({ user_id: user.id, ga4_property_id: id.trim() }),
       });
       const data = await res.json();
-      setGa4Status({ valid: data.valid, message: data.message });
+      setGa4Statuses(s => ({ ...s, [url]: { valid: data.valid, message: data.message } }));
     } catch {
-      setGa4Status({ valid: false, message: 'Validierung fehlgeschlagen. Bitte manuell prüfen.' });
+      setGa4Statuses(s => ({ ...s, [url]: { valid: false, message: 'Validierung fehlgeschlagen.' } }));
     }
   };
 
-  const handleGa4Change = (val) => {
-    setGa4Id(val);
-    setGa4Status(null);
-    if (ga4Timer) clearTimeout(ga4Timer);
+  const handleGa4Change = (url, val) => {
+    setGa4Ids(ids => ({ ...ids, [url]: val }));
+    setGa4Statuses(s => ({ ...s, [url]: null }));
+    if (ga4Timers[url]) clearTimeout(ga4Timers[url]);
     if (val.trim().length >= 6) {
-      const t = setTimeout(() => validateGa4(val), 800); // 800ms debounce
-      setGa4Timer(t);
+      const t = setTimeout(() => validateGa4(url, val), 800);
+      setGa4Timers(ts => ({ ...ts, [url]: t }));
     }
   };
 
@@ -299,21 +301,25 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
 
   const handleSave = async (skipGa4 = false) => {
     setSaving(true); setError('');
-    const ga4Value = skipGa4 ? null : ga4Id.trim() || null;
-    if (!skipGa4 && ga4Id.trim()) {
-      if (!/^\d+$/.test(ga4Id.trim())) {
-        setError('Die GA4 Property ID besteht nur aus Zahlen (z.B. 123456789).');
-        setSaving(false); return;
-      }
-      // Blockieren wenn Validierung explizit fehlgeschlagen ist
-      if (ga4Status && ga4Status !== 'checking' && !ga4Status.valid) {
-        setError(ga4Status.message || 'Bitte überprüfe die GA4 Property ID.');
-        setSaving(false); return;
-      }
-      // Noch am Prüfen → warten
-      if (ga4Status === 'checking') {
-        setError('GA4 ID wird noch geprüft. Bitte einen Moment warten.');
-        setSaving(false); return;
+
+    if (!skipGa4) {
+      // Prüfen ob noch Validierungen laufen oder fehlgeschlagen sind
+      for (const url of Object.keys(selected)) {
+        const id = ga4Ids[url]?.trim();
+        const status = ga4Statuses[url];
+        if (!id) continue;
+        if (status === 'checking') {
+          setError('GA4 IDs werden noch geprüft. Bitte einen Moment warten.');
+          setSaving(false); return;
+        }
+        if (!status) {
+          setError('Bitte warte bis alle GA4 IDs geprüft wurden.');
+          setSaving(false); return;
+        }
+        if (status && !status.valid) {
+          setError(`GA4 ID für ${url} ist ungültig: ${status.message}`);
+          setSaving(false); return;
+        }
       }
     }
     try {
@@ -333,13 +339,12 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
           .eq('user_id', user.id).eq('gsc_property_url', url)
           .maybeSingle();
 
+        const ga4Value = skipGa4 ? null : (ga4Ids[url]?.trim() || null);
         if (existing) {
-          // Existiert → status auf active setzen + optional GA4 updaten
-          const updates: any = { status: 'active', last_synced_at: new Date().toISOString() };
+          const updates = { status: 'active', last_synced_at: new Date().toISOString() };
           if (ga4Value) updates.ga_property_id = ga4Value;
           await supabase.from('properties').update(updates).eq('id', existing.id);
         } else {
-          // Existiert nicht → neu anlegen
           await supabase.from('properties').insert({
             user_id: user.id, google_account_id: accountId,
             gsc_property_url: url, display_name: url,
@@ -453,59 +458,82 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
           <>
             <Title>Google Analytics verbinden</Title>
             <Sub>
-              GA4 ergänzt deinen Report um <strong>Sessions, Nutzer und Engagement Rate</strong> — also was Besucher auf deiner Website wirklich tun, nicht nur wie sie über Google kommen.
+              GA4 ergänzt deinen Report um <strong>Sessions, Nutzer und Engagement Rate</strong>. Optional — kann auch später in den Settings pro Property eingetragen werden.
             </Sub>
 
-            <InfoBox>
-              💡 <strong>Eine GA4 ID für alle Properties?</strong> Kein Problem — trag sie hier ein und sie gilt für alle verbundenen Properties. Hast du pro Domain eine eigene GA4 Property, kannst du das später in den <strong>Settings</strong> pro Property anpassen.
-            </InfoBox>
+            {/* Pro Property ein GA4-Eingabefeld */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.25rem' }}>
+              {Object.keys(selected).map(url => {
+                const status = ga4Statuses[url];
+                const val = ga4Ids[url] ?? '';
+                return (
+                  <div key={url} style={{
+                    padding: '0.875rem 1rem',
+                    border: '1px solid var(--border, #E5E4F5)',
+                    borderRadius: '10px',
+                    background: 'var(--bg, #F8F7FF)',
+                  }}>
+                    <div style={{ fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text, #1A1A2E)', wordBreak: 'break-all' }}>
+                      {url}
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <Input
+                        style={{ flex: 1, marginBottom: 0 }}
+                        type="text"
+                        placeholder="GA4 Property ID (optional)"
+                        value={val}
+                        onChange={e => handleGa4Change(url, e.target.value)}
+                        $error={status && status !== 'checking' && !status.valid}
+                      />
+                    </div>
+                    {status === 'checking' && (
+                      <div style={{ fontSize: '0.75rem', color: '#9898B8', marginTop: '0.375rem' }}>⏳ Wird geprüft…</div>
+                    )}
+                    {status && status !== 'checking' && (
+                      <div style={{
+                        fontSize: '0.75rem', fontWeight: 600, marginTop: '0.375rem',
+                        padding: '0.25rem 0.625rem', borderRadius: '6px', display: 'inline-block',
+                        color: status.valid ? '#065F46' : '#991B1B',
+                        background: status.valid ? '#D1FAE5' : '#FEE2E2',
+                      }}>
+                        {status.message}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
 
-            <Input
-              type="text" placeholder="z.B. 123456789"
-              value={ga4Id}
-              onChange={e => handleGa4Change(e.target.value)}
-              $error={ga4Status && !ga4Status.valid && ga4Status !== 'checking'}
-            />
-            {ga4Status === 'checking' && (
-              <div style={{ fontSize: '0.8125rem', color: '#9898B8', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                ⏳ GA4 ID wird geprüft…
-              </div>
-            )}
-            {ga4Status && ga4Status !== 'checking' && (
-              <div style={{
-                fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.75rem',
-                padding: '0.5rem 0.875rem', borderRadius: '8px',
-                color: ga4Status.valid ? '#065F46' : '#991B1B',
-                background: ga4Status.valid ? '#D1FAE5' : '#FEE2E2',
-                border: `1px solid ${ga4Status.valid ? '#6EE7B7' : '#FECACA'}`,
-              }}>
-                {ga4Status.message}
-              </div>
-            )}
             <HelpText>
-              Zu finden in <a href="https://analytics.google.com" target="_blank" rel="noreferrer">Google Analytics</a> → Admin → Property Settings → Property ID. Nur Zahlen — nicht G-XXXXXXXX. Kann später in den Settings pro Property angepasst werden.
+              Zu finden in <a href="https://analytics.google.com" target="_blank" rel="noreferrer">Google Analytics</a> → Admin → Property Settings → Property ID. Nur Zahlen — nicht G-XXXXXXXX.
             </HelpText>
             {error && <ErrorText>{error}</ErrorText>}
-            {/* "Einrichtung abschließen" nur wenn GA4 leer ODER erfolgreich validiert */}
-            {(!ga4Id.trim() || (ga4Status && ga4Status !== 'checking' && ga4Status.valid)) && (
-              <BtnPrimary onClick={() => handleSave(false)} disabled={saving}>
-                {saving ? <Spinner /> : 'Einrichtung abschließen →'}
-              </BtnPrimary>
-            )}
 
-            {/* Während Validierung läuft: deaktivierter Button */}
-            {ga4Id.trim() && (ga4Status === 'checking' || !ga4Status) && (
-              <BtnPrimary disabled={true}>
-                ⏳ GA4 wird geprüft…
-              </BtnPrimary>
-            )}
-
-            {/* Bei invalider ID: nur "Ohne GA4 fortfahren" */}
-            <BtnGhost onClick={() => handleSave(true)} disabled={saving}>
-              {ga4Id.trim() && ga4Status && !ga4Status.valid
-                ? 'Ohne GA4 fortfahren (ID ungültig)'
-                : 'Ohne GA4 fortfahren'}
-            </BtnGhost>
+            {/* Button-Logik: sperren wenn noch Validierungen laufen oder fehlgeschlagen */}
+            {(() => {
+              const anyChecking = Object.keys(selected).some(url => {
+                const id = ga4Ids[url]?.trim();
+                const st = ga4Statuses[url];
+                return id && (st === 'checking' || !st);
+              });
+              const anyInvalid = Object.keys(selected).some(url => {
+                const id = ga4Ids[url]?.trim();
+                const st = ga4Statuses[url];
+                return id && st && st !== 'checking' && !st.valid;
+              });
+              return (
+                <>
+                  {!anyInvalid && (
+                    <BtnPrimary onClick={() => handleSave(false)} disabled={saving || anyChecking}>
+                      {saving ? <Spinner /> : anyChecking ? '⏳ GA4 wird geprüft…' : 'Einrichtung abschließen →'}
+                    </BtnPrimary>
+                  )}
+                  <BtnGhost onClick={() => handleSave(true)} disabled={saving}>
+                    {anyInvalid ? 'Ohne GA4 fortfahren (ungültige ID)' : 'Ohne GA4 fortfahren'}
+                  </BtnGhost>
+                </>
+              );
+            })()}
           </>
         )}
       </Box>
