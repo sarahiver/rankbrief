@@ -37,6 +37,8 @@ const TCellMono = styled(TCell)`font-family:${({theme})=>theme.fonts.mono};color
 // Badges
 const PlanBadge = styled.span`font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .5rem;border-radius:99px;background:${({$plan})=>$plan==='agency'?'rgba(245,158,11,.12)':$plan==='pro'?'rgba(108,99,255,.12)':$plan==='basic'?'rgba(16,185,129,.12)':'rgba(148,163,184,.12)'};color:${({$plan})=>$plan==='agency'?'#D97706':$plan==='pro'?'#6C63FF':$plan==='basic'?'#059669':'#94A3B8'};`;
 const StatusDot = styled.span`display:inline-block;width:7px;height:7px;border-radius:50%;background:${({$status})=>$status==='active'?'#10B981':$status==='frozen'?'#6C63FF':'#F59E0B'};margin-right:.4rem;`;
+const PromoBar  = styled.div`height:4px;border-radius:99px;background:${({theme})=>theme.colors.border};overflow:hidden;margin-top:3px;width:80px;`;
+const PromoFill = styled.div`height:100%;border-radius:99px;background:${({$pct})=>$pct>=100?'#EF4444':$pct>=66?'#F59E0B':'#10B981'};width:${({$pct})=>Math.min($pct,100)}%;transition:width .3s;`;
 
 // Action buttons
 const ActionBtn = styled.button`font-size:.75rem;font-weight:600;padding:.25rem .625rem;border-radius:${({theme})=>theme.radius.md};border:1px solid ${({$danger,theme})=>$danger?'rgba(239,68,68,.3)':theme.colors.border};color:${({$danger,theme})=>$danger?'#EF4444':theme.colors.textMuted};background:transparent;transition:all .15s;&:hover{background:${({$danger})=>$danger?'rgba(239,68,68,.08)':'rgba(108,99,255,.06)'};color:${({$danger,theme})=>$danger?'#EF4444':theme.colors.accent};border-color:${({$danger,theme})=>$danger?'rgba(239,68,68,.5)':theme.colors.accent};}&:disabled{opacity:.4;cursor:not-allowed}`;
@@ -69,7 +71,7 @@ const Alert     = styled.div`padding:.75rem 1rem;border-radius:${({theme})=>them
 const ADMIN_PW_KEY = 'rb_admin_unlocked';
 const ADMIN_PW     = process.env.REACT_APP_ADMIN_PW || 'rankbrief-admin';
 const PLANS = ['free','basic','pro','agency'];
-const COLS_USERS = '2fr 1fr 1fr 1fr 1fr 1fr 1.5fr';
+const COLS_USERS = '2fr 1fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr';
 const COLS_REPORTS = '2fr 1fr 1fr 1fr 1fr';
 const COLS_PROPS = '2fr 1fr 1fr 1fr 1fr';
 
@@ -84,16 +86,18 @@ export default function Admin({ user }) {
   const [pwInput, setPwInput]   = useState('');
   const [pwErr, setPwErr]       = useState(false);
   const [tab, setTab]           = useState('users');
-  const [users, setUsers]     = useState([]);
-  const [reports, setReports] = useState([]);
-  const [props, setProps]     = useState([]);
-  const [stats, setStats]     = useState({});
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch]   = useState('');
-  const [alert, setAlert]     = useState(null);
-  const [modal, setModal]     = useState(null); // { type: 'plan'|'delete'|'report_delete', user?, prop?, report? }
-  const [saving, setSaving]   = useState(false);
-  const [newPlan, setNewPlan] = useState('free');
+  const [users, setUsers]       = useState([]);
+  const [reports, setReports]   = useState([]);
+  const [props, setProps]       = useState([]);
+  const [promos, setPromos]     = useState([]);
+  const [stats, setStats]       = useState({});
+  const [loading, setLoading]   = useState(true);
+  const [search, setSearch]     = useState('');
+  const [alert, setAlert]       = useState(null);
+  const [modal, setModal]       = useState(null);
+  const [saving, setSaving]     = useState(false);
+  const [newPlan, setNewPlan]   = useState('free');
+  const [promoForm, setPromoForm] = useState({ code: '', plan: 'pro', max_uses: 50, report_limit: 6, notes: '' });
 
   // Guard: only admin
   useEffect(() => {
@@ -125,10 +129,12 @@ export default function Admin({ user }) {
       { data: profiles },
       { data: allReports },
       { data: allProps },
+      { data: allPromos },
     ] = await Promise.all([
-      supabase.from('profiles').select('id, plan, plan_status, free_report_sent, promo_code_used, trial_ends_at, created_at, report_language, email').order('created_at', { ascending: false }),
+      supabase.from('profiles').select('id, plan, plan_status, free_report_sent, promo_code_used, promo_reports_limit, promo_reports_used, trial_ends_at, created_at, report_language, email').order('created_at', { ascending: false }),
       supabase.from('reports').select('id, property_id, report_month, clicks, status, pdf_url, summary_text, created_at').order('created_at', { ascending: false }).limit(200),
       supabase.from('properties').select('id, user_id, gsc_property_url, display_name, status, ga_property_id, created_at').order('created_at', { ascending: false }),
+      supabase.from('promo_codes').select('*').order('created_at', { ascending: false }),
     ]);
 
     // ── Load emails via Edge Function (always — uses service role key) ────
@@ -201,6 +207,7 @@ export default function Admin({ user }) {
     setUsers(usersEnriched);
     setReports(allReports || []);
     setProps(allPropsEnriched);
+    setPromos(allPromos || []);
 
     setStats({
       total_users:    (profiles || []).length,
@@ -277,6 +284,36 @@ export default function Admin({ user }) {
   const filteredReports = reports.filter(r => r.id?.includes(q) || r.status?.includes(q));
   const filteredProps   = props.filter(p => p.gsc_property_url?.toLowerCase().includes(q) || p.user_email?.toLowerCase().includes(q));
 
+  const handleCreatePromo = async () => {
+    if (!promoForm.code.trim()) return;
+    setSaving(true);
+    const { error } = await supabase.from('promo_codes').insert({
+      code:         promoForm.code.trim().toUpperCase(),
+      plan:         promoForm.plan,
+      max_uses:     parseInt(promoForm.max_uses) || 100,
+      report_limit: promoForm.report_limit ? parseInt(promoForm.report_limit) : null,
+      notes:        promoForm.notes || null,
+    });
+    setSaving(false);
+    if (error) { showAlert('Fehler: ' + error.message, true); return; }
+    showAlert('Code erstellt ✓');
+    setPromoForm({ code: '', plan: 'pro', max_uses: 50, report_limit: 6, notes: '' });
+    setModal(null);
+    loadAll();
+  };
+
+  const handleTogglePromo = async (promo) => {
+    await supabase.from('promo_codes').update({ active: !promo.active }).eq('id', promo.id);
+    showAlert(promo.active ? 'Code deaktiviert' : 'Code aktiviert');
+    loadAll();
+  };
+
+  const handleDeletePromo = async (promo) => {
+    await supabase.from('promo_codes').delete().eq('id', promo.id);
+    showAlert('Code gelöscht');
+    loadAll();
+  };
+
   if (!user || (ADMIN_UID && user.id !== ADMIN_UID)) return null;
 
   // ── Password Gate ──────────────────────────────────────────────────────────
@@ -341,6 +378,7 @@ export default function Admin({ user }) {
             <Tab $active={tab==='users'}   onClick={()=>setTab('users')}>👤 User ({users.length})</Tab>
             <Tab $active={tab==='props'}   onClick={()=>setTab('props')}>🌐 Properties ({props.length})</Tab>
             <Tab $active={tab==='reports'} onClick={()=>setTab('reports')}>📄 Reports ({reports.length})</Tab>
+            <Tab $active={tab==='promos'}  onClick={()=>setTab('promos')}>🎟 Promo-Codes ({promos.length})</Tab>
           </Tabs>
           <SearchInput placeholder="Suchen…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
@@ -352,7 +390,7 @@ export default function Admin({ user }) {
               <TableWrap>
                 <THead $cols={COLS_USERS}>
                   <div>E-Mail / ID</div><div>Plan</div><div>Status</div>
-                  <div>Properties</div><div>Reports</div><div>Erstellt</div><div>Aktionen</div>
+                  <div>Properties</div><div>Reports</div><div>Promo</div><div>Erstellt</div><div>Aktionen</div>
                 </THead>
                 {filteredUsers.map(u => (
                   <TRow key={u.id} $cols={COLS_USERS}>
@@ -372,6 +410,22 @@ export default function Admin({ user }) {
                     </TCell>
                     <TCell>{u.property_count}</TCell>
                     <TCell>{u.report_count}</TCell>
+                    <TCell>
+                      {u.promo_code_used && u.promo_reports_limit ? (
+                        <div>
+                          <div style={{ fontSize:'.7rem', color:'var(--text-dim)', marginBottom:'2px' }}>
+                            {u.promo_reports_used ?? 0}/{u.promo_reports_limit} Reports
+                          </div>
+                          <PromoBar>
+                            <PromoFill $pct={Math.round(((u.promo_reports_used ?? 0) / u.promo_reports_limit) * 100)} />
+                          </PromoBar>
+                        </div>
+                      ) : u.promo_code_used ? (
+                        <span style={{ fontSize:'.7rem', color:'#10B981' }}>∞ unbegrenzt</span>
+                      ) : (
+                        <span style={{ fontSize:'.7rem', color:'var(--text-dim)' }}>–</span>
+                      )}
+                    </TCell>
                     <TCellMono>{fmtDate(u.created_at)}</TCellMono>
                     <div style={{ display:'flex', gap:'0.375rem', flexWrap:'wrap' }}>
                       <ActionBtn onClick={() => { setNewPlan(u.plan); setModal({ type:'plan', user:u }); }}>Plan</ActionBtn>
@@ -429,6 +483,45 @@ export default function Admin({ user }) {
                 ))}
               </TableWrap>
             )}
+
+            {/* ── PROMO CODES TAB ── */}
+            {tab === 'promos' && (
+              <>
+                <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:'1rem' }}>
+                  <ActionBtn style={{ padding:'0.5rem 1rem', fontSize:'0.875rem', fontWeight:700, background:'var(--accent)', color:'#fff', borderColor:'transparent' }}
+                    onClick={() => setModal({ type:'create_promo' })}>
+                    + Neuer Code
+                  </ActionBtn>
+                </div>
+                <TableWrap>
+                  <THead $cols="1.5fr 1fr 1fr 1fr 1fr 1fr 1.5fr">
+                    <div>Code</div><div>Plan</div><div>Genutzt</div><div>Max</div><div>Report-Limit</div><div>Status</div><div>Aktionen</div>
+                  </THead>
+                  {promos.length === 0 && (
+                    <div style={{ padding:'1.5rem', textAlign:'center', fontSize:'0.875rem', color:'var(--text-dim)' }}>Keine Codes vorhanden</div>
+                  )}
+                  {promos.map(p => (
+                    <TRow key={p.id} $cols="1.5fr 1fr 1fr 1fr 1fr 1fr 1.5fr">
+                      <TCell style={{ fontWeight:700, fontFamily:'monospace', fontSize:'0.8rem' }}>{p.code}</TCell>
+                      <TCell><PlanBadge $plan={p.plan}>{p.plan}</PlanBadge></TCell>
+                      <TCell>{p.uses_count}</TCell>
+                      <TCell>{p.max_uses}</TCell>
+                      <TCell>{p.report_limit ?? <span style={{ color:'#10B981' }}>∞</span>}</TCell>
+                      <TCell>
+                        <StatusDot $status={p.active ? 'active' : 'inactive'} />
+                        {p.active ? 'Aktiv' : 'Inaktiv'}
+                      </TCell>
+                      <div style={{ display:'flex', gap:'.375rem' }}>
+                        <ActionBtn onClick={() => handleTogglePromo(p)}>
+                          {p.active ? '⏸ Pause' : '▶ Aktivieren'}
+                        </ActionBtn>
+                        <ActionBtn $danger onClick={() => handleDeletePromo(p)}>Löschen</ActionBtn>
+                      </div>
+                    </TRow>
+                  ))}
+                </TableWrap>
+              </>
+            )}
           </>
         )}
       </Main>
@@ -474,6 +567,57 @@ export default function Admin({ user }) {
             <BtnRow>
               <BtnGhost onClick={() => setModal(null)}>Abbrechen</BtnGhost>
               <BtnDanger onClick={handleDeleteReport} disabled={saving}>{saving ? 'Löscht…' : 'Löschen'}</BtnDanger>
+            </BtnRow>
+          </ModalBox>
+        </Overlay>
+      )}
+
+      {modal?.type === 'create_promo' && (
+        <Overlay onClick={() => setModal(null)}>
+          <ModalBox onClick={e => e.stopPropagation()}>
+            <ModalTitle>Neuer Promo-Code</ModalTitle>
+            <ModalSub>Code wird automatisch in Großbuchstaben gespeichert.</ModalSub>
+            {[
+              ['Code', 'code', 'text', 'Z.B. SOMMER2026'],
+              ['Notiz (intern)', 'notes', 'text', 'Z.B. Beta-Tester Kampagne'],
+            ].map(([label, key, type, ph]) => (
+              <div key={key} style={{ marginBottom:'0.75rem' }}>
+                <div style={{ fontSize:'0.8rem', fontWeight:600, color:'var(--text-muted)', marginBottom:'0.375rem' }}>{label}</div>
+                <GateInput as="input" type={type} placeholder={ph}
+                  value={promoForm[key]}
+                  onChange={e => setPromoForm(f => ({ ...f, [key]: e.target.value }))}
+                  style={{ marginBottom:0 }} />
+              </div>
+            ))}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem', marginBottom:'0.75rem' }}>
+              <div>
+                <div style={{ fontSize:'0.8rem', fontWeight:600, color:'var(--text-muted)', marginBottom:'0.375rem' }}>Plan</div>
+                <Select value={promoForm.plan} onChange={e => setPromoForm(f => ({ ...f, plan: e.target.value }))}>
+                  {PLANS.map(p => <option key={p} value={p}>{p}</option>)}
+                </Select>
+              </div>
+              <div>
+                <div style={{ fontSize:'0.8rem', fontWeight:600, color:'var(--text-muted)', marginBottom:'0.375rem' }}>Max. Einlösungen</div>
+                <GateInput as="input" type="number" placeholder="50"
+                  value={promoForm.max_uses}
+                  onChange={e => setPromoForm(f => ({ ...f, max_uses: e.target.value }))}
+                  style={{ marginBottom:0 }} />
+              </div>
+            </div>
+            <div style={{ marginBottom:'1rem' }}>
+              <div style={{ fontSize:'0.8rem', fontWeight:600, color:'var(--text-muted)', marginBottom:'0.375rem' }}>
+                Report-Limit <span style={{ fontWeight:300, color:'var(--text-dim)' }}>(leer = unbegrenzt)</span>
+              </div>
+              <GateInput as="input" type="number" placeholder="6 (leer = unbegrenzt)"
+                value={promoForm.report_limit}
+                onChange={e => setPromoForm(f => ({ ...f, report_limit: e.target.value }))}
+                style={{ marginBottom:0 }} />
+            </div>
+            <BtnRow>
+              <BtnGhost onClick={() => setModal(null)}>Abbrechen</BtnGhost>
+              <BtnPrimary onClick={handleCreatePromo} disabled={saving || !promoForm.code.trim()}>
+                {saving ? 'Erstellt…' : 'Code erstellen'}
+              </BtnPrimary>
             </BtnRow>
           </ModalBox>
         </Overlay>
