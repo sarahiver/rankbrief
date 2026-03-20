@@ -53,9 +53,21 @@ const BtnGhost  = styled.button`padding:.625rem 1.25rem;color:${({theme})=>theme
 const BtnDanger = styled.button`padding:.625rem 1.25rem;background:rgba(239,68,68,.1);color:#EF4444;font-weight:700;font-size:.875rem;border-radius:${({theme})=>theme.radius.md};border:1px solid rgba(239,68,68,.2);transition:all .2s;&:hover{background:rgba(239,68,68,.18)}&:disabled{opacity:.5;cursor:not-allowed}`;
 
 const Spinner   = styled.div`width:20px;height:20px;border:2px solid ${({theme})=>theme.colors.border};border-top-color:${({theme})=>theme.colors.accent};border-radius:50%;animation:${spin} .7s linear infinite;margin:3rem auto;`;
+
+// ── Password Gate ─────────────────────────────────────────────────────────────
+const GatePage  = styled.div`min-height:100vh;display:flex;align-items:center;justify-content:center;background:${({theme})=>theme.colors.bg};`;
+const GateCard  = styled.div`background:${({theme})=>theme.colors.bgCard};border:1px solid ${({theme})=>theme.colors.border};border-radius:${({theme})=>theme.radius.xl};padding:2.5rem;width:100%;max-width:380px;animation:${fadeUp} .4s ease both;`;
+const GateLogo  = styled.div`font-family:${({theme})=>theme.fonts.display};font-weight:800;font-size:1rem;letter-spacing:-.03em;display:flex;align-items:center;gap:.4rem;margin-bottom:1.75rem;span{color:${({theme})=>theme.colors.accent}}`;
+const GateTitle = styled.h1`font-family:${({theme})=>theme.fonts.display};font-size:1.25rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.375rem;`;
+const GateSub   = styled.p`font-size:.875rem;color:${({theme})=>theme.colors.textMuted};font-weight:300;margin-bottom:1.5rem;`;
+const GateInput = styled.input`width:100%;padding:.75rem 1rem;box-sizing:border-box;background:${({theme})=>theme.colors.bg};border:1px solid ${({$err,theme})=>$err?theme.colors.danger:theme.colors.border};border-radius:${({theme})=>theme.radius.md};color:${({theme})=>theme.colors.text};font-size:.9375rem;outline:none;margin-bottom:.75rem;transition:border-color .2s;&:focus{border-color:${({theme})=>theme.colors.accent}}&::placeholder{color:${({theme})=>theme.colors.textDim}}`;
+const GateBtn   = styled.button`width:100%;padding:.875rem;background:${({theme})=>theme.colors.accent};color:#fff;font-family:${({theme})=>theme.fonts.display};font-weight:700;font-size:1rem;border-radius:${({theme})=>theme.radius.md};transition:all .2s;&:hover:not(:disabled){background:${({theme})=>theme.colors.accentHover};transform:translateY(-1px)}&:disabled{opacity:.5;cursor:not-allowed}`;
+const GateErr   = styled.div`font-size:.8125rem;color:${({theme})=>theme.colors.danger};margin-bottom:.75rem;`;
 const SearchInput = styled.input`padding:.5rem .875rem;background:${({theme})=>theme.colors.bg};border:1px solid ${({theme})=>theme.colors.border};border-radius:${({theme})=>theme.radius.md};color:${({theme})=>theme.colors.text};font-size:.875rem;width:260px;outline:none;transition:border-color .2s;&:focus{border-color:${({theme})=>theme.colors.accent}}&::placeholder{color:${({theme})=>theme.colors.textDim}}`;
 const Alert     = styled.div`padding:.75rem 1rem;border-radius:${({theme})=>theme.radius.md};font-size:.875rem;margin-bottom:1rem;background:${({$err})=>$err?'rgba(239,68,68,.1)':'rgba(16,185,129,.08)'};border:1px solid ${({$err})=>$err?'rgba(239,68,68,.2)':'rgba(16,185,129,.2)'};color:${({$err})=>$err?'#EF4444':'#10B981'};`;
 
+const ADMIN_PW_KEY = 'rb_admin_unlocked';
+const ADMIN_PW     = process.env.REACT_APP_ADMIN_PW || 'rankbrief-admin';
 const PLANS = ['free','basic','pro','agency'];
 const COLS_USERS = '2fr 1fr 1fr 1fr 1fr 1fr 1.5fr';
 const COLS_REPORTS = '2fr 1fr 1fr 1fr 1fr';
@@ -68,7 +80,10 @@ function fmtDate(d) {
 
 export default function Admin({ user }) {
   const navigate = useNavigate();
-  const [tab, setTab]         = useState('users');
+  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem(ADMIN_PW_KEY) === '1');
+  const [pwInput, setPwInput]   = useState('');
+  const [pwErr, setPwErr]       = useState(false);
+  const [tab, setTab]           = useState('users');
   const [users, setUsers]     = useState([]);
   const [reports, setReports] = useState([]);
   const [props, setProps]     = useState([]);
@@ -87,6 +102,17 @@ export default function Admin({ user }) {
     loadAll();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  const handlePwSubmit = () => {
+    if (pwInput === ADMIN_PW) {
+      sessionStorage.setItem(ADMIN_PW_KEY, '1');
+      setUnlocked(true);
+      setPwErr(false);
+    } else {
+      setPwErr(true);
+      setPwInput('');
+    }
+  };
 
   const showAlert = (msg, err = false) => {
     setAlert({ msg, err });
@@ -223,6 +249,28 @@ export default function Admin({ user }) {
   const filteredProps   = props.filter(p => p.gsc_property_url?.toLowerCase().includes(q) || p.user_email?.toLowerCase().includes(q));
 
   if (!user || (ADMIN_UID && user.id !== ADMIN_UID)) return null;
+
+  // ── Password Gate ──────────────────────────────────────────────────────────
+  if (!unlocked) return (
+    <GatePage>
+      <GateCard>
+        <GateLogo><LogoDot />Rank<span>Brief</span></GateLogo>
+        <GateTitle>Admin-Zugang</GateTitle>
+        <GateSub>Bitte gib das Admin-Passwort ein.</GateSub>
+        <GateInput
+          type="password"
+          placeholder="Passwort"
+          value={pwInput}
+          $err={pwErr}
+          onChange={e => { setPwInput(e.target.value); setPwErr(false); }}
+          onKeyDown={e => e.key === 'Enter' && handlePwSubmit()}
+          autoFocus
+        />
+        {pwErr && <GateErr>Falsches Passwort.</GateErr>}
+        <GateBtn onClick={handlePwSubmit} disabled={!pwInput}>Einloggen →</GateBtn>
+      </GateCard>
+    </GatePage>
+  );
 
   return (
     <Layout>
