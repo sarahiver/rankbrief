@@ -364,6 +364,11 @@ export default function Admin({ user }) {
                     <TCell>
                       <StatusDot $status={u.plan_status} />
                       {u.plan_status}
+                      {u.promo_code_used && u.promo_code_used !== true && (
+                        <span style={{ marginLeft:'0.375rem', fontSize:'0.7rem', color:'#F59E0B', fontWeight:700, fontFamily:'monospace' }}>
+                          🎟 {u.promo_code_used}
+                        </span>
+                      )}
                     </TCell>
                     <TCell>{u.property_count}</TCell>
                     <TCell>{u.report_count}</TCell>
