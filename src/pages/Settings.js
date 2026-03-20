@@ -1184,7 +1184,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                 )}
                 {isPaid && (
                   <Btn onClick={handlePortal} disabled={portalLoading} style={{ fontSize: '13px', padding: '6px 14px' }}>
-                    {portalLoading ? '...' : (branding.report_language === 'en' ? '{t(lang, 'set.billing_portal')}' : '{t(lang, 'set.billing_portal')}')}
+                    {portalLoading ? '...' : t(lang, 'set.billing_portal')}
                   </Btn>
                 )}
               </div>
