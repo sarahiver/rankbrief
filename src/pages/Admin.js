@@ -36,7 +36,7 @@ const TCellMono = styled(TCell)`font-family:${({theme})=>theme.fonts.mono};color
 
 // Badges
 const PlanBadge = styled.span`font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .5rem;border-radius:99px;background:${({$plan})=>$plan==='agency'?'rgba(245,158,11,.12)':$plan==='pro'?'rgba(108,99,255,.12)':$plan==='basic'?'rgba(16,185,129,.12)':'rgba(148,163,184,.12)'};color:${({$plan})=>$plan==='agency'?'#D97706':$plan==='pro'?'#6C63FF':$plan==='basic'?'#059669':'#94A3B8'};`;
-const StatusDot = styled.span`display:inline-block;width:7px;height:7px;border-radius:50%;background:${({$ok})=>$ok?'#10B981':'#EF4444'};margin-right:.4rem;`;
+const StatusDot = styled.span`display:inline-block;width:7px;height:7px;border-radius:50%;background:${({$status})=>$status==='active'?'#10B981':$status==='frozen'?'#6C63FF':'#F59E0B'};margin-right:.4rem;`;
 
 // Action buttons
 const ActionBtn = styled.button`font-size:.75rem;font-weight:600;padding:.25rem .625rem;border-radius:${({theme})=>theme.radius.md};border:1px solid ${({$danger,theme})=>$danger?'rgba(239,68,68,.3)':theme.colors.border};color:${({$danger,theme})=>$danger?'#EF4444':theme.colors.textMuted};background:transparent;transition:all .15s;&:hover{background:${({$danger})=>$danger?'rgba(239,68,68,.08)':'rgba(108,99,255,.06)'};color:${({$danger,theme})=>$danger?'#EF4444':theme.colors.accent};border-color:${({$danger,theme})=>$danger?'rgba(239,68,68,.5)':theme.colors.accent};}&:disabled{opacity:.4;cursor:not-allowed}`;
@@ -362,7 +362,7 @@ export default function Admin({ user }) {
                     </div>
                     <TCell><PlanBadge $plan={u.plan}>{u.plan}</PlanBadge></TCell>
                     <TCell>
-                      <StatusDot $ok={u.plan_status !== 'frozen'} />
+                      <StatusDot $status={u.plan_status} />
                       {u.plan_status}
                     </TCell>
                     <TCell>{u.property_count}</TCell>
@@ -392,7 +392,7 @@ export default function Admin({ user }) {
                       <TCellMono>{p.gsc_property_url}</TCellMono>
                     </div>
                     <TCellMono>{p.user_email}</TCellMono>
-                    <TCell><StatusDot $ok={p.status==='active'} />{p.status}</TCell>
+                    <TCell><StatusDot $status={p.status} />{p.status}</TCell>
                     <TCell>{p.report_count}</TCell>
                     <TCell>{p.ga_property_id ? <span style={{ color:'#10B981', fontWeight:600, fontSize:'.75rem' }}>✓ {p.ga_property_id}</span> : <span style={{ color:'#94A3B8', fontSize:'.75rem' }}>–</span>}</TCell>
                   </TRow>
@@ -412,7 +412,7 @@ export default function Admin({ user }) {
                     <TCell>{r.report_month ? new Date(r.report_month).toLocaleDateString('de-DE', { month:'long', year:'numeric' }) : '–'}</TCell>
                     <TCell>{r.clicks?.toLocaleString('de-DE') ?? '–'}</TCell>
                     <TCell>
-                      <StatusDot $ok={r.status==='done'} />
+                      <StatusDot $status={r.status==='done'?'active':'inactive'} />
                       {r.status}
                       {r.pdf_url && <span style={{ marginLeft:'.5rem', fontSize:'.7rem', color:'#10B981' }}>PDF ✓</span>}
                     </TCell>
