@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import t from '../lib/i18n';
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(12px); }
@@ -919,20 +920,20 @@ function FrozenWallView({ onUpgrade, upgrading }) {
       key: 'basic',
       name: 'Basic',
       price: '19',
-      features: ['1 Domain', 'Monatlicher PDF-Report', 'GSC + GA4 Daten', 'KI-Zusammenfassung', 'Email-Versand'],
+      features: ['1 Domain', t(lang, 'dash.feature_monthly_report'), t(lang, 'dash.feature_gsc_ga4'), t(lang, 'dash.feature_ai_summary'), t(lang, 'dash.feature_email')],
     },
     {
       key: 'pro',
       name: 'Pro',
       price: '39',
       highlight: true,
-      features: ['3 Domains', 'Alles in Basic', 'White-Label Reports', 'Eigenes Logo', 'Priority Delivery'],
+      features: ['3 Domains', t(lang, 'dash.feature_all_basic'), t(lang, 'dash.feature_white_label'), t(lang, 'dash.feature_own_logo'), 'Priority Delivery'],
     },
     {
       key: 'agency',
       name: 'Agency',
       price: '79',
-      features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Bulk Reporting', 'Agency Branding'],
+      features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', 'Bulk Reporting', 'Agency Branding'],
     },
   ];
 
@@ -941,7 +942,7 @@ function FrozenWallView({ onUpgrade, upgrading }) {
       <FrozenIcon>⏸️</FrozenIcon>
       <FrozenTitle>Dein kostenloser Monat ist abgelaufen</FrozenTitle>
       <FrozenSubtitle>
-        Wähle einen Plan um weiterhin automatische monatliche SEO-Reports zu erhalten.
+        {t(lang, 'dash.trial_choose')}
         Deine Daten sind sicher gespeichert.
       </FrozenSubtitle>
 
@@ -977,10 +978,10 @@ function fmtMonth(dateStr) {
 // ── UpgradeModal ──────────────────────────────────────────────────────────────
 function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading }) {
   const opts = currentPlan === 'pro'
-    ? [{ key: 'agency', name: 'Agency', price: '79', highlight: true, features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Endkunden-Email', 'Agency Branding'] }]
+    ? [{ key: 'agency', name: 'Agency', price: '79', highlight: true, features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', 'Endkunden-Email', 'Agency Branding'] }]
     : [
         { key: 'pro',    name: 'Pro',    price: '39', highlight: true, features: ['3 Domains', 'White-Label', 'SEO-Empfehlungen', 'Endkunden-Email'] },
-        { key: 'agency', name: 'Agency', price: '79', highlight: false, features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Endkunden-Email'] },
+        { key: 'agency', name: 'Agency', price: '79', highlight: false, features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', 'Endkunden-Email'] },
       ];
   return (
     <ModalOverlay onClick={onClose}>
@@ -997,7 +998,7 @@ function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading }) {
               <PlanPrice $highlight={p.highlight}>€{p.price}<span>/mo</span></PlanPrice>
               {p.features.map(f => <PlanFeature key={f} $highlight={p.highlight}>{f}</PlanFeature>)}
               <PlanBtn $highlight={p.highlight} onClick={() => onUpgrade(p.key)} disabled={upgrading}>
-                {upgrading ? 'Lädt...' : `Upgrade auf ${p.name} →`}
+                {upgrading ? t(lang, 'dash.upgrade_loading') : `Upgrade auf ${p.name} →`}
               </PlanBtn>
             </PlanCard>
           ))}
@@ -1077,7 +1078,7 @@ function PropertyItem({ property, isAgency, plan }) {
           </div>
         </PropertyInfo>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <PropertyMeta>Verbunden {new Date(property.created_at).toLocaleDateString('de-DE')}</PropertyMeta>
+          <PropertyMeta>Verbunden {new Date(property.created_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB')}</PropertyMeta>
           <PropertyChevron $open={open}>▾</PropertyChevron>
         </div>
       </PropertyHeader>
@@ -1113,7 +1114,7 @@ function PropertyItem({ property, isAgency, plan }) {
             <EmptyState>
               <EmptyIcon>📭</EmptyIcon>
               <EmptyTitle>Noch kein Report vorhanden</EmptyTitle>
-              <EmptyText>Der erste Report wird automatisch am 1. des nächsten Monats generiert.</EmptyText>
+              <EmptyText>{t(lang, 'dash.first_report')}</EmptyText>
             </EmptyState>
           ) : (
             <>
@@ -1182,7 +1183,7 @@ function PropertyItem({ property, isAgency, plan }) {
                         <h3>🚀 Mit Pro bekommst du noch mehr</h3>
                         <ul>
                           <li><strong>3 Domains:</strong> Mehrere Websites in einem Account verwalten</li>
-                          <li><strong>SEO-Empfehlungen:</strong> Konkrete Maßnahmen was du diese Woche tun kannst</li>
+                          <li><strong>{t(lang, 'dash.seo_recs')}</strong> {t(lang, 'dash.seo_recs_sub')}</li>
                           <li><strong>White-Label Reports:</strong> Reports mit eigenem Logo und Branding</li>
                         </ul>
                       </UpgradeHintText>
@@ -1195,7 +1196,7 @@ function PropertyItem({ property, isAgency, plan }) {
                       <SummaryCard>
                         {selectedReport.summary_text
                           ? <SummaryText>{selectedReport.summary_text}</SummaryText>
-                          : <SummaryEmpty>🤖 Noch keine KI-Zusammenfassung vorhanden. Wird automatisch beim nächsten Report generiert.</SummaryEmpty>}
+                          : <SummaryEmpty>{t(lang, 'dash.no_summary')}</SummaryEmpty>}
                       </SummaryCard>
                     </>
                   )}
@@ -1229,7 +1230,7 @@ function PropertyItem({ property, isAgency, plan }) {
                     <Alert $type="info">
                       <strong>GA4-Daten fehlen</strong><br />
                       <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
-                        Google Analytics 4 zeigt dir was Besucher auf deiner Website tun.{' '}
+                        {t(lang, 'dash.ga4_hint')}{' '}
                         <a href="https://analytics.google.com" target="_blank" rel="noreferrer" style={{ color: 'inherit', fontWeight: 600, textDecoration: 'underline' }}>
                           GA4 kostenlos einrichten →
                         </a>{' '}(ca. 5 Minuten)
@@ -1247,7 +1248,7 @@ function PropertyItem({ property, isAgency, plan }) {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function Dashboard({ user, onOpenModal }) {
+export default function Dashboard({ user, onOpenModal, lang = 'en' }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -1422,14 +1423,14 @@ export default function Dashboard({ user, onOpenModal }) {
         {profile?.plan === 'free' && profile?.free_report_sent && properties.length > 0 && (
           <TrialUpgradeBanner>
             <TrialUpgradeTop>
-              <TrialUpgradeTitle>Dein kostenloser Monat läuft</TrialUpgradeTitle>
-              <TrialUpgradeSub>Wähle einen Plan um nach dem Freimonat weiterhin Reports zu erhalten.</TrialUpgradeSub>
+              <TrialUpgradeTitle>{t(lang, 'dash.trial_title')}</TrialUpgradeTitle>
+              <TrialUpgradeSub>{t(lang, 'dash.trial_sub')}</TrialUpgradeSub>
             </TrialUpgradeTop>
             <TrialPlanGrid>
               {[
-                { key: 'basic', name: 'Basic', price: '19', features: ['1 Domain', 'Monatlicher PDF-Report', 'GSC-Daten', 'KI-Zusammenfassung', 'Email-Versand'] },
-                { key: 'pro', name: 'Pro', price: '39', highlight: true, features: ['3 Domains', 'Alles in Basic', 'GA4-Daten', 'SEO-Empfehlungen', 'White-Label'] },
-                { key: 'agency', name: 'Agency', price: '79', features: ['10 Domains', 'Alles in Pro', 'Client Management', 'Bulk Reporting', 'Agency Branding'] },
+                { key: 'basic', name: 'Basic', price: '19', features: ['1 Domain', t(lang, 'dash.feature_monthly_report'), 'GSC-Daten', t(lang, 'dash.feature_ai_summary'), t(lang, 'dash.feature_email')] },
+                { key: 'pro', name: 'Pro', price: '39', highlight: true, features: ['3 Domains', t(lang, 'dash.feature_all_basic'), 'GA4-Daten', 'SEO-Empfehlungen', 'White-Label'] },
+                { key: 'agency', name: 'Agency', price: '79', features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', 'Bulk Reporting', 'Agency Branding'] },
               ].map(plan => (
                 <TrialPlanCard key={plan.key} $highlight={plan.highlight}>
                   {plan.highlight && <TrialPlanBadge>Empfohlen</TrialPlanBadge>}
@@ -1443,7 +1444,7 @@ export default function Dashboard({ user, onOpenModal }) {
                     onClick={() => handleUpgrade(plan.key)}
                     disabled={upgrading}
                   >
-                    {upgrading ? 'Lädt...' : `${plan.name} wählen →`}
+                    {upgrading ? t(lang, 'dash.upgrade_loading') : `${plan.name} ${t(lang, 'dash.choose_plan')}`}
                   </PlanBtn>
                 </TrialPlanCard>
               ))}
@@ -1456,7 +1457,7 @@ export default function Dashboard({ user, onOpenModal }) {
             {/* Header row: Titel + einziger Connect-Button */}
             <AddPropertyRow>
               <SectionTitle style={{ margin: 0 }}>
-                {activeProperties.length === 0 ? 'Erste Website verbinden' : 'Deine Properties'}
+                {activeProperties.length === 0 ? t(lang, 'dash.first_website') : t(lang, 'dash.properties_title')}
               </SectionTitle>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap' }}>
                 {activeProperties.length > 0 && (
@@ -1489,7 +1490,7 @@ export default function Dashboard({ user, onOpenModal }) {
                       <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                       <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    {googleAccounts.length === 0 ? 'Google-Konto verbinden' : '+ Weiteres Konto'}
+                    {googleAccounts.length === 0 ? t(lang, 'dash.connect_google') : t(lang, 'dash.more_account')}
                   </BtnConnect>
                 )}
 

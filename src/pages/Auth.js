@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import { supabase } from '../lib/supabase';
+import t from '../lib/i18n';
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(16px); }
@@ -246,7 +247,7 @@ const PromoLabel = styled.label`
   gap: 0.375rem;
 `;
 
-export default function Auth({ mode = 'login' }) {
+export default function Auth({ mode = 'login', lang = 'en' }) {
   const [isLogin, setIsLogin] = useState(mode === 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -315,8 +316,8 @@ export default function Auth({ mode = 'login' }) {
       <Card>
         <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
 
-        <Title>{isLogin ? 'Welcome back' : 'Create your account'}</Title>
-        <Sub>{isLogin ? 'Sign in to your RankBrief dashboard.' : 'Start for free – first month on us. No credit card required.'}</Sub>
+        <Title>{isLogin ? t(lang, 'auth.welcome_back') : t(lang, 'auth.create_account')}</Title>
+        <Sub>{isLogin ? t(lang, 'auth.sign_in_sub') : t(lang, 'auth.register_sub')}</Sub>
 
         <Form>
           {error && <ErrorMsg>{error}</ErrorMsg>}
@@ -368,18 +369,8 @@ export default function Auth({ mode = 'login' }) {
             </div>
           )}
 
-          {isLogin && (
-            <div style={{ textAlign: 'right', marginTop: '-0.25rem', marginBottom: '0.25rem' }}>
-              <a href="/forgot-password" style={{ fontSize: '0.8125rem', color: 'inherit', opacity: 0.6, textDecoration: 'none' }}
-                onMouseOver={e => e.target.style.opacity = 1}
-                onMouseOut={e => e.target.style.opacity = 0.6}>
-                Forgot password?
-              </a>
-            </div>
-          )}
-
           <BtnSubmit onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Please wait…' : isLogin ? 'Sign in' : 'Create account'}
+            {loading ? t(lang, 'auth.waiting') : isLogin ? t(lang, 'auth.sign_in') : t(lang, 'auth.register')}
           </BtnSubmit>
 
           <Divider>or</Divider>

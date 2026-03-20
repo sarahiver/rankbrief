@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { supabase } from '../lib/supabase';
+import t from '../lib/i18n';
 
 const fadeIn = keyframes`from { opacity: 0; } to { opacity: 1; }`;
 const fadeUp = keyframes`from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); }`;
@@ -190,7 +191,7 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export default function PropertySelectModal({ user, onDone, onNewAccount, plan = 'free', activeCount = 0 }) {
+export default function PropertySelectModal({ user, onDone, onNewAccount, plan = 'free', activeCount = 0, lang = 'en' }) {
   const limit = PLAN_LIMITS[plan] ?? 1;
   const isPro = ['pro', 'agency'].includes(plan);
 
@@ -246,7 +247,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
         if (p.ga_property_id) {
           preGa4[p.gsc_property_url] = p.ga_property_id;
           // Bereits gespeicherte IDs als valid markieren — wurden schon früher validiert
-          preStatuses[p.gsc_property_url] = { valid: true, message: `✅ GA4 bereits verbunden: ${p.ga_property_id}` };
+          preStatuses[p.gsc_property_url] = { valid: true, message: t(lang, 'modal.ga4_already', { id: p.ga_property_id }) };
         }
       }
       setSelected(preSelected);
@@ -331,13 +332,13 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
     try {
       const selectedUrls = Object.keys(selected);
 
-      // Aktuelle aktive Properties
+      // Aktuelle {t(lang, 'modal.active_badge')}e Properties
       const { data: currentActive } = await supabase
         .from('properties').select('id, gsc_property_url')
         .eq('user_id', user.id).eq('status', 'active');
       const currentActiveUrls = new Set((currentActive ?? []).map(p => p.gsc_property_url));
 
-      // Neu ausgewählte aktivieren
+      // Neu ausgewählte {t(lang, 'modal.active_badge')}ieren
       for (const [url, accountId] of Object.entries(selected)) {
         // Prüfen ob Property bereits in DB existiert (egal welcher Status)
         const { data: existing } = await supabase
@@ -360,7 +361,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
         }
       }
 
-      // Abgewählte aktive Properties → inactive
+      // Abgewählte {t(lang, 'modal.active_badge')}e Properties → inactive
       const deactivate = (currentActive ?? []).filter(p => !selectedUrls.includes(p.gsc_property_url));
       for (const p of deactivate) {
         await supabase.from('properties').update({ status: 'inactive' }).eq('id', p.id);
@@ -389,22 +390,22 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
 
         {step === 1 && (
           <>
-            <Title>Welche Properties tracken?</Title>
+            <Title>{t(lang, 'modal.step1_title')}</Title>
             <Sub>
               {realRemaining > 0
                 ? <>Du kannst noch <strong>{realRemaining}</strong> von <strong>{limit}</strong> {limit === 1 ? 'Property' : 'Properties'} verbinden ({plan === 'free' ? 'Free' : plan.charAt(0).toUpperCase() + plan.slice(1)}-Plan).</>
-                : <>Du hast alle {limit} {limit === 1 ? 'Property' : 'Properties'} deines Plans belegt. Wähle ab um eine andere zu aktivieren.</>
+                : <>Du hast alle {limit} {limit === 1 ? 'Property' : 'Properties'} deines Plans belegt. Wähle ab um eine andere zu {t(lang, 'modal.active_badge')}ieren.</>
               }
             </Sub>
 
             <InfoBox>
-              💡 <strong>sc-domain:</strong> Deckt alle Subdomains & Protokolle ab (empfohlen). URL-Properties nur den exakten Pfad.
+              {t(lang, 'modal.sc_domain_hint')}
             </InfoBox>
 
             {loading ? (
-              <LoadingWrap><LoadSpinner />Properties werden geladen…</LoadingWrap>
+              <LoadingWrap><LoadSpinner />{t(lang, 'loading')}</LoadingWrap>
             ) : accounts.length === 0 ? (
-              <EmptyNote>Keine Google-Konten gefunden.</EmptyNote>
+              <EmptyNote>{t(lang, 'modal.no_sites')}</EmptyNote>
             ) : (
               accounts.map(account => (
                 <AccountBlock key={account.google_account_id}>
@@ -417,9 +418,9 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
                   </AccountHeader>
                   <AccountBody $open={openAccounts[account.google_account_id]}>
                     {account.error ? (
-                      <ErrorBadge>⚠️ Token abgelaufen oder Fehler beim Laden. Bitte Google-Konto neu verbinden.</ErrorBadge>
+                      <ErrorBadge>{t(lang, 'modal.token_error')}</ErrorBadge>
                     ) : account.sites?.length === 0 ? (
-                      <EmptyNote>Keine GSC Properties in diesem Konto gefunden.</EmptyNote>
+                      <EmptyNote>{t(lang, 'modal.no_sites')}</EmptyNote>
                     ) : (
                       <CheckboxList>
                         {(account.sites ?? []).map(site => {
@@ -430,7 +431,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
                               <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {site.url}
                               </span>
-                              {site.active && <ActiveBadge>aktiv</ActiveBadge>}
+                              {site.active && <ActiveBadge>{t(lang, 'modal.active_badge')}</ActiveBadge>}
                             </CheckboxItem>
                           );
                         })}
@@ -443,7 +444,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
 
             <div style={{ marginTop: '1.25rem' }}>
               <BtnPrimary onClick={() => setStep(2)} disabled={selectedCount === 0 || loading}>
-                {selectedCount === 0 ? 'Mindestens eine Property wählen' : `${selectedCount} ${selectedCount === 1 ? 'Property' : 'Properties'} verbinden →`}
+                {selectedCount === 0 ? '{t(lang, 'modal.min_one')}' : `${selectedCount} ${selectedCount === 1 ? 'Property' : 'Properties'} verbinden →`}
               </BtnPrimary>
 
               {isPro && onNewAccount && (
@@ -451,18 +452,18 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
                   <Divider>oder</Divider>
                   <BtnGoogle onClick={onNewAccount}>
                     <GoogleIcon />
-                    Weiteres Google-Konto verbinden
+                    {t(lang, 'modal.add_google')}
                   </BtnGoogle>
                 </>
               )}
-              <BtnGhost onClick={onDone}>Später einrichten</BtnGhost>
+              <BtnGhost onClick={onDone}>{t(lang, 'modal.later')}</BtnGhost>
             </div>
           </>
         )}
 
         {step === 2 && (
           <>
-            <Title>Google Analytics verbinden</Title>
+            <Title>{t(lang, 'modal.step2_title')}</Title>
             <Sub>
               GA4 ergänzt deinen Report um <strong>Sessions, Nutzer und Engagement Rate</strong>. Optional — kann auch später in den Settings pro Property eingetragen werden.
             </Sub>
@@ -486,7 +487,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
                       <Input
                         style={{ flex: 1, marginBottom: 0 }}
                         type="text"
-                        placeholder="GA4 Property ID (optional)"
+                        placeholder="{t(lang, 'modal.ga4_placeholder')}"
                         value={val}
                         onChange={e => handleGa4Change(url, e.target.value)}
                         $error={status && status !== 'checking' && !status.valid}
@@ -531,11 +532,11 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
                 <>
                   {!anyInvalid && (
                     <BtnPrimary onClick={() => handleSave(false)} disabled={saving || anyChecking}>
-                      {saving ? <Spinner /> : anyChecking ? '⏳ GA4 wird geprüft…' : 'Einrichtung abschließen →'}
+                      {saving ? <Spinner /> : anyChecking ? '{t(lang, 'modal.checking')}' : '{t(lang, 'modal.finish')}'}
                     </BtnPrimary>
                   )}
                   <BtnGhost onClick={() => handleSave(true)} disabled={saving}>
-                    {anyInvalid ? 'Ohne GA4 fortfahren (ungültige ID)' : 'Ohne GA4 fortfahren'}
+                    {anyInvalid ? '{t(lang, 'modal.skip_ga4_invalid')}' : '{t(lang, 'modal.skip_ga4')}'}
                   </BtnGhost>
                 </>
               );

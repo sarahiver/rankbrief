@@ -146,6 +146,7 @@ function AppInner() {
       {showPropertyModal && user && (
         <PropertySelectModal
           user={user}
+          lang={lang}
           onDone={handleModalDone}
           onNewAccount={() => {
             setShowPropertyModal(false);
@@ -173,10 +174,10 @@ function AppInner() {
       {showNav && <Navbar user={user} lang={lang} onLangChange={handleLangChange} />}
       <Routes>
         <Route path="/"          element={<Landing lang={lang} />} />
-        <Route path="/login"     element={!user ? <Auth mode="login" /> : <Navigate to="/dashboard" />} />
-        <Route path="/register"  element={!user ? <Auth mode="register" /> : <Navigate to="/dashboard" />} />
+        <Route path="/login"     element={!user ? <Auth mode="login" lang={lang} /> : <Navigate to="/dashboard" />} />
+        <Route path="/register"  element={!user ? <Auth mode="register" lang={lang} /> : <Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={user ? <Dashboard user={user} onOpenModal={handleOpenModal} /> : <Navigate to="/login" />} />
-        <Route path="/settings"  element={user ? <Settings user={user} /> : <Navigate to="/login" />} />
+        <Route path="/settings"  element={user ? <Settings user={user} lang={lang} /> : <Navigate to="/login" />} />
         <Route path="/onboarding" element={user ? <Onboarding user={user} /> : <Navigate to="/login" />} />
         <Route path="/docs"      element={<Docs />} />
         <Route path="/privacy"   element={<PrivacyEN />} />

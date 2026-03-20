@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import t from '../lib/i18n';
 import PropertySelectModal from '../components/PropertySelectModal';
 
 const fadeUp = keyframes`
@@ -550,7 +551,7 @@ const PLAN_LIMITS = {
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function Settings({ user }) {
+export default function Settings({ user, lang = 'en' }) {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [googleAccounts, setGoogleAccounts] = useState([]);
@@ -673,9 +674,9 @@ export default function Settings({ user }) {
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-      else showAlert('Fehler beim Öffnen des Portals. Bitte erneut versuchen.', 'error');
+      else showAlert(t(lang, 'set.portal_error'), 'error');
     } catch {
-      showAlert('Netzwerkfehler. Bitte erneut versuchen.', 'error');
+      showAlert(t(lang, 'error_network'), 'error');
     }
     setPortalLoading(false);
   };
@@ -797,9 +798,9 @@ export default function Settings({ user }) {
       .from('properties')
       .delete()
       .eq('id', deletePropertyId);
-    if (error) showAlert('Fehler beim Löschen.', 'error');
+    if (error) showAlert(t(lang, 'set.error_delete'), 'error');
     else {
-      showAlert('Property gelöscht.');
+      showAlert(t(lang, 'set.property_deleted'));
       setProperties(ps => ps.filter(p => p.id !== deletePropertyId));
     }
     setDeletePropertyId(null);
@@ -854,7 +855,7 @@ export default function Settings({ user }) {
       report_language:      branding.report_language,
     }).eq('id', user.id);
     if (error) showAlert('Fehler beim Speichern.', 'error');
-    else showAlert('Branding gespeichert – wirkt beim nächsten Report. ✓');
+    else showAlert(t(lang, 'set.branding_saved'));
     setBrandingSaving(false);
   };
 
@@ -901,21 +902,21 @@ export default function Settings({ user }) {
     const { error } = await supabase.auth.updateUser({ password: pwNew });
     if (error) showAlert(error.message, 'error');
     else {
-      showAlert('Passwort erfolgreich geändert.');
+      showAlert(t(lang, 'set.password_saved'));
       setPwCurrent('');
       setPwNew('');
     }
     setPwLoading(false);
   };
 
-  // ── Account löschen ───────────────────────────────────────────────────────
+  // ── {t(lang, 'set.delete_account')} ───────────────────────────────────────────────────────
   const handleDeleteAccount = async () => {
     // Block deletion if active paid subscription exists
     const hasActivePlan = ['basic', 'pro', 'agency'].includes(profile?.plan)
       && profile?.plan_status === 'active';
     if (hasActivePlan) {
       setDeleteConfirm(false);
-      showAlert('Bitte kündige zuerst dein Abo über das Billing Portal, bevor du den Account löschst.', 'error');
+      showAlert(t(lang, 'set.delete_cancel_first'), 'error');
       return;
     }
     setDeleteLoading(true);
@@ -928,7 +929,7 @@ export default function Settings({ user }) {
       await supabase.auth.signOut();
       navigate('/');
     } catch {
-      showAlert('Fehler beim Löschen des Accounts. Bitte kontaktiere support@rankbrief.com', 'error');
+      showAlert(t(lang, 'error_generic'), 'error');
     }
     setDeleteLoading(false);
   };
@@ -993,7 +994,7 @@ export default function Settings({ user }) {
                 {branding.report_language === 'en' ? 'Cancel' : 'Abbrechen'}
               </Btn>
               <Btn $variant="primary" onClick={confirmDowngrade} disabled={selectedProperties.length !== downgradeModal.maxDomains}>
-                {branding.report_language === 'en' ? 'Confirm & Switch Plan →' : 'Bestätigen & Plan wechseln →'}
+                {branding.report_language === 'en' ? 'Confirm & Switch Plan →' : t(lang, lang === 'de' ? 'Bestätigen & Plan wechseln →' : 'Confirm & Switch Plan →')}
               </Btn>
             </div>
           </ModalCard>
@@ -1010,13 +1011,13 @@ export default function Settings({ user }) {
             </ModalText>
             <ModalActions>
               <Btn onClick={() => setDeletePropertyId(null)}>Abbrechen</Btn>
-              <Btn $variant="danger" onClick={handleDeleteProperty}>Löschen</Btn>
+              <Btn $variant="danger" onClick={handleDeleteProperty}>{t(lang, 'delete')}</Btn>
             </ModalActions>
           </ModalCard>
         </ModalOverlay>
       )}
 
-      {/* Confirm Modal: Account löschen */}
+      {/* Confirm Modal: {t(lang, 'set.delete_account')} */}
       {deleteConfirm && (
         <ModalOverlay onClick={() => setDeleteConfirm(false)}>
           <ModalCard onClick={e => e.stopPropagation()}>
@@ -1025,7 +1026,7 @@ export default function Settings({ user }) {
               <>
                 <ModalText style={{ color: '#ef4444' }}>
                   ⚠️ Du hast noch ein aktives Abo ({profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1)}).
-                  Bitte kündige es zuerst im Billing Portal – danach kannst du deinen Account löschen.
+                  Bitte kündige es zuerst im Billing Portal – danach kannst du deinen {t(lang, 'set.delete_account')}.
                 </ModalText>
                 <ModalActions>
                   <Btn onClick={() => setDeleteConfirm(false)}>Abbrechen</Btn>
@@ -1041,7 +1042,7 @@ export default function Settings({ user }) {
                 <ModalActions>
                   <Btn onClick={() => setDeleteConfirm(false)}>Abbrechen</Btn>
                   <Btn $variant="danger" onClick={handleDeleteAccount} disabled={deleteLoading}>
-                    {deleteLoading ? 'Wird gelöscht...' : 'Account löschen'}
+                    {deleteLoading ? t(lang, 'deleting') : '{t(lang, 'set.delete_account')}'}
                   </Btn>
                 </ModalActions>
               </>
@@ -1090,7 +1091,7 @@ export default function Settings({ user }) {
             {profile?.trial_ends_at && (
               <InfoRow>
                 <InfoLabel>Freimonat endet am</InfoLabel>
-                <InfoValue>{new Date(profile.trial_ends_at).toLocaleDateString('de-DE')}</InfoValue>
+                <InfoValue>{new Date(profile.trial_ends_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB')}</InfoValue>
               </InfoRow>
             )}
 
@@ -1144,7 +1145,7 @@ export default function Settings({ user }) {
             {/* ── Other Plans ── */}
             <div style={{ marginTop: '1.25rem' }}>
               <FieldHint style={{ marginBottom: '0.5rem' }}>
-                {branding.report_language === 'en' ? 'Looking for a different plan?' : 'Anderen Plan wählen?'}
+                {t(lang, 'set.choose_plan')}
               </FieldHint>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 {plan !== 'basic' && (
@@ -1184,7 +1185,7 @@ export default function Settings({ user }) {
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {googleAccounts.length > 0 && properties.length < (planInfo?.domains ?? 1) && (
                 <Btn $variant="secondary" onClick={handleConnectNew}>
-                  + Property hinzufügen
+                  {t(lang, 'set.add_property')}
                 </Btn>
               )}
               {(googleAccounts.length === 0 || ['pro', 'agency'].includes(profile?.plan)) && properties.length < (planInfo?.domains ?? 1) && (
@@ -1257,7 +1258,7 @@ export default function Settings({ user }) {
                         padding: '0.375rem 0.75rem', borderRadius: '6px',
                         color: '#065F46', background: '#D1FAE5', border: '1px solid #6EE7B7',
                       }}>
-                        ✅ GA4 verbunden: {prop.ga_property_id}
+                        {t(lang, 'set.ga4_connected', { id: prop.ga_property_id })}
                       </div>
                     )}
                     <FieldHint>
@@ -1278,7 +1279,7 @@ export default function Settings({ user }) {
                     onClick={() => handleUpgrade(plan === 'basic' ? 'pro' : 'agency')}
                     style={{ background: 'none', border: 'none', color: '#6C63FF', cursor: 'pointer', fontSize: 'inherit', fontWeight: 600 }}
                   >
-                    Upgrade für mehr Domains →
+                    {t(lang, 'dash.upgrade_domains')}
                   </button>
                 )}
               </FieldHint>
@@ -1298,7 +1299,7 @@ export default function Settings({ user }) {
           <SectionBody>
             {!isPro && (
               <Alert $type="info" style={{ marginBottom: '1.5rem' }}>
-                🔒 White-Label ist ab dem Pro-Plan verfügbar.{' '}
+                {t(lang, 'set.branding_locked')}{' '}
                 <button onClick={() => handleUpgrade('pro')} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}>
                   Jetzt upgraden →
                 </button>
@@ -1323,7 +1324,7 @@ export default function Settings({ user }) {
                   </LogoThumbInfo>
                   <Row style={{ gap: '0.5rem' }}>
                     <Btn onClick={() => isPro && document.getElementById('rb-logo-input').click()} disabled={!isPro || logoUploading}>
-                      Ändern
+                      {t(lang, 'save')}
                     </Btn>
                     <Btn $variant="danger" onClick={() => setBranding(b => ({ ...b, brand_logo_url: '', _logoFile: '', _logoSize: 0 }))} disabled={!isPro}>
                       Entfernen
@@ -1352,7 +1353,7 @@ export default function Settings({ user }) {
 
               {!branding.brand_logo_url && (
                 <Btn style={{ marginTop: '0.5rem' }} onClick={() => isPro && document.getElementById('rb-logo-input').click()} disabled={!isPro || logoUploading}>
-                  {logoUploading ? 'Lädt hoch...' : '↑ Logo hochladen'}
+                  {logoUploading ? t(lang, 'uploading') : '↑ Logo hochladen'}
                 </Btn>
               )}
 
@@ -1412,7 +1413,7 @@ export default function Settings({ user }) {
                   </FontPill>
                 ))}
               </FontGrid>
-              <FieldHint>Schriftart wird im PDF via Google Fonts geladen</FieldHint>
+              <FieldHint>{t(lang, 'set.font_hint')}</FieldHint>
             </Field>
 
             {/* Report-Sprache */}
@@ -1571,7 +1572,7 @@ export default function Settings({ user }) {
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '0.9375rem', fontWeight: 500 }}>{account.google_email}</div>
                       <div style={{ fontSize: '0.75rem', color: '#888', fontWeight: 300 }}>
-                        Verbunden {new Date(account.created_at).toLocaleDateString('de-DE')}
+                        Verbunden {new Date(account.created_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB')}
                       </div>
                     </div>
                   </div>
@@ -1610,7 +1611,7 @@ export default function Settings({ user }) {
               onClick={handlePasswordChange}
               disabled={pwLoading || !pwNew}
             >
-              {pwLoading ? 'Wird gespeichert...' : 'Passwort ändern'}
+              {pwLoading ? t(lang, 'saving') : t(lang, 'set.save_password')}
             </Btn>
           </SectionBody>
         </Section>
@@ -1625,13 +1626,13 @@ export default function Settings({ user }) {
           </SectionHead>
           <SectionBody>
             <DangerZone>
-              <DangerTitle>Account löschen</DangerTitle>
+              <DangerTitle>{t(lang, 'set.delete_account')}</DangerTitle>
               <DangerText>
-                Löscht deinen Account, alle Properties und alle Report-Daten dauerhaft.
-                Ein aktives Abo bitte vorher im Billing Portal kündigen.
+                {t(lang, 'set.delete_account_sub')}
+                {t(lang, 'set.delete_cancel_first')}
               </DangerText>
               <Btn $variant="danger" onClick={() => setDeleteConfirm(true)}>
-                Account löschen
+                {t(lang, 'set.delete_account')}
               </Btn>
             </DangerZone>
           </SectionBody>
