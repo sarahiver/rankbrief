@@ -126,21 +126,49 @@ export default function Admin({ user }) {
       { data: allReports },
       { data: allProps },
     ] = await Promise.all([
-      supabase.from('profiles').select('id, plan, plan_status, free_report_sent, promo_code_used, trial_ends_at, created_at, report_language').order('created_at', { ascending: false }),
+      supabase.from('profiles').select('id, plan, plan_status, free_report_sent, promo_code_used, trial_ends_at, created_at, report_language, email').order('created_at', { ascending: false }),
       supabase.from('reports').select('id, property_id, report_month, clicks, status, pdf_url, summary_text, created_at').order('created_at', { ascending: false }).limit(200),
       supabase.from('properties').select('id, user_id, gsc_property_url, display_name, status, ga_property_id, created_at').order('created_at', { ascending: false }),
     ]);
 
-    // Load emails from auth.users via admin API — fallback to profile id
-    const profilesWithEmail = (profiles || []).map(p => ({ ...p, email: p.id }));
+    // ── Load emails: profiles.email first, then Edge Function for missing ──
+    // Build initial email map from profiles.email column
+    const emailMap = {};
+    (profiles || []).forEach(p => { if (p.email) emailMap[p.id] = p.email; });
 
-    // Try to get emails via google_accounts (no admin API needed)
+    // Also pull google_accounts emails as fallback
     const { data: gAccounts } = await supabase
       .from('google_accounts')
       .select('user_id, google_email');
-    const emailMap = {};
-    (gAccounts || []).forEach(g => { emailMap[g.user_id] = g.google_email; });
-    profilesWithEmail.forEach(p => { if (emailMap[p.id]) p.email = emailMap[p.id]; });
+    (gAccounts || []).forEach(g => { if (!emailMap[g.user_id]) emailMap[g.user_id] = g.google_email; });
+
+    // If any profiles still missing email → call Edge Function (uses service role)
+    const missingEmails = (profiles || []).filter(p => !emailMap[p.id]);
+    if (missingEmails.length > 0) {
+      try {
+        const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/get-admin-users`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+            'apikey': process.env.REACT_APP_SUPABASE_ANON_KEY,
+          },
+        });
+        const result = await res.json();
+        if (result.emailMap) {
+          Object.assign(emailMap, result.emailMap);
+        }
+      } catch (e) {
+        console.warn('Could not load emails via Edge Function:', e);
+      }
+    }
+
+    const profilesWithEmail = (profiles || []).map(p => ({
+      ...p,
+      email: emailMap[p.id] || p.id.slice(0, 12) + '…',
+    }));
 
     // Count reports per property
     const reportsByProp = {};

@@ -271,6 +271,14 @@ export default function Auth({ mode = 'login', lang = 'en' }) {
         const { data: signUpData, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
 
+        // E-Mail in profiles speichern (für Admin-Dashboard)
+        if (signUpData?.user?.id) {
+          await supabase.from('profiles').upsert(
+            { id: signUpData.user.id, email },
+            { onConflict: 'id' }
+          );
+        }
+
         // Promo code einloesen falls angegeben
         if (promoCode.trim() && signUpData?.user?.id) {
           const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
