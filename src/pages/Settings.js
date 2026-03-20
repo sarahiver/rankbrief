@@ -797,7 +797,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
       .from('properties')
       .update({ ga_property_id: val || null })
       .eq('id', propertyId);
-    if (error) showAlert('Fehler beim Speichern.', 'error');
+    if (error) showAlert(lang === 'de' ? 'Fehler beim Speichern.' : 'Error saving. Please try again.', 'error');
     else showAlert('GA4 Property ID gespeichert.');
     setGa4Saving(s => ({ ...s, [propertyId]: false }));
   };
@@ -867,7 +867,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
       brand_reply_to_email: branding.brand_reply_to_email || null,
       report_language:      branding.report_language,
     }).eq('id', user.id);
-    if (error) showAlert('Fehler beim Speichern.', 'error');
+    if (error) showAlert(lang === 'de' ? 'Fehler beim Speichern.' : 'Error saving. Please try again.', 'error');
     else showAlert(t(lang, 'set.branding_saved'));
     setBrandingSaving(false);
   };
@@ -1039,11 +1039,11 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
               <>
                 <ModalText style={{ color: '#ef4444' }}>
                   ⚠️ Du hast noch ein aktives Abo ({profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1)}).
-                  Bitte kündige es zuerst im Billing Portal – danach kannst du deinen Account löschen.
+                  {lang === 'de' ? 'Bitte kündige es zuerst im Billing Portal – danach kannst du deinen Account löschen.' : 'Please cancel your subscription in the Billing Portal first, then you can delete your account.'}
                 </ModalText>
                 <ModalActions>
                   <Btn onClick={() => setDeleteConfirm(false)}>Abbrechen</Btn>
-                  <Btn $variant="primary" onClick={handlePortal}>Zum Billing Portal →</Btn>
+                  <Btn $variant="primary" onClick={handlePortal}>{lang === 'de' ? 'Zum Billing Portal →' : 'Go to Billing Portal →'}</Btn>
                 </ModalActions>
               </>
             ) : (
@@ -1088,7 +1088,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
           <SectionHead>
             <div>
               <SectionTitle>Plan & Billing</SectionTitle>
-              <SectionSub>Dein aktuelles Abonnement und Zahlungsinformationen</SectionSub>
+              <SectionSub>{t(lang, 'set.plan_sub')}</SectionSub>
             </div>
             <PlanBadge $plan={plan}>
               <StatusDot />
@@ -1097,11 +1097,11 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
           </SectionHead>
           <SectionBody>
             <InfoRow>
-              <InfoLabel>Aktueller Plan</InfoLabel>
+              <InfoLabel>{t(lang, 'set.current_plan')}</InfoLabel>
               <InfoValue>{planInfo?.label} – bis zu {planInfo?.domains} Domain{planInfo?.domains > 1 ? 's' : ''}</InfoValue>
             </InfoRow>
             <InfoRow>
-              <InfoLabel>Status</InfoLabel>
+              <InfoLabel>{t(lang, 'set.status')}</InfoLabel>
               <InfoValue>
                 {profile?.plan_status === 'frozen' ? '⏸ Pausiert' :
                  profile?.plan_status === 'active' ? '✅ Aktiv' : profile?.plan_status}
@@ -1184,7 +1184,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                 )}
                 {isPaid && (
                   <Btn onClick={handlePortal} disabled={portalLoading} style={{ fontSize: '13px', padding: '6px 14px' }}>
-                    {portalLoading ? '...' : (branding.report_language === 'en' ? '↗ Billing Portal' : '↗ Billing Portal')}
+                    {portalLoading ? '...' : (branding.report_language === 'en' ? '{t(lang, 'set.billing_portal')}' : '{t(lang, 'set.billing_portal')}')}
                   </Btn>
                 )}
               </div>
@@ -1198,7 +1198,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
             <div>
               <SectionTitle>Properties</SectionTitle>
               <SectionSub>
-                {properties.length} / {planInfo?.domains} Domains verbunden
+                {properties.length} / {planInfo?.domains} {lang === 'de' ? 'Domains verbunden' : 'Domains connected'}
               </SectionSub>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -1209,7 +1209,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
               )}
               {(googleAccounts.length === 0 || ['pro', 'agency'].includes(profile?.plan)) && properties.length < (planInfo?.domains ?? 1) && (
                 <Btn $variant="primary" onClick={startOAuth}>
-                  + Google-Konto verbinden
+                  {t(lang, 'set.connect_google')}
                 </Btn>
               )}
             </div>
@@ -1217,7 +1217,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
           <SectionBody>
             {properties.length === 0 && (
               <Alert $type="info">
-                Noch keine Property verbunden.{' '}
+                {lang === 'de' ? 'Noch keine Property verbunden.' : 'No properties connected yet.'}{' '}
                 <button
                   onClick={handleConnectNew}
                   style={{ background: 'none', border: 'none', color: 'inherit', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}
@@ -1238,7 +1238,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                     </div>
                   </div>
                   <Btn $variant="danger" onClick={() => setDeletePropertyId(prop.id)}>
-                    Entfernen
+                    {lang === 'de' ? 'Entfernen' : 'Remove'}
                   </Btn>
                 </PropertyHead>
                 <PropertyBody>
@@ -1256,7 +1256,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                         onClick={() => saveGa4(prop.id)}
                         disabled={ga4Saving[prop.id] || ga4Status[prop.id] === 'checking' || (ga4Edits[prop.id]?.trim() && ga4Status[prop.id] && !ga4Status[prop.id]?.valid)}
                       >
-                        {ga4Saving[prop.id] ? 'Speichert...' : ga4Status[prop.id] === 'checking' ? '⏳' : 'Speichern'}
+                        {ga4Saving[prop.id] ? t(lang, 'saving') : ga4Status[prop.id] === 'checking' ? '⏳' : t(lang, 'save')}
                       </Btn>
                     </Row>
                     {ga4Status[prop.id] && ga4Status[prop.id] !== 'checking' && (
@@ -1281,9 +1281,9 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                       </div>
                     )}
                     <FieldHint>
-                      Nur Ziffern – z.B. <code>123456789</code>. Zu finden in{' '}
+                      {lang === 'de' ? 'Nur Ziffern – z.B. ' : 'Numbers only – e.g. '}<code>123456789</code>{lang === 'de' ? '. Zu finden in' : '. Find it in'}{' '}
                       <a href="https://analytics.google.com" target="_blank" rel="noreferrer">
-                        Google Analytics → Admin → Property-Einstellungen
+                        {lang === 'de' ? 'Google Analytics → Admin → Property-Einstellungen' : 'Google Analytics → Admin → Property Settings'}
                       </a>
                     </FieldHint>
                   </Field>
@@ -1346,7 +1346,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                       {t(lang, 'save')}
                     </Btn>
                     <Btn $variant="danger" onClick={() => setBranding(b => ({ ...b, brand_logo_url: '', _logoFile: '', _logoSize: 0 }))} disabled={!isPro}>
-                      Entfernen
+                      {lang === 'de' ? 'Entfernen' : 'Remove'}
                     </Btn>
                   </Row>
                 </LogoThumbWrap>
@@ -1563,14 +1563,14 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
         <Section>
           <SectionHead>
             <div>
-              <SectionTitle>Verbundene Google-Konten</SectionTitle>
+              <SectionTitle>{lang === 'de' ? 'Verbundene Google-Konten' : 'Connected Google Accounts'}</SectionTitle>
               <SectionSub>Diese Google-Accounts sind mit deinem RankBrief-Account verknüpft.</SectionSub>
             </div>
           </SectionHead>
           <SectionBody>
             {googleAccounts.length === 0 ? (
               <div style={{ fontSize: '0.875rem', color: '#888', fontWeight: 300 }}>
-                Noch kein Google-Konto verbunden. Verbinde ein Konto über das Dashboard.
+                {lang === 'de' ? 'Noch kein Google-Konto verbunden. Verbinde ein Konto über das Dashboard.' : 'No Google account connected yet. Connect an account from the Dashboard.'}
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -1591,7 +1591,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '0.9375rem', fontWeight: 500 }}>{account.google_email}</div>
                       <div style={{ fontSize: '0.75rem', color: '#888', fontWeight: 300 }}>
-                        Verbunden {new Date(account.created_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB')}
+                        {lang === 'de' ? 'Verbunden' : 'Connected'} {new Date(account.created_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB')}
                       </div>
                     </div>
                   </div>

@@ -12,6 +12,7 @@ import Onboarding from './pages/Onboarding';
 import Docs from './pages/Docs';
 import Settings from './pages/Settings';
 import { PrivacyEN, PrivacyDE, TermsEN, TermsDE } from './pages/Legal';
+import Admin from './pages/Admin';
 import CookieBanner from './components/CookieBanner';
 import usePageTracking from './components/usePageTracking';
 
@@ -28,8 +29,8 @@ function AuthCallback() {
   return null;
 }
 
-const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings'];
-const noFooterRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings'];
+const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings', '/admin'];
+const noFooterRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings', '/admin'];
 
 function AppInner() {
   const [user, setUser] = useState(null);
@@ -79,6 +80,7 @@ function AppInner() {
         <Route path="/terms" element={<TermsEN />} />
         <Route path="/de/privacy" element={<PrivacyDE />} />
         <Route path="/de/terms" element={<TermsDE />} />
+        <Route path="/admin" element={user ? <Admin user={user} /> : <Navigate to="/login" />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
