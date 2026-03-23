@@ -11,6 +11,36 @@ const fadeUp = keyframes`
 `;
 const spin = keyframes`to { transform: rotate(360deg); }`;
 
+const PortalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+`;
+
+const PortalSpinner = styled.div`
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(108,99,255,0.2);
+  border-top-color: #6C63FF;
+  border-radius: 50%;
+  animation: ${spin} 0.75s linear infinite;
+`;
+
+const PortalLoadingText = styled.p`
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.01em;
+`;
+
 // ── Layout ────────────────────────────────────────────────────────────────────
 const Layout = styled.div`
   min-height: 100vh;
@@ -1706,6 +1736,15 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
         </Section>
       </Main>
     </Layout>
+
+      {portalLoading && (
+        <PortalOverlay>
+          <PortalSpinner />
+          <PortalLoadingText>
+            {lang === 'de' ? 'Billing-Portal wird geöffnet…' : 'Opening billing portal…'}
+          </PortalLoadingText>
+        </PortalOverlay>
+      )}
 
       {showPropertyModal && (
         <PropertySelectModal
