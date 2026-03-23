@@ -1563,6 +1563,50 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
           </Section>
         )}
 
+        {/* ── Billing ─────────────────────────────────────────────────── */}
+        {profile?.plan && profile.plan !== 'free' && (
+          <Section>
+            <SectionHead>
+              <div>
+                <SectionTitle>💳 {lang === 'de' ? 'Billing & Rechnungen' : 'Billing & Invoices'}</SectionTitle>
+                <SectionSub>
+                  {lang === 'de'
+                    ? 'Zahlungsmethode ändern, Rechnungen downloaden und Abo verwalten.'
+                    : 'Update payment method, download invoices and manage your subscription.'}
+                </SectionSub>
+              </div>
+            </SectionHead>
+            <SectionBody>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                padding: '1rem 1.25rem',
+                background: 'rgba(108,99,255,0.05)',
+                border: '1px solid rgba(108,99,255,0.15)',
+                borderRadius: '10px',
+              }}>
+                <div>
+                  <div style={{ fontSize: '0.9375rem', fontWeight: 600 }}>
+                    {lang === 'de' ? 'Aktueller Plan' : 'Current Plan'}:{' '}
+                    <span style={{ color: '#6C63FF', textTransform: 'capitalize' }}>{profile.plan}</span>
+                  </div>
+                  <div style={{ fontSize: '0.8125rem', color: '#888', marginTop: '0.2rem', fontWeight: 300 }}>
+                    {lang === 'de'
+                      ? 'Rechnungen, Zahlungsmethode & Abo im Stripe-Portal verwalten.'
+                      : 'Manage invoices, payment method & subscription in the Stripe portal.'}
+                  </div>
+                </div>
+                <Btn $variant="primary" onClick={handlePortal} disabled={portalLoading} style={{ whiteSpace: 'nowrap' }}>
+                  {portalLoading ? '...' : (lang === 'de' ? '🧾 Rechnungen & Billing →' : '🧾 Invoices & Billing →')}
+                </Btn>
+              </div>
+            </SectionBody>
+          </Section>
+        )}
+
         {/* ── Google-Konten ─────────────────────────────────────────────── */}
         <Section>
           <SectionHead>
