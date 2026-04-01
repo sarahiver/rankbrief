@@ -504,6 +504,20 @@ const PropertyBody = styled.div`
   @media (max-width: 480px) { padding: 1rem; }
 `;
 
+const ReauthBadge = styled.button`
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #F59E0B;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 6px;
+  padding: 3px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  &:hover { background: rgba(245,158,11,0.2); }
+`;
+
 // ── Recipient Email ───────────────────────────────────────────────────────────
 const RecipientRow = styled.div`
   display: flex;
@@ -1161,7 +1175,7 @@ function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading, lang = 'en' 
 }
 
 // ── PropertyItem (expandable) ─────────────────────────────────────────────────
-function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
+function PropertyItem({ property, isAgency, plan, lang = 'en', onReauth }) {
   const [open, setOpen]                       = useState(false);
   const [reports, setReports]                 = useState([]);
   const [reportsLoading, setReportsLoading]   = useState(false);
@@ -1231,23 +1245,9 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
         </PropertyInfo>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {(!property.refresh_token_encrypted) && (
-            <Link
-              to="/settings"
-              onClick={e => e.stopPropagation()}
-              style={{
-                fontSize: '0.72rem',
-                fontWeight: 600,
-                color: '#F59E0B',
-                background: 'rgba(245,158,11,0.1)',
-                border: '1px solid rgba(245,158,11,0.3)',
-                borderRadius: '6px',
-                padding: '2px 8px',
-                textDecoration: 'none',
-                whiteSpace: 'nowrap',
-              }}
-            >
+            <ReauthBadge onClick={e => { e.stopPropagation(); onReauth && onReauth(); }}>
               ⚠️ {lang === 'de' ? 'Google-Konto neu verbinden →' : 'Reconnect Google account →'}
-            </Link>
+            </ReauthBadge>
           )}
           <PropertyMeta>Verbunden {new Date(property.created_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB')}</PropertyMeta>
           <PropertyChevron $open={open}>▾</PropertyChevron>
@@ -1275,6 +1275,42 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
                 Wenn gesetzt, bekommt der Endkunde den Report zusätzlich zu dir – mit deinem White-Label Branding als PDF-Anhang. Leer lassen = nur du bekommst den Report.
               </RecipientHint>
             </>
+          )}
+
+          {/* Reauth Warning */}
+          {!property.refresh_token_encrypted && (
+            <div style={{
+              marginBottom: '1rem',
+              padding: '1rem 1.25rem',
+              background: 'rgba(245,158,11,0.07)',
+              border: '1px solid rgba(245,158,11,0.3)',
+              borderRadius: '10px',
+              borderLeft: '4px solid #F59E0B',
+            }}>
+              <div style={{ fontWeight: 700, color: '#B45309', fontSize: '0.875rem', marginBottom: '0.375rem' }}>
+                ⚠️ {lang === 'de' ? 'Google-Konto neu verbinden erforderlich' : 'Google account reconnection required'}
+              </div>
+              <div style={{ fontSize: '0.8125rem', color: '#78716C', lineHeight: 1.6, marginBottom: '0.75rem' }}>
+                {lang === 'de'
+                  ? 'RankBrief kann keine Daten von der Google Search Console abrufen, weil die Verbindung zu deinem Google-Konto abgelaufen oder unterbrochen ist. Das passiert, wenn du dein Google-Passwort geändert hast, die App-Berechtigungen widerrufen wurden oder die Verbindung zu lange inaktiv war. Bitte verbinde dein Konto erneut – der Vorgang dauert nur wenige Sekunden.'
+                  : 'RankBrief cannot fetch data from Google Search Console because the connection to your Google account has expired or been interrupted. This can happen if you changed your Google password, revoked app permissions, or the connection was inactive for too long. Please reconnect – it only takes a few seconds.'}
+              </div>
+              <button
+                onClick={onReauth}
+                style={{
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  color: '#fff',
+                  background: '#F59E0B',
+                  border: 'none',
+                  borderRadius: '7px',
+                  padding: '0.5rem 1.125rem',
+                  cursor: 'pointer',
+                }}
+              >
+                {lang === 'de' ? '🔗 Jetzt neu verbinden' : '🔗 Reconnect now'}
+              </button>
+            </div>
           )}
 
           {/* Report-Verlauf */}
@@ -1900,6 +1936,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
                     isAgency={isAgency}
                     plan={plan}
                     lang={lang}
+                    onReauth={startGoogleOAuth}
                   />
                 ))}
               </PropertyList>
