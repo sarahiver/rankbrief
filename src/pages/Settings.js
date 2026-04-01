@@ -1271,11 +1271,54 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                       <PropertyUrl>{prop.gsc_property_url}</PropertyUrl>
                     </div>
                   </div>
-                  <Btn $variant="danger" onClick={() => setDeletePropertyId(prop.id)}>
-                    {lang === 'de' ? 'Entfernen' : 'Remove'}
-                  </Btn>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    {!prop.refresh_token_encrypted && (
+                      <button
+                        onClick={startOAuth}
+                        style={{
+                          fontSize: '0.72rem', fontWeight: 600, color: '#F59E0B',
+                          background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)',
+                          borderRadius: '6px', padding: '3px 10px', cursor: 'pointer', whiteSpace: 'nowrap',
+                        }}
+                      >
+                        ⚠️ {lang === 'de' ? 'Neu verbinden →' : 'Reconnect →'}
+                      </button>
+                    )}
+                    <Btn $variant="danger" onClick={() => setDeletePropertyId(prop.id)}>
+                      {lang === 'de' ? 'Entfernen' : 'Remove'}
+                    </Btn>
+                  </div>
                 </PropertyHead>
                 <PropertyBody>
+                  {!prop.refresh_token_encrypted && (
+                    <div style={{
+                      marginBottom: '1rem',
+                      padding: '1rem 1.25rem',
+                      background: 'rgba(245,158,11,0.07)',
+                      border: '1px solid rgba(245,158,11,0.3)',
+                      borderRadius: '10px',
+                      borderLeft: '4px solid #F59E0B',
+                    }}>
+                      <div style={{ fontWeight: 700, color: '#B45309', fontSize: '0.875rem', marginBottom: '0.375rem' }}>
+                        ⚠️ {lang === 'de' ? 'Google-Konto neu verbinden erforderlich' : 'Google account reconnection required'}
+                      </div>
+                      <div style={{ fontSize: '0.8125rem', color: '#78716C', lineHeight: 1.6, marginBottom: '0.75rem' }}>
+                        {lang === 'de'
+                          ? 'RankBrief kann keine Daten von der Google Search Console abrufen, weil die Verbindung zu deinem Google-Konto abgelaufen oder unterbrochen ist. Das passiert, wenn du dein Google-Passwort geändert hast, die App-Berechtigungen widerrufen wurden oder die Verbindung zu lange inaktiv war. Bitte verbinde dein Konto erneut.'
+                          : 'RankBrief cannot fetch data from Google Search Console because the connection to your Google account has expired or been interrupted. This can happen if you changed your Google password, revoked app permissions, or the connection was inactive for too long. Please reconnect.'}
+                      </div>
+                      <button
+                        onClick={startOAuth}
+                        style={{
+                          fontSize: '0.8125rem', fontWeight: 600, color: '#fff',
+                          background: '#F59E0B', border: 'none', borderRadius: '7px',
+                          padding: '0.5rem 1.125rem', cursor: 'pointer',
+                        }}
+                      >
+                        {lang === 'de' ? '🔗 Jetzt neu verbinden' : '🔗 Reconnect now'}
+                      </button>
+                    </div>
+                  )}
                   <Field>
                     <Label>GA4 Property ID</Label>
                     <Row>
