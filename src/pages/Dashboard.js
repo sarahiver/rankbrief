@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import t from '../lib/i18n';
+import PropertySelectModal from '../components/PropertySelectModal';
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(12px); }
@@ -1229,6 +1230,25 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
           </div>
         </PropertyInfo>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {!property.google_account_id && (
+            <Link
+              to="/settings"
+              onClick={e => e.stopPropagation()}
+              style={{
+                fontSize: '0.72rem',
+                fontWeight: 600,
+                color: '#F59E0B',
+                background: 'rgba(245,158,11,0.1)',
+                border: '1px solid rgba(245,158,11,0.3)',
+                borderRadius: '6px',
+                padding: '2px 8px',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              ⚠️ {lang === 'de' ? 'Google-Konto neu verbinden →' : 'Reconnect Google account →'}
+            </Link>
+          )}
           <PropertyMeta>Verbunden {new Date(property.created_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB')}</PropertyMeta>
           <PropertyChevron $open={open}>▾</PropertyChevron>
         </div>
@@ -1583,6 +1603,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
   const [profile, setProfile] = useState(null);
   const [upgrading, setUpgrading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showPropertyModal, setShowPropertyModal] = useState(false);
 
   const connected = new URLSearchParams(location.search).get('connected') === 'true';
   const upgraded = new URLSearchParams(location.search).get('upgraded') === 'true';
@@ -1681,6 +1702,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
     // Kein Google-Konto → OAuth starten
     if (googleAccounts.length > 0) {
       if (onOpenModal) onOpenModal({ plan, activeCount });
+      else setShowPropertyModal(true);
     } else {
       startGoogleOAuth();
     }
@@ -1725,6 +1747,15 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
           onUpgrade={handleUpgrade}
           onClose={() => setShowUpgradeModal(false)}
           upgrading={upgrading}
+        />
+      )}
+      {showPropertyModal && (
+        <PropertySelectModal
+          user={user}
+          plan={plan}
+          activeCount={activeProperties.length}
+          onDone={() => { setShowPropertyModal(false); loadProperties(); }}
+          onNewAccount={() => { setShowPropertyModal(false); startGoogleOAuth(); }}
         />
       )}
       <TopBar>
@@ -1805,7 +1836,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
                 {/* Button 1: Property hinzufügen (aus bestehendem Konto) — wenn Google-Konto vorhanden */}
                 {googleAccounts.length > 0 && canAdd && (
                   <BtnConnect
-                    onClick={() => onOpenModal && onOpenModal({ plan, activeCount: activeProperties.length })}
+                    onClick={() => { if (onOpenModal) onOpenModal({ plan, activeCount: activeProperties.length }); else setShowPropertyModal(true); }}
                     disabled={upgrading}
                     style={{ fontSize: '0.8125rem', padding: '0.5rem 1rem', background: 'transparent', border: '1px solid rgba(108,99,255,0.4)', color: '#6C63FF' }}
                   >
