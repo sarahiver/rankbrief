@@ -1230,7 +1230,7 @@ function PropertyItem({ property, isAgency, plan, lang = 'en' }) {
           </div>
         </PropertyInfo>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          {!property.google_account_id && (
+          {(!property.refresh_token_encrypted) && (
             <Link
               to="/settings"
               onClick={e => e.stopPropagation()}
