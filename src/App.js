@@ -17,16 +17,59 @@ import CookieBanner from './components/CookieBanner';
 import usePageTracking from './components/usePageTracking';
 
 function AuthCallback() {
+  const [status, setStatus] = React.useState('loading'); // loading | success | error
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    let attempts = 0;
+    const maxAttempts = 8;
+
+    const tryGetSession = async () => {
+      attempts++;
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        window.location.replace('/dashboard');
+        setStatus('success');
+        setTimeout(() => window.location.replace('/dashboard'), 1500);
+      } else if (attempts < maxAttempts) {
+        setTimeout(tryGetSession, 600);
       } else {
         window.location.replace('/login');
       }
-    });
+    };
+
+    tryGetSession();
   }, []);
-  return null;
+
+  if (status === 'success') {
+    return (
+      <div style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: '#f8f8fc', flexDirection: 'column', gap: '1rem',
+      }}>
+        <div style={{ fontSize: '3rem' }}>✅</div>
+        <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1a1a2e' }}>
+          E-Mail bestätigt!
+        </div>
+        <div style={{ fontSize: '0.9375rem', color: '#888' }}>
+          Du wirst gleich weitergeleitet…
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: '#f8f8fc', flexDirection: 'column', gap: '1rem',
+    }}>
+      <div style={{
+        width: '2rem', height: '2rem', border: '3px solid #e8e8f0',
+        borderTop: '3px solid #6C63FF', borderRadius: '50%',
+        animation: 'spin 0.8s linear infinite',
+      }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <div style={{ fontSize: '0.9375rem', color: '#888' }}>Account wird aktiviert…</div>
+    </div>
+  );
 }
 
 const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings', '/admin'];
