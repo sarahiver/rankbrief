@@ -92,8 +92,14 @@ const TopBarLink = styled(Link)`
   color: ${({ theme }) => theme.colors.textMuted};
   padding: 0.375rem 0.875rem;
   border-radius: ${({ theme }) => theme.radius.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
   transition: color 0.2s;
   &:hover { color: ${({ theme }) => theme.colors.text}; }
+  @media (max-width: 480px) {
+    padding: 0.375rem 0.5rem;
+    font-size: 0;
+    &::before { content: '←'; font-size: 1rem; }
+  }
 `;
 
 const LangToggle = styled.button`
@@ -117,6 +123,7 @@ const BtnSignOut = styled.button`
   border: 1px solid ${({ theme }) => theme.colors.border};
   transition: all 0.2s;
   &:hover { color: ${({ theme }) => theme.colors.text}; border-color: ${({ theme }) => theme.colors.borderLight}; }
+  @media (max-width: 480px) { display: none; }
 `;
 
 const Main = styled.main`
@@ -441,6 +448,10 @@ const LogoThumbWrap = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radius.lg};
   background: ${({ theme }) => theme.colors.bgElevated};
+  @media (max-width: 480px) {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
 `;
 
 const LogoThumb = styled.div`
@@ -1389,7 +1400,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
           <SectionHead>
             <div>
               <SectionTitle>Branding & White-Label <ProTag>Pro / Agency</ProTag></SectionTitle>
-              <SectionSub>Logo, Farben, Schriftart und Absendername im monatlichen PDF-Report</SectionSub>
+              <SectionSub>{lang === 'de' ? 'Logo, Farben, Schriftart und Absendername im monatlichen PDF-Report' : 'Logo, colors, font and sender name in the monthly PDF report'}</SectionSub>
             </div>
           </SectionHead>
           <SectionBody>
@@ -1397,14 +1408,14 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
               <Alert $type="info" style={{ marginBottom: '1.5rem' }}>
                 {t(lang, 'set.branding_locked')}{' '}
                 <button onClick={() => handleUpgrade('pro')} style={{ background: 'none', border: 'none', color: 'inherit', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}>
-                  Jetzt upgraden →
+                  {lang === 'de' ? 'Jetzt upgraden →' : 'Upgrade now →'}
                 </button>
               </Alert>
             )}
 
             {/* Logo */}
             <Field>
-              <Label>Firmenlogo</Label>
+              <Label>{lang === 'de' ? 'Firmenlogo' : 'Company Logo'}</Label>
 
               {/* Thumbnail wenn Logo vorhanden */}
               {branding.brand_logo_url ? (
@@ -1439,7 +1450,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                 >
                   <div style={{ fontSize: '1.25rem' }}>🖼</div>
                   <p style={{ fontSize: '0.8125rem', color: '#9898B8', fontWeight: 300 }}>
-                    {logoUploading ? 'Wird hochgeladen...' : 'Drag & Drop oder klicken zum Hochladen'}
+                    {logoUploading ? 'Wird hochgeladen...' : lang === 'de' ? 'Drag & Drop oder klicken zum Hochladen' : 'Drag & drop or click to upload'}
                   </p>
                 </LogoDropZone>
               )}
@@ -1449,32 +1460,32 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
 
               {!branding.brand_logo_url && (
                 <Btn style={{ marginTop: '0.5rem' }} onClick={() => isPro && document.getElementById('rb-logo-input').click()} disabled={!isPro || logoUploading}>
-                  {logoUploading ? t(lang, 'uploading') : '↑ Logo hochladen'}
+                  {logoUploading ? t(lang, 'uploading') : lang === 'de' ? '↑ Logo hochladen' : '↑ Upload Logo'}
                 </Btn>
               )}
 
-              <FieldHint>PNG, JPG oder SVG · max. 500 KB · Empfohlen: 400×120px, transparenter Hintergrund</FieldHint>
+              <FieldHint>{lang === 'de' ? 'PNG, JPG oder SVG · max. 500 KB · Empfohlen: 400×120px, transparenter Hintergrund' : 'PNG, JPG or SVG · max. 500 KB · Recommended: 400×120px, transparent background'}</FieldHint>
             </Field>
 
             {/* Firmenname */}
             <Field>
-              <Label>Firmenname im Report</Label>
-              <Input placeholder="z.B. Muster SEO GmbH" value={branding.brand_company_name}
+              <Label>{lang === 'de' ? 'Firmenname im Report' : 'Company Name'}</Label>
+              <Input placeholder={lang === 'de' ? 'z.B. Muster SEO GmbH' : 'e.g. My SEO Agency'} value={branding.brand_company_name}
                 onChange={e => setBranding(b => ({ ...b, brand_company_name: e.target.value }))} disabled={!isPro} />
-              <FieldHint>Erscheint im Header und Footer anstelle von "RankBrief"</FieldHint>
+              <FieldHint>{lang === 'de' ? 'Erscheint im Header und Footer anstelle von "RankBrief"' : 'Appears in header and footer instead of "RankBrief"'}</FieldHint>
             </Field>
 
             {/* Reply-To */}
             <Field>
               <Label>Reply-To E-Mail</Label>
-              <Input type="email" placeholder="reports@deine-agentur.de" value={branding.brand_reply_to_email}
+              <Input type="email" placeholder={lang === 'de' ? 'reports@deine-agentur.de' : 'reports@your-agency.com'} value={branding.brand_reply_to_email}
                 onChange={e => setBranding(b => ({ ...b, brand_reply_to_email: e.target.value }))} disabled={!isPro} />
-              <FieldHint>Kunden sehen diese Adresse wenn sie auf den Report antworten</FieldHint>
+              <FieldHint>{lang === 'de' ? 'Kunden sehen diese Adresse wenn sie auf den Report antworten' : 'Clients see this address when they reply to the report'}</FieldHint>
             </Field>
 
             {/* Primärfarbe */}
             <Field>
-              <Label>Primärfarbe (Headlines, KPI-Akzente)</Label>
+              <Label>{lang === 'de' ? 'Primärfarbe (Headlines, KPI-Akzente)' : 'Primary Color (Headlines, KPIs)'}</Label>
               <ColorRow>
                 <ColorSwatch $c={branding.brand_primary_color}>
                   <input type="color" value={branding.brand_primary_color}
@@ -1487,7 +1498,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
 
             {/* Akzentfarbe */}
             <Field>
-              <Label>Akzentfarbe (Trennlinien, Highlights)</Label>
+              <Label>{lang === 'de' ? 'Akzentfarbe (Trennlinien, Highlights)' : 'Accent Color (Dividers, Highlights)'}</Label>
               <ColorRow>
                 <ColorSwatch $c={branding.brand_accent_color}>
                   <input type="color" value={branding.brand_accent_color}
@@ -1500,7 +1511,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
 
             {/* Schriftart */}
             <Field>
-              <Label>Schriftart</Label>
+              <Label>{lang === 'de' ? 'Schriftart' : 'Font'}</Label>
               <FontGrid>
                 {FONTS.map(f => (
                   <FontPill key={f.key} $active={branding.brand_font === f.key} $ff={f.ff}
@@ -1514,7 +1525,7 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
 
             {/* Report-Sprache */}
             <Field>
-              <Label>Report-Sprache</Label>
+              <Label>{lang === 'de' ? 'Report-Sprache' : 'Report Language'}</Label>
               <LangGrid>
                 {[
                   { key: 'de', flag: '🇩🇪', label: 'Deutsch', sub: 'Zusammenfassung & Empfehlungen auf Deutsch' },
@@ -1534,22 +1545,24 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                   </LangPill>
                 ))}
               </LangGrid>
-              <FieldHint>Gilt für KI-Zusammenfassung, Empfehlungen und alle Beschriftungen im PDF</FieldHint>
+              <FieldHint>{lang === 'de' ? 'Gilt für KI-Zusammenfassung, Empfehlungen und alle Beschriftungen im PDF' : 'Applies to AI summary, recommendations and all labels in the PDF'}</FieldHint>
             </Field>
 
             {/* Live PDF Preview */}
             <Field>
-              <Label>Live-Vorschau PDF-Report</Label>
+              <Label>{lang === 'de' ? 'Live-Vorschau PDF-Report' : 'Live PDF Preview'}</Label>
               <PdfShell>
                 <PdfHead $c={branding.brand_primary_color}>
                   <PdfHeadLeft>
                     {branding.brand_logo_url
                       ? <img src={branding.brand_logo_url} alt="Logo" />
-                      : <div style={{ width: 8, height: 8, borderRadius: '50%', background: branding.brand_primary_color }} />
+                      : <>
+                          <div style={{ width: 8, height: 8, borderRadius: '50%', background: branding.brand_primary_color }} />
+                          <PdfCompany $c={branding.brand_primary_color} $ff={activeFontFF}>
+                            {branding.brand_company_name || 'RankBrief'}
+                          </PdfCompany>
+                        </>
                     }
-                    <PdfCompany $c={branding.brand_primary_color} $ff={activeFontFF}>
-                      {branding.brand_company_name || 'RankBrief'}
-                    </PdfCompany>
                   </PdfHeadLeft>
                   <PdfPeriod>SEO Report · {new Date().toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}</PdfPeriod>
                 </PdfHead>
@@ -1577,11 +1590,11 @@ export default function Settings({ user, lang = 'en', onLangChange }) {
                   <span style={{ color: branding.brand_accent_color }}>Powered by RankBrief</span>
                 </PdfFoot>
               </PdfShell>
-              <FieldHint>Echtzeit-Vorschau — das finale PDF kann minimal abweichen</FieldHint>
+              <FieldHint>{lang === 'de' ? 'Echtzeit-Vorschau — das finale PDF kann minimal abweichen' : 'Real-time preview — the final PDF may differ slightly'}</FieldHint>
             </Field>
 
             <Btn $variant="primary" onClick={saveBranding} disabled={brandingSaving || !isPro}>
-              {brandingSaving ? 'Wird gespeichert...' : 'Branding speichern'}
+              {brandingSaving ? (lang === 'de' ? 'Wird gespeichert...' : 'Saving...') : (lang === 'de' ? 'Branding speichern' : 'Save Branding')}
             </Btn>
           </SectionBody>
         </Section>

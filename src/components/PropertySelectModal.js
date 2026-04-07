@@ -487,7 +487,7 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
                       <Input
                         style={{ flex: 1, marginBottom: 0 }}
                         type="text"
-                        placeholder="{t(lang, 'modal.ga4_placeholder')}"
+                        placeholder={t(lang, 'modal.ga4_placeholder')}
                         value={val}
                         onChange={e => handleGa4Change(url, e.target.value)}
                         $error={status && status !== 'checking' && !status.valid}
