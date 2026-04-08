@@ -1269,7 +1269,7 @@ export default function Landing({ lang = 'en' }) {
               <TestimonialText>
                 {lang === 'de'
                   ? '"Ich habe früher 3 Stunden pro Kunde für den monatlichen Report gebraucht. Mit RankBrief ist das komplett weg – der Report kommt automatisch und sieht professioneller aus als alles was ich manuell gemacht hätte."'
-                  : '"I used to spend 3 hours per client on monthly reports. With RankBrief that's completely gone – the report arrives automatically and looks more professional than anything I built manually."'}
+                  : '"I used to spend 3 hours per client on monthly reports. With RankBrief that\'s completely gone – the report arrives automatically and looks more professional than anything I built manually."'}
               </TestimonialText>
               <TestimonialAuthor>Moritz H. · {lang === 'de' ? 'Geschäftsführer, doppeldeutlich GmbH' : 'CEO, doppeldeutlich GmbH'}</TestimonialAuthor>
             </TestimonialCard>
