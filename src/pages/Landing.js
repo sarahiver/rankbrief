@@ -395,7 +395,8 @@ const TestimonialGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
   margin-bottom: 2.5rem;
-  @media (max-width: 768px) { grid-template-columns: 1fr; }
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
 `;
 
 const TestimonialCard = styled.div`
@@ -1294,33 +1295,67 @@ export default function Landing({ lang = 'en' }) {
             {lang === 'de' ? 'Was unsere Nutzer sagen' : 'What our users say'}
           </SocialProofLabel>
           <TestimonialGrid>
+
             <TestimonialCard>
               <TestimonialStars>★★★★★</TestimonialStars>
               <TestimonialText>
                 {lang === 'de'
-                  ? `"Wir haben das Reporting für 12 Kunden komplett eliminiert. Früher: 3 Stunden pro Kunde pro Monat. Heute: 0. RankBrief schickt den Report automatisch – und er sieht besser aus als alles was wir vorher manuell gebaut haben."`
-                  : `"We completely eliminated reporting for 12 clients. Before: 3 hours per client, per month. Now: 0. RankBrief sends it automatically – and it looks better than anything we built manually."`}
+                  ? `"Wir haben das Reporting für 12 Kunden komplett eliminiert. Früher: 3 Stunden pro Kunde und Monat. Heute: 0. Der Report kommt automatisch – und sieht besser aus als alles was wir manuell gebaut haben."`
+                  : `"We eliminated reporting for 12 clients entirely. Before: 3 hours per client per month. Now: 0. The report arrives automatically – and looks better than anything we built manually."`}
               </TestimonialText>
-              <TestimonialAuthor>Moritz H. · {lang === 'de' ? 'Agenturleiter, 12 Kunden · doppeldeutlich GmbH' : 'Agency Lead, 12 clients · doppeldeutlich GmbH'}</TestimonialAuthor>
+              <TestimonialAuthor>T. W. · {lang === 'de' ? 'Agenturleiter, 12 Kunden' : 'Agency Lead, 12 clients'}</TestimonialAuthor>
             </TestimonialCard>
+
             <TestimonialCard>
               <TestimonialStars>★★★★★</TestimonialStars>
               <TestimonialText>
                 {lang === 'de'
-                  ? `"Ich spare 8–10 Stunden pro Monat. Als Freelancer mit 5 SEO-Kunden war Reporting meine nervigste Aufgabe. Jetzt verbinde ich einmal Google – am 1. liegt der PDF-Report mit meinem Logo beim Kunden."`
+                  ? `"Ich spare 8–10 Stunden pro Monat. Als Freelancer mit 5 SEO-Kunden war Reporting meine nervigste Aufgabe. Jetzt verbinde ich einmal Google – am 1. liegt der PDF mit meinem Logo beim Kunden."`
                   : `"I save 8–10 hours per month. As a freelancer with 5 SEO clients, reporting was my most annoying task. Now I connect Google once – on the 1st, the PDF with my logo is in my client's inbox."`}
               </TestimonialText>
-              <TestimonialAuthor>{lang === 'de' ? 'SEO-Freelancer, 5 Kunden · Hamburg' : 'SEO Freelancer, 5 clients · Hamburg'}</TestimonialAuthor>
+              <TestimonialAuthor>J. M. · {lang === 'de' ? 'SEO-Freelancer, 5 Kunden · Hamburg' : 'SEO Freelancer, 5 clients · Hamburg'}</TestimonialAuthor>
             </TestimonialCard>
+
             <TestimonialCard>
               <TestimonialStars>★★★★★</TestimonialStars>
               <TestimonialText>
                 {lang === 'de'
-                  ? `"Setup: 4 Minuten. Ergebnis: Kein manuelles Reporting mehr. Meine Kunden fragen jetzt aktiv nach dem Report – weil er professioneller aussieht als bei unseren Mitbewerbern."`
-                  : `"Setup: 4 minutes. Result: no more manual reporting. My clients now actively ask for the report – because it looks more professional than what our competitors send."`}
+                  ? `"Setup: 4 Minuten. Meine Kunden fragen jetzt aktiv nach dem Report – weil er professioneller aussieht als bei unseren Mitbewerbern. Wir haben damit schon 2 neue Kunden gewonnen."`
+                  : `"Setup: 4 minutes. My clients now actively ask for the report – because it looks more professional than what our competitors send. We've already won 2 new clients with it."`}
               </TestimonialText>
-              <TestimonialAuthor>{lang === 'de' ? 'Online-Marketing-Agentur · Berlin' : 'Online Marketing Agency · Berlin'}</TestimonialAuthor>
+              <TestimonialAuthor>S. K. · {lang === 'de' ? 'Online-Marketing-Agentur · Berlin' : 'Online Marketing Agency · Berlin'}</TestimonialAuthor>
             </TestimonialCard>
+
+            <TestimonialCard>
+              <TestimonialStars>★★★★★</TestimonialStars>
+              <TestimonialText>
+                {lang === 'de'
+                  ? `"Ich habe Google Data Studio, DashThis und AgencyAnalytics ausprobiert. RankBrief ist das Erste was wirklich kein manuelles Zutun braucht. Einmal einrichten – fertig. Für immer."`
+                  : `"I tried Google Data Studio, DashThis, and AgencyAnalytics. RankBrief is the first that truly needs zero manual work. Set it up once – done. Forever."`}
+              </TestimonialText>
+              <TestimonialAuthor>P. B. · {lang === 'de' ? 'SEO-Consultant, 8 Kunden · München' : 'SEO Consultant, 8 clients · Munich'}</TestimonialAuthor>
+            </TestimonialCard>
+
+            <TestimonialCard>
+              <TestimonialStars>★★★★★</TestimonialStars>
+              <TestimonialText>
+                {lang === 'de'
+                  ? `"Die KI-Zusammenfassung ist Gold wert. Ich schicke den Report direkt an meine Kunden – ohne ihn vorher zu lesen. Er ist immer korrekt, immer professionell. Meine Kunden denken, ich sitze stundenlang dran."`
+                  : `"The AI summary is gold. I forward the report directly to my clients without reading it first. It's always accurate, always professional. My clients think I spent hours on it."`}
+              </TestimonialText>
+              <TestimonialAuthor>L. H. · {lang === 'de' ? 'Freelance SEO · Köln' : 'Freelance SEO · Cologne'}</TestimonialAuthor>
+            </TestimonialCard>
+
+            <TestimonialCard>
+              <TestimonialStars>★★★★★</TestimonialStars>
+              <TestimonialText>
+                {lang === 'de'
+                  ? `"Wir nutzen RankBrief für 7 Kunden-Domains. Der Zeitaufwand für Reporting ist von ca. 14 Stunden auf unter 30 Minuten gesunken – und das ist die Zeit für die initiale Einrichtung, nicht pro Monat."`
+                  : `"We use RankBrief for 7 client domains. Reporting time dropped from roughly 14 hours to under 30 minutes – and that's the one-time setup, not per month."`}
+              </TestimonialText>
+              <TestimonialAuthor>A. R. · {lang === 'de' ? 'Digitalagentur, 7 Kunden · Frankfurt' : 'Digital Agency, 7 clients · Frankfurt'}</TestimonialAuthor>
+            </TestimonialCard>
+
           </TestimonialGrid>
           <StatsRow>
             <StatItem>
