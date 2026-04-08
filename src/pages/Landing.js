@@ -109,14 +109,14 @@ const HeroBadge = styled.div`
 
 const HeroTitle = styled.h1`
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(1.75rem, 5vw, 4rem);
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.15;
   letter-spacing: -0.04em;
   max-width: 720px;
   width: 100%;
   margin-bottom: 1.75rem;
-  padding: 0 0.5rem;
+  padding: 0 0.5rem 0.25rem;
   animation: ${fadeUp} 0.6s 0.1s ease both;
 
   .line1 {
@@ -124,12 +124,16 @@ const HeroTitle = styled.h1`
   }
   .gradient {
     display: block;
+    padding-bottom: 0.15em;
     background: linear-gradient(135deg, #6C63FF 0%, #A78BFA 40%, #63CFFF 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: ${shimmer} 4s linear infinite;
+  }
+  @media (max-width: 480px) {
+    font-size: clamp(1.6rem, 8vw, 2.5rem);
   }
 `;
 
@@ -237,6 +241,9 @@ const UrgencyTop = styled.div`
   font-size: 0.8125rem;
   font-weight: 700;
   color: #B45309;
+  text-align: center;
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
 const UrgencySlots = styled.div`
@@ -251,6 +258,7 @@ const UrgencyCodeRow = styled.div`
   gap: 0.625rem;
   flex-wrap: wrap;
   justify-content: center;
+  @media (max-width: 360px) { flex-direction: column; }
 `;
 
 const UrgencyCode = styled.span`
@@ -523,14 +531,17 @@ const SectionLabel = styled.div`
 
 const SectionTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-size: clamp(1.5rem, 3.5vw, 2.75rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  line-height: 1.1;
+  line-height: 1.2;
   margin-bottom: 1rem;
   max-width: 600px;
-  word-break: break-word;
-  overflow-wrap: break-word;
+  padding-bottom: 0.1em;
+  @media (max-width: 480px) {
+    font-size: clamp(1.4rem, 7vw, 2rem);
+    line-height: 1.25;
+  }
 `;
 
 const SectionSub = styled.p`
