@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 // ── Animations ────────────────────────────────────────────────────────────────
 const fadeUp = keyframes`
@@ -214,22 +215,67 @@ const TrustItem = styled.div`
 
 // ── Urgency Banner ────────────────────────────────────────────────────────────
 const UrgencyBanner = styled.div`
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(239,68,68,0.06) 100%);
+  border: 1px solid rgba(245,158,11,0.35);
+  border-radius: 16px;
+  padding: 1rem 1.75rem;
+  margin-top: 1.5rem;
+  animation: ${fadeUp} 0.6s 0.45s ease both;
+  max-width: 560px;
+  width: 100%;
+  @media (max-width: 480px) { padding: 0.875rem 1.25rem; }
+`;
+
+const UrgencyTop = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #B45309;
+`;
+
+const UrgencySlots = styled.div`
+  font-size: 0.8125rem;
+  color: #92400E;
+  font-weight: 500;
+`;
+
+const UrgencyCodeRow = styled.div`
+  display: flex;
   align-items: center;
   gap: 0.625rem;
-  background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(239,68,68,0.08) 100%);
-  border: 1px solid rgba(245,158,11,0.35);
-  border-radius: 100px;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.8125rem;
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+const UrgencyCode = styled.span`
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #B45309;
+  background: rgba(245,158,11,0.15);
+  border: 1px dashed rgba(245,158,11,0.5);
+  border-radius: 6px;
+  padding: 0.25rem 0.75rem;
+  letter-spacing: 0.05em;
+`;
+
+const CopyBtn = styled.button`
+  font-size: 0.75rem;
   font-weight: 600;
   color: #B45309;
-  margin-top: 1.25rem;
-  animation: ${fadeUp} 0.6s 0.45s ease both;
-  &::before {
-    content: '⚡';
-    font-size: 0.875rem;
-  }
+  background: rgba(245,158,11,0.15);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 6px;
+  padding: 0.25rem 0.625rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  &:hover { background: rgba(245,158,11,0.25); }
 `;
 
 // ── Mock Dashboard Preview ────────────────────────────────────────────────────
@@ -1126,12 +1172,35 @@ const i18n = {
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
+const PROMO_CODE = 'EARLY2026';
+const PROMO_MAX  = 50;
+
 export default function Landing({ lang = 'en' }) {
   const [openFaq, setOpenFaq] = React.useState(null);
   const [annual, setAnnual] = React.useState(false);
   const [sampleOpen, setSampleOpen] = React.useState(null);
   const [pdfLoading, setPdfLoading] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 700);
+  const [promoUsed, setPromoUsed] = React.useState(null);
+  const [copied, setCopied] = React.useState(false);
+
+  React.useEffect(() => {
+    supabase
+      .from('promo_codes')
+      .select('uses_count')
+      .eq('code', PROMO_CODE)
+      .single()
+      .then(({ data }) => {
+        if (data) setPromoUsed(data.uses_count ?? 0);
+      });
+  }, []);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(PROMO_CODE).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
   React.useEffect(() => {
     const handler = () => setIsMobile(window.innerWidth < 700);
     window.addEventListener('resize', handler);
@@ -1234,9 +1303,28 @@ export default function Landing({ lang = 'en' }) {
         </TrustRow>
 
         <UrgencyBanner>
-          {lang === 'de'
-            ? 'Beta-Phase: Gründer-Rabatt für die ersten 50 User — danach regulärer Preis'
-            : 'Beta: Founding user discount for the first 50 users — full price after that'}
+          <UrgencyTop>
+            <span>⚡</span>
+            {lang === 'de'
+              ? 'Beta-Aktion: 3 Monate Pro kostenlos für Gründer-User'
+              : 'Beta deal: 3 months Pro free for founding users'}
+          </UrgencyTop>
+          {promoUsed !== null && (
+            <UrgencySlots>
+              {lang === 'de'
+                ? `Noch ${Math.max(0, PROMO_MAX - promoUsed)} von ${PROMO_MAX} Plätzen verfügbar`
+                : `${Math.max(0, PROMO_MAX - promoUsed)} of ${PROMO_MAX} spots remaining`}
+            </UrgencySlots>
+          )}
+          <UrgencyCodeRow>
+            <span style={{ fontSize: '0.8125rem', color: '#92400E' }}>
+              {lang === 'de' ? 'Code bei Registrierung eingeben:' : 'Enter code at signup:'}
+            </span>
+            <UrgencyCode>{PROMO_CODE}</UrgencyCode>
+            <CopyBtn onClick={handleCopy}>
+              {copied ? (lang === 'de' ? '✓ Kopiert' : '✓ Copied') : (lang === 'de' ? 'Kopieren' : 'Copy')}
+            </CopyBtn>
+          </UrgencyCodeRow>
         </UrgencyBanner>
 
         <PreviewWrap>
