@@ -338,7 +338,7 @@ export default function Navbar({ user, lang, onLangChange }) {
   return (
     <>
       <Nav $scrolled={scrolled || !isLanding}>
-        <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
+        <Logo to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}><LogoDot />Rank<span>Brief</span></Logo>
 
         {/* Desktop links */}
         {isLanding && (
