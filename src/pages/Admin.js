@@ -83,7 +83,7 @@ const ADMIN_PW     = process.env.REACT_APP_ADMIN_PW || 'rankbrief-admin';
 const PLANS = ['free','basic','pro','agency'];
 const PLAN_PRICES = { free: 0, basic: 19, pro: 39, agency: 79 };
 const COLS_USERS = '2fr 1fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr';
-const COLS_REPORTS = '2fr 1fr 1fr 1fr 1fr';
+const COLS_REPORTS = '2fr 2fr 1fr 1fr 1fr 1fr';
 const COLS_PROPS = '2fr 1fr 1fr 1fr 1fr';
 
 function fmtDate(d) {
@@ -104,6 +104,8 @@ export default function Admin({ user }) {
   const [stats, setStats]       = useState({});
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState('');
+  const [reportMonthFilter, setReportMonthFilter] = useState('');
+  const [reportUserFilter, setReportUserFilter]   = useState('');
   const [alert, setAlert]       = useState(null);
   const [modal, setModal]       = useState(null);
   const [saving, setSaving]     = useState(false);
@@ -218,7 +220,16 @@ export default function Admin({ user }) {
     }));
 
     setUsers(usersEnriched);
-    setReports(allReports || []);
+    // Enrich reports with property + user info
+    const propMap = {};
+    (allPropsEnriched || []).forEach(p => { propMap[p.id] = p; });
+    const reportsEnriched = (allReports || []).map(r => ({
+      ...r,
+      property_url: propMap[r.property_id]?.gsc_property_url || '–',
+      property_display: propMap[r.property_id]?.display_name || propMap[r.property_id]?.gsc_property_url || '–',
+      user_email: propMap[r.property_id]?.user_email || '–',
+    }));
+    setReports(reportsEnriched);
     setProps(allPropsEnriched);
     setPromos(allPromos || []);
 
@@ -457,7 +468,16 @@ export default function Admin({ user }) {
   // ── Filter ──────────────────────────────────────────────────────────────────
   const q = search.toLowerCase();
   const filteredUsers   = users.filter(u => u.email?.toLowerCase().includes(q) || u.plan?.includes(q));
-  const filteredReports = reports.filter(r => r.id?.includes(q) || r.status?.includes(q));
+  const filteredReports = reports.filter(r => {
+    const matchSearch = !q || 
+      r.property_url?.toLowerCase().includes(q) || 
+      r.property_display?.toLowerCase().includes(q) ||
+      r.user_email?.toLowerCase().includes(q) ||
+      r.id?.includes(q);
+    const matchMonth = !reportMonthFilter || r.report_month?.slice(0,7) === reportMonthFilter;
+    const matchUser  = !reportUserFilter  || r.user_email === reportUserFilter;
+    return matchSearch && matchMonth && matchUser;
+  });
   const filteredProps   = props.filter(p => p.gsc_property_url?.toLowerCase().includes(q) || p.user_email?.toLowerCase().includes(q));
 
   const handleCreatePromo = async () => {
@@ -672,29 +692,75 @@ export default function Admin({ user }) {
             )}
 
             {/* ── REPORTS TAB ── */}
-            {tab === 'reports' && (
-              <TableWrap>
-                <THead $cols={COLS_REPORTS}>
-                  <div>Report ID</div><div>Monat</div><div>Klicks</div><div>Status</div><div>Aktionen</div>
-                </THead>
-                {filteredReports.map(r => (
-                  <TRow key={r.id} $cols={COLS_REPORTS}>
-                    <TCellMono>{r.id.slice(0,16)}…</TCellMono>
-                    <TCell>{r.report_month ? new Date(r.report_month).toLocaleDateString('de-DE', { month:'long', year:'numeric' }) : '–'}</TCell>
-                    <TCell>{r.clicks?.toLocaleString('de-DE') ?? '–'}</TCell>
-                    <TCell>
-                      <StatusDot $status={r.status==='done'?'active':'inactive'} />
-                      {r.status}
-                      {r.pdf_url && <span style={{ marginLeft:'.5rem', fontSize:'.7rem', color:'#10B981' }}>PDF ✓</span>}
-                    </TCell>
-                    <div style={{ display:'flex', gap:'.375rem' }}>
-                      {r.pdf_url && <ActionBtn as="a" href={r.pdf_url} target="_blank" rel="noreferrer">↓ PDF</ActionBtn>}
-                      <ActionBtn $danger onClick={() => setModal({ type:'report_delete', report:r })}>Löschen</ActionBtn>
-                    </div>
-                  </TRow>
-                ))}
-              </TableWrap>
-            )}
+            {tab === 'reports' && (() => {
+              // Build unique months + users for filter dropdowns
+              const uniqueMonths = [...new Set(reports.map(r => r.report_month?.slice(0,7)).filter(Boolean))].sort().reverse();
+              const uniqueUsers  = [...new Set(reports.map(r => r.user_email).filter(v => v && v !== '–'))].sort();
+              return (
+                <>
+                  {/* Filters */}
+                  <div style={{ display:'flex', gap:'0.75rem', marginBottom:'1rem', flexWrap:'wrap', alignItems:'center' }}>
+                    <div style={{ fontSize:'0.8125rem', color:'#888', fontWeight:600 }}>Filter:</div>
+                    <select
+                      value={reportMonthFilter}
+                      onChange={e => setReportMonthFilter(e.target.value)}
+                      style={{ padding:'0.375rem 0.75rem', borderRadius:6, border:'1px solid #e8e8f0', fontSize:'0.8125rem', background:'#fff', color:'#1a1a2e', cursor:'pointer' }}
+                    >
+                      <option value="">Alle Monate</option>
+                      {uniqueMonths.map(m => (
+                        <option key={m} value={m}>
+                          {new Date(m+'-01').toLocaleDateString('de-DE', { month:'long', year:'numeric' })}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={reportUserFilter}
+                      onChange={e => setReportUserFilter(e.target.value)}
+                      style={{ padding:'0.375rem 0.75rem', borderRadius:6, border:'1px solid #e8e8f0', fontSize:'0.8125rem', background:'#fff', color:'#1a1a2e', cursor:'pointer' }}
+                    >
+                      <option value="">Alle User</option>
+                      {uniqueUsers.map(u => (
+                        <option key={u} value={u}>{u}</option>
+                      ))}
+                    </select>
+                    {(reportMonthFilter || reportUserFilter) && (
+                      <ActionBtn onClick={() => { setReportMonthFilter(''); setReportUserFilter(''); }}>
+                        ✕ Filter zurücksetzen
+                      </ActionBtn>
+                    )}
+                    <span style={{ marginLeft:'auto', fontSize:'0.8125rem', color:'#888' }}>
+                      {filteredReports.length} von {reports.length} Reports
+                    </span>
+                  </div>
+
+                  <TableWrap>
+                    <THead $cols={COLS_REPORTS}>
+                      <div>Property</div><div>User</div><div>Monat</div><div>Klicks</div><div>Status</div><div>Aktionen</div>
+                    </THead>
+                    {filteredReports.map(r => (
+                      <TRow key={r.id} $cols={COLS_REPORTS}>
+                        <div>
+                          <TCell style={{ fontWeight:500, fontSize:'0.8rem' }}>{r.property_display}</TCell>
+                          <TCellMono style={{ fontSize:'0.7rem' }}>{r.id.slice(0,12)}…</TCellMono>
+                        </div>
+                        <TCellMono style={{ fontSize:'0.75rem' }}>{r.user_email}</TCellMono>
+                        <TCell>{r.report_month ? new Date(r.report_month).toLocaleDateString('de-DE', { month:'long', year:'numeric' }) : '–'}</TCell>
+                        <TCell>{r.clicks?.toLocaleString('de-DE') ?? '–'}</TCell>
+                        <TCell>
+                          <StatusDot $status={r.status==='done'?'active':'inactive'} />
+                          {r.status}
+                          {r.pdf_url && <span style={{ marginLeft:'.5rem', fontSize:'.7rem', color:'#10B981' }}>PDF ✓</span>}
+                        </TCell>
+                        <div style={{ display:'flex', gap:'.375rem' }}>
+                          {r.pdf_url && <ActionBtn as="a" href={r.pdf_url} target="_blank" rel="noreferrer">↓ PDF</ActionBtn>}
+                          <ActionBtn $danger onClick={() => setModal({ type:'report_delete', report:r })}>Löschen</ActionBtn>
+                        </div>
+                      </TRow>
+                    ))}
+                  </TableWrap>
+                </>
+              );
+            })()}
 
             {/* ── PROMO CODES TAB ── */}
             {tab === 'finanzen' && (() => {
