@@ -2061,9 +2061,9 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
                     ? 'Wir haben deine Anfrage erhalten und melden uns so schnell wie möglich bei dir. Schau auch in deinen Spam-Ordner.'
                     : 'We have received your request and will get back to you as soon as possible. Please also check your spam folder.'}
                 </SupportSub>
-                <BtnPrimary as="button" onClick={() => { setShowSupportModal(false); setSupportSent(false); }}>
+                <BtnConnect onClick={() => { setShowSupportModal(false); setSupportSent(false); }} style={{ padding: "0.625rem 1.25rem", fontSize: "0.875rem", fontWeight: 700, background: "var(--color-accent, #6C63FF)", color: "#fff", border: "none", borderRadius: "8px" }}>
                   {lang === 'de' ? 'Schließen' : 'Close'}
-                </BtnPrimary>
+                </BtnConnect>
               </>
             ) : (
               <>
@@ -2106,18 +2106,18 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
                   />
                 </SupportField>
                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-                  <BtnGhost as="button" onClick={() => setShowSupportModal(false)}>
+                  <BtnSignOut onClick={() => setShowSupportModal(false)} style={{ padding: "0.625rem 1.25rem", fontSize: "0.875rem" }}>
                     {lang === 'de' ? 'Abbrechen' : 'Cancel'}
-                  </BtnGhost>
-                  <BtnPrimary
-                    as="button"
+                  </BtnSignOut>
+                  <BtnConnect
                     onClick={handleSupportSubmit}
                     disabled={supportSending || !supportForm.category || !supportForm.message.trim()}
+                    style={{ padding: "0.625rem 1.25rem", fontSize: "0.875rem", fontWeight: 700, background: "#6C63FF", color: "#fff", border: "none", borderRadius: "8px", opacity: (supportSending || !supportForm.category || !supportForm.message.trim()) ? 0.5 : 1, cursor: (supportSending || !supportForm.category || !supportForm.message.trim()) ? "not-allowed" : "pointer" }}
                   >
                     {supportSending
                       ? (lang === 'de' ? 'Sendet...' : 'Sending...')
                       : (lang === 'de' ? 'Anfrage senden' : 'Send request')}
-                  </BtnPrimary>
+                  </BtnConnect>
                 </div>
               </>
             )}
