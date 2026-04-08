@@ -1118,7 +1118,7 @@ const i18n = {
     badge: 'Automatisches SEO-Reporting für Agenturen & Freelancer',
     heroTitle1: 'Dein SEO-Report,',
     heroTitle2: 'automatisch geliefert.',
-    heroSub: 'Schluss mit 3 Stunden manuellem Reporting. Google Search Console einmal verbinden – RankBrief erstellt jeden 1. des Monats automatisch einen professionellen PDF-Report mit KI-Analyse und schickt ihn direkt an deinen Kunden.',
+    heroSub: 'Schluss mit 3 Stunden manuellem Reporting. Google Search Console einmal verbinden – RankBrief erstellt jeden 1. des Monats automatisch einen professionellen PDF-Report mit KI-Analyse – automatisch per Mail, ohne weiteres Zutun.',
     heroCta: 'Ersten Report kostenlos erhalten',
     heroSeeHow: '▶ Echten Kunden-Report sehen',
     trust1: 'Erster Report kostenlos',
