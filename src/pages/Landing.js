@@ -35,7 +35,7 @@ const HeroSection = styled.section`
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 8rem 2rem 6rem;
+  padding: 8rem 2rem 8rem;
   overflow: hidden;
   width: 100%;
   box-sizing: border-box;
@@ -108,17 +108,21 @@ const HeroBadge = styled.div`
 
 const HeroTitle = styled.h1`
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: clamp(2rem, 5.5vw, 4.5rem);
+  font-size: clamp(2rem, 5vw, 4rem);
   font-weight: 800;
-  line-height: 1.08;
+  line-height: 1.1;
   letter-spacing: -0.04em;
-  max-width: 760px;
+  max-width: 720px;
   width: 100%;
-  margin-bottom: 1.5rem;
-  padding: 0 1rem;
+  margin-bottom: 1.75rem;
+  padding: 0 0.5rem;
   animation: ${fadeUp} 0.6s 0.1s ease both;
 
+  .line1 {
+    display: block;
+  }
   .gradient {
+    display: block;
     background: linear-gradient(135deg, #6C63FF 0%, #A78BFA 40%, #63CFFF 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
@@ -129,7 +133,7 @@ const HeroTitle = styled.h1`
 `;
 
 const HeroSub = styled.p`
-  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-size: clamp(1rem, 1.8vw, 1.125rem);
   color: ${({ theme }) => theme.colors.textMuted};
   max-width: 560px;
   line-height: 1.7;
@@ -1183,7 +1187,7 @@ export default function Landing({ lang = 'en' }) {
         <HeroBadge>{t.badge}</HeroBadge>
 
         <HeroTitle>
-          {t.heroTitle1}
+          <span className="line1">{t.heroTitle1}</span>
           <span className="gradient">{t.heroTitle2}</span>
         </HeroTitle>
 
@@ -1268,8 +1272,8 @@ export default function Landing({ lang = 'en' }) {
               <TestimonialStars>★★★★★</TestimonialStars>
               <TestimonialText>
                 {lang === 'de'
-                  ? '"Ich habe früher 3 Stunden pro Kunde für den monatlichen Report gebraucht. Mit RankBrief ist das komplett weg – der Report kommt automatisch und sieht professioneller aus als alles was ich manuell gemacht hätte."'
-                  : '"I used to spend 3 hours per client on monthly reports. With RankBrief that\'s completely gone – the report arrives automatically and looks more professional than anything I built manually."'}
+                  ? `"Ich habe früher 3 Stunden pro Kunde gebraucht. Mit RankBrief kommt der Report automatisch – professioneller als alles was ich manuell gemacht hätte."`
+                  : `"I used to spend 3 hours per client on reports. With RankBrief that's completely gone – automatic and more professional than anything I built manually."`}
               </TestimonialText>
               <TestimonialAuthor>Moritz H. · {lang === 'de' ? 'Geschäftsführer, doppeldeutlich GmbH' : 'CEO, doppeldeutlich GmbH'}</TestimonialAuthor>
             </TestimonialCard>
@@ -1277,8 +1281,8 @@ export default function Landing({ lang = 'en' }) {
               <TestimonialStars>★★★★★</TestimonialStars>
               <TestimonialText>
                 {lang === 'de'
-                  ? '"Endlich kann ich meinen Kunden einen professionellen White-Label-Report schicken ohne selbst eine einzige Zeile zu schreiben. Die KI-Zusammenfassung erklärt die Daten besser als ich es könnte."'
-                  : '"Finally I can send my clients a professional white-label report without writing a single line myself. The AI summary explains the data better than I could."'}
+                  ? `"Endlich kann ich meinen Kunden einen professionellen White-Label-Report schicken. Die KI-Zusammenfassung erklärt die Daten besser als ich es könnte."`
+                  : `"Finally I can send clients a professional white-label report. The AI summary explains the data better than I could."`}
               </TestimonialText>
               <TestimonialAuthor>{lang === 'de' ? 'SEO-Freelancer · Hamburg' : 'SEO Freelancer · Hamburg'}</TestimonialAuthor>
             </TestimonialCard>
@@ -1286,8 +1290,8 @@ export default function Landing({ lang = 'en' }) {
               <TestimonialStars>★★★★★</TestimonialStars>
               <TestimonialText>
                 {lang === 'de'
-                  ? '"Setup war in 5 Minuten erledigt. Seitdem macht RankBrief jeden Monat automatisch seinen Job – ich bemerke es nur wenn die E-Mail mit dem Report ankommt."'
-                  : '"Setup took 5 minutes. Since then RankBrief does its job every month automatically – I only notice it when the email with the report arrives."'}
+                  ? `"Setup war in 5 Minuten erledigt. Seitdem macht RankBrief jeden Monat automatisch seinen Job – ich bemerke es nur wenn die E-Mail ankommt."`
+                  : `"Setup took 5 minutes. Since then RankBrief does its job automatically – I only notice it when the email arrives."`}
               </TestimonialText>
               <TestimonialAuthor>{lang === 'de' ? 'Online-Marketing-Agentur · Berlin' : 'Online Marketing Agency · Berlin'}</TestimonialAuthor>
             </TestimonialCard>
