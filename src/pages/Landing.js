@@ -108,18 +108,17 @@ const HeroBadge = styled.div`
 
 const HeroTitle = styled.h1`
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: clamp(2rem, 7vw, 5.5rem);
+  font-size: clamp(2rem, 6vw, 5rem);
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.08;
   letter-spacing: -0.04em;
-  max-width: 900px;
+  max-width: 820px;
   width: 100%;
   margin-bottom: 1.5rem;
-  word-break: break-word;
-  overflow-wrap: break-word;
   animation: ${fadeUp} 0.6s 0.1s ease both;
 
   .gradient {
+    display: block;
     background: linear-gradient(135deg, #6C63FF 0%, #A78BFA 40%, #63CFFF 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
@@ -1097,7 +1096,7 @@ export default function Landing({ lang = 'en' }) {
         <HeroBadge>{t.badge}</HeroBadge>
 
         <HeroTitle>
-          {t.heroTitle1}<br />
+          {t.heroTitle1}
           <span className="gradient">{t.heroTitle2}</span>
         </HeroTitle>
 
