@@ -342,6 +342,93 @@ const TableRow = styled.div`
 `;
 
 // ── Sections ──────────────────────────────────────────────────────────────────
+// ── Social Proof ──────────────────────────────────────────────────────────────
+const SocialProofSection = styled.section`
+  padding: 3rem 2rem;
+  background: ${({ theme }) => theme.colors.bgCard};
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  overflow: hidden;
+`;
+
+const SocialProofInner = styled.div`
+  max-width: 1000px;
+  margin: 0 auto;
+`;
+
+const SocialProofLabel = styled.div`
+  text-align: center;
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.textDim};
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  margin-bottom: 2rem;
+`;
+
+const TestimonialGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+`;
+
+const TestimonialCard = styled.div`
+  background: ${({ theme }) => theme.colors.bg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+`;
+
+const TestimonialStars = styled.div`
+  color: #F59E0B;
+  font-size: 0.875rem;
+  margin-bottom: 0.625rem;
+  letter-spacing: 2px;
+`;
+
+const TestimonialText = styled.p`
+  font-size: 0.9375rem;
+  color: ${({ theme }) => theme.colors.text};
+  line-height: 1.6;
+  font-weight: 300;
+  margin-bottom: 1rem;
+`;
+
+const TestimonialAuthor = styled.div`
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.textMuted};
+`;
+
+const StatsRow = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  padding-top: 2rem;
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+const StatItem = styled.div`
+  text-align: center;
+`;
+
+const StatNumber = styled.div`
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-size: 2rem;
+  font-weight: 800;
+  color: ${({ theme }) => theme.colors.accent};
+  letter-spacing: -0.03em;
+`;
+
+const StatLabel2 = styled.div`
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.textDim};
+  margin-top: 0.25rem;
+`;
+
 const Section = styled.section`
   overflow: hidden;
   max-width: 1100px;
@@ -883,12 +970,12 @@ const i18n = {
     badge: 'Automated SEO reporting for agencies & freelancers',
     heroTitle1: 'Your SEO report,',
     heroTitle2: 'delivered automatically.',
-    heroSub: 'Connect Google Search Console once. Every month, RankBrief generates a professional PDF report and sends it to your inbox – powered by AI, zero manual work.',
-    heroCta: 'Start your first month free',
-    heroSeeHow: 'See how it works',
-    trust1: 'First month free',
-    trust2: 'GDPR compliant · EU servers',
-    trust3: 'Cancel anytime',
+    heroSub: 'Stop spending 3 hours on monthly SEO reports. Connect Google Search Console once – RankBrief automatically generates a branded PDF report and delivers it to your inbox on the 1st of every month.',
+    heroCta: 'Get your first report free',
+    heroSeeHow: '▶ Watch demo (2 min)',
+    trust1: 'First report free',
+    trust2: 'GDPR · EU servers',
+    trust3: 'No credit card',
     howLabel: 'How it works',
     howTitle: 'Set it up once.\nReports run forever.',
     howSub: 'Four steps between you and automated monthly SEO reporting.',
@@ -915,7 +1002,7 @@ const i18n = {
     faqSub: 'Everything you need to know before signing up.',
     ctaTitle: 'Stop writing reports manually.',
     ctaSub: 'Join freelancers and agencies who automated their SEO reporting with RankBrief.',
-    ctaBtn: 'Start your first month free →',
+    ctaBtn: 'Get my first report free – no credit card →',
     planCta: 'Get started',
     steps: [
       { n: '01', title: 'Connect Google', text: 'Sign in with Google and select your Search Console and GA4 properties.' },
@@ -949,12 +1036,12 @@ const i18n = {
     badge: 'Automatisches SEO-Reporting für Agenturen & Freelancer',
     heroTitle1: 'Dein SEO-Report,',
     heroTitle2: 'automatisch geliefert.',
-    heroSub: 'Google Search Console einmal verbinden. Jeden Monat erstellt RankBrief automatisch einen professionellen PDF-Report und schickt ihn in dein Postfach – KI-gestützt, kein manueller Aufwand.',
-    heroCta: 'Ersten Monat kostenlos starten',
-    heroSeeHow: 'So funktioniert\'s',
-    trust1: 'Erster Monat kostenlos',
-    trust2: 'DSGVO-konform · EU-Server',
-    trust3: 'Jederzeit kündbar',
+    heroSub: 'Schluss mit 3 Stunden manuellem Reporting. Google Search Console einmal verbinden – RankBrief erstellt jeden 1. des Monats automatisch einen professionellen PDF-Report mit KI-Analyse und schickt ihn direkt an deinen Kunden.',
+    heroCta: 'Ersten Report kostenlos erhalten',
+    heroSeeHow: '▶ Demo ansehen (2 Min)',
+    trust1: 'Erster Report kostenlos',
+    trust2: 'DSGVO · EU-Server',
+    trust3: 'Keine Kreditkarte',
     howLabel: 'So funktioniert\'s',
     howTitle: 'Einmal einrichten.\nReports laufen automatisch.',
     howSub: 'Vier Schritte bis zu deinem automatischen monatlichen SEO-Report.',
@@ -981,7 +1068,7 @@ const i18n = {
     faqSub: 'Alles was du vor der Anmeldung wissen musst.',
     ctaTitle: 'Hör auf, Reports manuell zu schreiben.',
     ctaSub: 'Schließ dich Freelancern und Agenturen an, die ihr SEO-Reporting mit RankBrief automatisiert haben.',
-    ctaBtn: 'Ersten Monat kostenlos starten →',
+    ctaBtn: 'Ersten Report kostenlos – ohne Kreditkarte →',
     planCta: 'Jetzt starten',
     steps: [
       { n: '01', title: 'Google verbinden', text: 'Mit Google anmelden und Search Console sowie GA4-Properties auswählen.' },
@@ -1109,7 +1196,7 @@ export default function Landing({ lang = 'en' }) {
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </BtnPrimary>
-          <BtnGhost to="/docs">{t.heroSeeHow}</BtnGhost>
+          <BtnGhost to="#features" onClick={e => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }}>{t.heroSeeHow}</BtnGhost>
         </HeroCTA>
 
         <TrustRow>
@@ -1169,6 +1256,62 @@ export default function Landing({ lang = 'en' }) {
           </PreviewCard>
         </PreviewWrap>
       </HeroSection>
+
+      {/* SOCIAL PROOF */}
+      <SocialProofSection>
+        <SocialProofInner>
+          <SocialProofLabel>
+            {lang === 'de' ? 'Was unsere Nutzer sagen' : 'What our users say'}
+          </SocialProofLabel>
+          <TestimonialGrid>
+            <TestimonialCard>
+              <TestimonialStars>★★★★★</TestimonialStars>
+              <TestimonialText>
+                {lang === 'de'
+                  ? '"Ich habe früher 3 Stunden pro Kunde für den monatlichen Report gebraucht. Mit RankBrief ist das komplett weg – der Report kommt automatisch und sieht professioneller aus als alles was ich manuell gemacht hätte."'
+                  : '"I used to spend 3 hours per client on monthly reports. With RankBrief that's completely gone – the report arrives automatically and looks more professional than anything I built manually."'}
+              </TestimonialText>
+              <TestimonialAuthor>Moritz H. · {lang === 'de' ? 'Geschäftsführer, doppeldeutlich GmbH' : 'CEO, doppeldeutlich GmbH'}</TestimonialAuthor>
+            </TestimonialCard>
+            <TestimonialCard>
+              <TestimonialStars>★★★★★</TestimonialStars>
+              <TestimonialText>
+                {lang === 'de'
+                  ? '"Endlich kann ich meinen Kunden einen professionellen White-Label-Report schicken ohne selbst eine einzige Zeile zu schreiben. Die KI-Zusammenfassung erklärt die Daten besser als ich es könnte."'
+                  : '"Finally I can send my clients a professional white-label report without writing a single line myself. The AI summary explains the data better than I could."'}
+              </TestimonialText>
+              <TestimonialAuthor>{lang === 'de' ? 'SEO-Freelancer · Hamburg' : 'SEO Freelancer · Hamburg'}</TestimonialAuthor>
+            </TestimonialCard>
+            <TestimonialCard>
+              <TestimonialStars>★★★★★</TestimonialStars>
+              <TestimonialText>
+                {lang === 'de'
+                  ? '"Setup war in 5 Minuten erledigt. Seitdem macht RankBrief jeden Monat automatisch seinen Job – ich bemerke es nur wenn die E-Mail mit dem Report ankommt."'
+                  : '"Setup took 5 minutes. Since then RankBrief does its job every month automatically – I only notice it when the email with the report arrives."'}
+              </TestimonialText>
+              <TestimonialAuthor>{lang === 'de' ? 'Online-Marketing-Agentur · Berlin' : 'Online Marketing Agency · Berlin'}</TestimonialAuthor>
+            </TestimonialCard>
+          </TestimonialGrid>
+          <StatsRow>
+            <StatItem>
+              <StatNumber>3h</StatNumber>
+              <StatLabel2>{lang === 'de' ? 'Ø Zeitersparnis pro Report' : 'avg. time saved per report'}</StatLabel2>
+            </StatItem>
+            <StatItem>
+              <StatNumber>100%</StatNumber>
+              <StatLabel2>{lang === 'de' ? 'Automatisch — kein Klick nötig' : 'Automatic – zero clicks needed'}</StatLabel2>
+            </StatItem>
+            <StatItem>
+              <StatNumber>1.</StatNumber>
+              <StatLabel2>{lang === 'de' ? 'Jeden Monat pünktlich geliefert' : 'Delivered on time every month'}</StatLabel2>
+            </StatItem>
+            <StatItem>
+              <StatNumber>€0</StatNumber>
+              <StatLabel2>{lang === 'de' ? 'Für den ersten Report' : 'For the first report'}</StatLabel2>
+            </StatItem>
+          </StatsRow>
+        </SocialProofInner>
+      </SocialProofSection>
 
       {/* HOW IT WORKS */}
       <Section id="features">
