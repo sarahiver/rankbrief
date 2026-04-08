@@ -170,7 +170,7 @@ export function PrivacyEN() {
           <p>This Privacy Policy explains how RankBrief collects, uses, and protects your data. RankBrief is operated by S&I. (sole trader, owner: Iver Gentz), Große Freiheit 82, 22767 Hamburg, Germany.</p>
 
           <h2>1. Who We Are</h2>
-          <p>RankBrief is a SaaS product operated by S&I. (Einzelunternehmen, Inhaber: Iver Gentz), Große Freiheit 82, 22767 Hamburg. Contact: support@rankbrief.com</p>
+          <p>RankBrief is a SaaS product operated by S&I. (Einzelunternehmen, Inhaber: Iver Gentz), Große Freiheit 82, 22767 Hamburg. Contact: hallo@rankbrief.com</p>
 
           <h2>2. What Data We Collect</h2>
           <h3>2.1 Account Data</h3>
@@ -240,7 +240,7 @@ export function PrivacyEN() {
             <li>Right to data portability</li>
             <li>Right to withdraw consent – disconnect Google at any time</li>
           </ul>
-          <p>To exercise any of these rights, contact us at support@rankbrief.com. We will respond within 30 days.</p>
+          <p>To exercise any of these rights, contact us at hallo@rankbrief.com. We will respond within 30 days.</p>
 
           <h2>9. Revoking Google Access</h2>
           <ul>
@@ -261,7 +261,7 @@ export function PrivacyEN() {
           <p>RankBrief uses only technically necessary cookies for session management (Supabase Auth). We do not use advertising or tracking cookies.</p>
 
           <h2>12. Contact & Supervisory Authority</h2>
-          <p>S&I. – Iver Gentz · Große Freiheit 82, 22767 Hamburg · support@rankbrief.com</p>
+          <p>S&I. – Iver Gentz · Große Freiheit 82, 22767 Hamburg · hallo@rankbrief.com</p>
           <p>Supervisory authority: Hamburgischer Beauftragter für Datenschutz und Informationsfreiheit, Ludwig-Erhard-Str. 22, 20459 Hamburg, www.datenschutz.hamburg.de</p>
         </Content>
       </Container>
@@ -286,7 +286,7 @@ export function PrivacyDE() {
           <p>Diese Datenschutzerklärung erläutert, wie RankBrief Ihre Daten erhebt, verwendet und schützt. RankBrief wird betrieben von S&I. (Einzelunternehmen, Inhaber: Iver Gentz), Große Freiheit 82, 22767 Hamburg.</p>
 
           <h2>1. Verantwortlicher</h2>
-          <p>S&I. (Einzelunternehmen, Inhaber: Iver Gentz) · Große Freiheit 82, 22767 Hamburg · E-Mail: support@rankbrief.com</p>
+          <p>S&I. (Einzelunternehmen, Inhaber: Iver Gentz) · Große Freiheit 82, 22767 Hamburg · E-Mail: hallo@rankbrief.com</p>
 
           <h2>2. Welche Daten wir erheben</h2>
           <h3>2.1 Accountdaten</h3>
@@ -352,7 +352,7 @@ export function PrivacyDE() {
             <li>Widerspruchsrecht</li>
             <li>Recht auf Widerruf der Einwilligung – Google-Verbindung jederzeit trennbar</li>
           </ul>
-          <p>Kontakt: support@rankbrief.com – Wir antworten innerhalb von 30 Tagen.</p>
+          <p>Kontakt: hallo@rankbrief.com – Wir antworten innerhalb von 30 Tagen.</p>
 
           <h2>9. Google-Zugriff widerrufen</h2>
           <ul>
@@ -372,7 +372,7 @@ export function PrivacyDE() {
           <p>RankBrief verwendet ausschließlich technisch notwendige Cookies (Supabase Auth). Kein Cookie-Banner erforderlich.</p>
 
           <h2>12. Kontakt & Aufsichtsbehörde</h2>
-          <p>S&I. – Iver Gentz · Große Freiheit 82, 22767 Hamburg · support@rankbrief.com</p>
+          <p>S&I. – Iver Gentz · Große Freiheit 82, 22767 Hamburg · hallo@rankbrief.com</p>
           <p>Aufsichtsbehörde: Hamburgischer Beauftragter für Datenschutz und Informationsfreiheit, Ludwig-Erhard-Str. 22, 20459 Hamburg, www.datenschutz.hamburg.de</p>
         </Content>
       </Container>
@@ -436,7 +436,7 @@ export function TermsEN() {
           <p>These Terms are governed by German law. Place of jurisdiction: Hamburg, Germany.</p>
 
           <h2>11. Contact</h2>
-          <p>S&I. – Iver Gentz · Große Freiheit 82, 22767 Hamburg · support@rankbrief.com · www.rankbrief.com</p>
+          <p>S&I. – Iver Gentz · Große Freiheit 82, 22767 Hamburg · hallo@rankbrief.com · www.rankbrief.com</p>
         </Content>
       </Container>
     </Page>
@@ -499,7 +499,7 @@ export function TermsDE() {
           <p>Es gilt deutsches Recht. Gerichtsstand ist Hamburg.</p>
 
           <h2>11. Kontakt</h2>
-          <p>S&I. – Iver Gentz · Große Freiheit 82, 22767 Hamburg · support@rankbrief.com · www.rankbrief.com</p>
+          <p>S&I. – Iver Gentz · Große Freiheit 82, 22767 Hamburg · hallo@rankbrief.com · www.rankbrief.com</p>
         </Content>
       </Container>
     </Page>
