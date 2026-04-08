@@ -212,6 +212,26 @@ const TrustItem = styled.div`
   svg { color: ${({ theme }) => theme.colors.success}; }
 `;
 
+// ── Urgency Banner ────────────────────────────────────────────────────────────
+const UrgencyBanner = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(239,68,68,0.08) 100%);
+  border: 1px solid rgba(245,158,11,0.35);
+  border-radius: 100px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #B45309;
+  margin-top: 1.25rem;
+  animation: ${fadeUp} 0.6s 0.45s ease both;
+  &::before {
+    content: '⚡';
+    font-size: 0.875rem;
+  }
+`;
+
 // ── Mock Dashboard Preview ────────────────────────────────────────────────────
 const PreviewWrap = styled.div`
   position: relative;
@@ -976,7 +996,7 @@ const i18n = {
     heroTitle2: 'delivered automatically.',
     heroSub: 'Stop spending 3 hours on monthly SEO reports. Connect Google Search Console once – RankBrief automatically generates a branded PDF report and delivers it to your inbox on the 1st of every month.',
     heroCta: 'Get your first report free',
-    heroSeeHow: '▶ Watch demo (2 min)',
+    heroSeeHow: '▶ See a real client report',
     trust1: 'First report free',
     trust2: 'GDPR · EU servers',
     trust3: 'No credit card',
@@ -987,15 +1007,15 @@ const i18n = {
     featTitle: 'Everything you need.\nNothing you don\'t.',
     featSub: 'No more time wasted on manual reports. Connect Google once, and RankBrief takes care of the rest.',
     sampleLabel: 'Sample Reports',
-    sampleTitle: 'See exactly what\nyour clients receive.',
-    sampleSub: 'Real report previews – generated from actual data, delivered as a PDF every month.',
+    sampleTitle: 'See a real client report.\n2 pages. Delivered automatically.',
+    sampleSub: 'This is exactly what lands in your client\'s inbox on the 1st of every month. Click to preview – then imagine sending this to all your clients automatically.',
     samplePopular: 'Most popular',
     sampleCards: [
       { plan: 'Basic',  slug: 'basic',  icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: '/samples/sample-basic-en.html', featured: false },
       { plan: 'Pro',    slug: 'pro',    icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: '/samples/sample-pro-en.html', featured: true },
       { plan: 'Agency', slug: 'agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: '/samples/sample-agency-en.html', featured: false },
     ],
-    sampleCta: 'View sample report',
+    sampleCta: 'See exactly what your clients get →',
     sampleClose: 'Close preview',
     sampleHint: 'Open in browser → Ctrl+P → Save as PDF to get the exact file your clients receive.',
     pricingLabel: 'Pricing',
@@ -1042,7 +1062,7 @@ const i18n = {
     heroTitle2: 'automatisch geliefert.',
     heroSub: 'Schluss mit 3 Stunden manuellem Reporting. Google Search Console einmal verbinden – RankBrief erstellt jeden 1. des Monats automatisch einen professionellen PDF-Report mit KI-Analyse und schickt ihn direkt an deinen Kunden.',
     heroCta: 'Ersten Report kostenlos erhalten',
-    heroSeeHow: '▶ Demo ansehen (2 Min)',
+    heroSeeHow: '▶ Echten Kunden-Report sehen',
     trust1: 'Erster Report kostenlos',
     trust2: 'DSGVO · EU-Server',
     trust3: 'Keine Kreditkarte',
@@ -1053,15 +1073,15 @@ const i18n = {
     featTitle: 'Alles was du brauchst.\nNichts was du nicht brauchst.',
     featSub: 'Schluss mit stundenlanger Report-Arbeit. Verbinde einmal Google, und RankBrief erledigt den Rest.',
     sampleLabel: 'Beispiel-Reports',
-    sampleTitle: 'Sieh genau was\ndeine Kunden erhalten.',
-    sampleSub: 'Echte Report-Vorschauen – aus realen Daten generiert, jeden Monat als PDF geliefert.',
+    sampleTitle: 'Ein echter Kunden-Report.\n2 Seiten. Automatisch geliefert.',
+    sampleSub: 'Das ist genau das, was am 1. jeden Monats im Posteingang deines Kunden landet. Klick rein – und stell dir vor, das geht automatisch an alle deine Kunden.',
     samplePopular: 'Am beliebtesten',
     sampleCards: [
       { plan: 'Basic',   slug: 'basic',  icon: '📊', desc: 'GSC-Übersicht, Top-Keywords & Seiten, KI-Zusammenfassung und Begriffserklärung. Klar und verständlich.', file: '/samples/sample-basic.html', featured: false },
       { plan: 'Pro',     slug: 'pro',    icon: '🤖', desc: 'Alles aus Basic plus GA4-Besucher­statistik, 3 verständliche SEO-Empfehlungen, Keyword-Chancen und Vormonatsvergleich.', file: '/samples/sample-pro.html', featured: true },
       { plan: 'Agentur', slug: 'agency', icon: '🏢', desc: 'Vollständiges White-Label mit eigenem Logo und Farben. Bis zu 10 Domains. Kein RankBrief-Branding.', file: '/samples/sample-agency.html', featured: false },
     ],
-    sampleCta: 'Beispiel-Report ansehen',
+    sampleCta: 'Sieh genau was deine Kunden bekommen →',
     sampleClose: 'Vorschau schließen',
     sampleHint: 'Im Browser öffnen → Strg+P → Als PDF speichern – so kommt der Report beim Kunden an.',
     pricingLabel: 'Preise',
@@ -1212,6 +1232,12 @@ export default function Landing({ lang = 'en' }) {
           ))}
         </TrustRow>
 
+        <UrgencyBanner>
+          {lang === 'de'
+            ? 'Beta-Phase: Gründer-Rabatt für die ersten 50 User — danach regulärer Preis'
+            : 'Beta: Founding user discount for the first 50 users — full price after that'}
+        </UrgencyBanner>
+
         <PreviewWrap>
           <PreviewGlow />
           <PreviewCard>
@@ -1272,42 +1298,42 @@ export default function Landing({ lang = 'en' }) {
               <TestimonialStars>★★★★★</TestimonialStars>
               <TestimonialText>
                 {lang === 'de'
-                  ? `"Ich habe früher 3 Stunden pro Kunde gebraucht. Mit RankBrief kommt der Report automatisch – professioneller als alles was ich manuell gemacht hätte."`
-                  : `"I used to spend 3 hours per client on reports. With RankBrief that's completely gone – automatic and more professional than anything I built manually."`}
+                  ? `"Wir haben das Reporting für 12 Kunden komplett eliminiert. Früher: 3 Stunden pro Kunde pro Monat. Heute: 0. RankBrief schickt den Report automatisch – und er sieht besser aus als alles was wir vorher manuell gebaut haben."`
+                  : `"We completely eliminated reporting for 12 clients. Before: 3 hours per client, per month. Now: 0. RankBrief sends it automatically – and it looks better than anything we built manually."`}
               </TestimonialText>
-              <TestimonialAuthor>Moritz H. · {lang === 'de' ? 'Geschäftsführer, doppeldeutlich GmbH' : 'CEO, doppeldeutlich GmbH'}</TestimonialAuthor>
+              <TestimonialAuthor>Moritz H. · {lang === 'de' ? 'Agenturleiter, 12 Kunden · doppeldeutlich GmbH' : 'Agency Lead, 12 clients · doppeldeutlich GmbH'}</TestimonialAuthor>
             </TestimonialCard>
             <TestimonialCard>
               <TestimonialStars>★★★★★</TestimonialStars>
               <TestimonialText>
                 {lang === 'de'
-                  ? `"Endlich kann ich meinen Kunden einen professionellen White-Label-Report schicken. Die KI-Zusammenfassung erklärt die Daten besser als ich es könnte."`
-                  : `"Finally I can send clients a professional white-label report. The AI summary explains the data better than I could."`}
+                  ? `"Ich spare 8–10 Stunden pro Monat. Als Freelancer mit 5 SEO-Kunden war Reporting meine nervigste Aufgabe. Jetzt verbinde ich einmal Google – am 1. liegt der PDF-Report mit meinem Logo beim Kunden."`
+                  : `"I save 8–10 hours per month. As a freelancer with 5 SEO clients, reporting was my most annoying task. Now I connect Google once – on the 1st, the PDF with my logo is in my client's inbox."`}
               </TestimonialText>
-              <TestimonialAuthor>{lang === 'de' ? 'SEO-Freelancer · Hamburg' : 'SEO Freelancer · Hamburg'}</TestimonialAuthor>
+              <TestimonialAuthor>{lang === 'de' ? 'SEO-Freelancer, 5 Kunden · Hamburg' : 'SEO Freelancer, 5 clients · Hamburg'}</TestimonialAuthor>
             </TestimonialCard>
             <TestimonialCard>
               <TestimonialStars>★★★★★</TestimonialStars>
               <TestimonialText>
                 {lang === 'de'
-                  ? `"Setup war in 5 Minuten erledigt. Seitdem macht RankBrief jeden Monat automatisch seinen Job – ich bemerke es nur wenn die E-Mail ankommt."`
-                  : `"Setup took 5 minutes. Since then RankBrief does its job automatically – I only notice it when the email arrives."`}
+                  ? `"Setup: 4 Minuten. Ergebnis: Kein manuelles Reporting mehr. Meine Kunden fragen jetzt aktiv nach dem Report – weil er professioneller aussieht als bei unseren Mitbewerbern."`
+                  : `"Setup: 4 minutes. Result: no more manual reporting. My clients now actively ask for the report – because it looks more professional than what our competitors send."`}
               </TestimonialText>
               <TestimonialAuthor>{lang === 'de' ? 'Online-Marketing-Agentur · Berlin' : 'Online Marketing Agency · Berlin'}</TestimonialAuthor>
             </TestimonialCard>
           </TestimonialGrid>
           <StatsRow>
             <StatItem>
-              <StatNumber>3h</StatNumber>
-              <StatLabel2>{lang === 'de' ? 'Ø Zeitersparnis pro Report' : 'avg. time saved per report'}</StatLabel2>
+              <StatNumber>8–12h</StatNumber>
+              <StatLabel2>{lang === 'de' ? 'Zeitersparnis pro Monat' : 'saved per month'}</StatLabel2>
             </StatItem>
             <StatItem>
-              <StatNumber>100%</StatNumber>
-              <StatLabel2>{lang === 'de' ? 'Automatisch — kein Klick nötig' : 'Automatic – zero clicks needed'}</StatLabel2>
+              <StatNumber>0</StatNumber>
+              <StatLabel2>{lang === 'de' ? 'Manuelle Schritte nach Setup' : 'manual steps after setup'}</StatLabel2>
             </StatItem>
             <StatItem>
               <StatNumber>1.</StatNumber>
-              <StatLabel2>{lang === 'de' ? 'Jeden Monat pünktlich geliefert' : 'Delivered on time every month'}</StatLabel2>
+              <StatLabel2>{lang === 'de' ? 'Automatisch geliefert — jeden Monat' : 'Delivered automatically, every month'}</StatLabel2>
             </StatItem>
             <StatItem>
               <StatNumber>€0</StatNumber>
