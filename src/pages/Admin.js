@@ -18,7 +18,7 @@ const BtnSm    = styled.button`font-size:0.8125rem;color:${({theme})=>theme.colo
 const Main     = styled.main`max-width:1200px;width:100%;margin:0 auto;padding:2rem;animation:${fadeUp} .4s ease both;`;
 
 // Stats row
-const StatsGrid = styled.div`display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:2rem;@media(max-width:900px){grid-template-columns:repeat(2,1fr)}`;
+const StatsGrid = styled.div`display:grid;grid-template-columns:repeat(6,1fr);gap:1rem;margin-bottom:2rem;@media(max-width:1100px){grid-template-columns:repeat(3,1fr)}@media(max-width:600px){grid-template-columns:repeat(2,1fr)}`;
 const StatCard  = styled.div`background:${({theme})=>theme.colors.bgCard};border:1px solid ${({theme})=>theme.colors.border};border-radius:${({theme})=>theme.radius.lg};padding:1.25rem;border-left:3px solid ${({$color})=>$color||'#6C63FF'}`;
 const StatLabel = styled.div`font-size:0.75rem;color:${({theme})=>theme.colors.textDim};text-transform:uppercase;letter-spacing:.08em;margin-bottom:.375rem;`;
 const StatValue = styled.div`font-family:${({theme})=>theme.fonts.display};font-size:1.75rem;font-weight:700;letter-spacing:-.03em;`;
@@ -224,7 +224,8 @@ export default function Admin({ user }) {
 
     setStats({
       total_users:    (profiles || []).length,
-      paid_users:     (profiles || []).filter(p => ['basic','pro','agency'].includes(p.plan)).length,
+      paid_users:     (profiles || []).filter(p => ['basic','pro','agency'].includes(p.plan) && !p.promo_code_used).length,
+      promo_users:    (profiles || []).filter(p => p.promo_code_used).length,
       free_users:     (profiles || []).filter(p => p.plan === 'free').length,
       total_reports:  (allReports || []).length,
       total_props:    (allProps || []).length,
@@ -529,8 +530,9 @@ export default function Admin({ user }) {
         {/* Stats */}
         <StatsGrid>
           <StatCard $color="#6C63FF"><StatLabel>Gesamt User</StatLabel><StatValue>{stats.total_users ?? '–'}</StatValue></StatCard>
-          <StatCard $color="#10B981"><StatLabel>Bezahlend</StatLabel><StatValue>{stats.paid_users ?? '–'}</StatValue></StatCard>
-          <StatCard $color="#F59E0B"><StatLabel>Free</StatLabel><StatValue>{stats.free_users ?? '–'}</StatValue></StatCard>
+          <StatCard $color="#10B981"><StatLabel>Zahlend (Stripe)</StatLabel><StatValue>{stats.paid_users ?? '–'}</StatValue></StatCard>
+          <StatCard $color="#F59E0B"><StatLabel>Promo (nicht zahlend)</StatLabel><StatValue>{stats.promo_users ?? '–'}</StatValue></StatCard>
+          <StatCard $color="#94A3B8"><StatLabel>Free</StatLabel><StatValue>{stats.free_users ?? '–'}</StatValue></StatCard>
           <StatCard $color="#6C63FF"><StatLabel>Reports gesamt</StatLabel><StatValue>{stats.total_reports ?? '–'}</StatValue></StatCard>
           <StatCard $color="#10B981"><StatLabel>Aktive Properties</StatLabel><StatValue>{stats.active_props ?? '–'}</StatValue></StatCard>
         </StatsGrid>
