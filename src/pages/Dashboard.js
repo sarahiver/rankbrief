@@ -113,6 +113,77 @@ const BtnSettings = styled(Link)`
   @media (max-width: 480px) { padding: 0.375rem 0.5rem; font-size: 0; &::before { content: '⚙'; font-size: 1rem; } }
 `;
 
+const BtnSupport = styled.button`
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  padding: 0.375rem 0.875rem;
+  border-radius: ${({ theme }) => theme.radius.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  &:hover { color: ${({ theme }) => theme.colors.text}; border-color: ${({ theme }) => theme.colors.borderLight}; }
+  @media (max-width: 480px) { padding: 0.375rem 0.5rem; font-size: 0; &::before { content: '?'; font-size: 1rem; font-weight: 700; } }
+`;
+
+const SupportOverlay = styled.div`
+  position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+`;
+
+const SupportBox = styled.div`
+  background: ${({ theme }) => theme.colors.bgCard};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.xl};
+  padding: 2rem; max-width: 520px; width: 100%;
+`;
+
+const SupportTitle = styled.h2`
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-size: 1.125rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: .375rem;
+`;
+
+const SupportSub = styled.p`
+  font-size: .875rem; color: ${({ theme }) => theme.colors.textMuted};
+  font-weight: 300; margin-bottom: 1.25rem; line-height: 1.6;
+`;
+
+const SupportField = styled.div`margin-bottom: 1rem;`;
+
+const SupportLabel = styled.div`
+  font-size: .8rem; font-weight: 600; color: ${({ theme }) => theme.colors.textMuted};
+  margin-bottom: .375rem;
+`;
+
+const SupportSelect = styled.select`
+  width: 100%; padding: .625rem .875rem;
+  background: ${({ theme }) => theme.colors.bg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.md};
+  color: ${({ theme }) => theme.colors.text}; font-size: .9375rem; outline: none;
+`;
+
+const SupportInput = styled.input`
+  width: 100%; padding: .625rem .875rem; box-sizing: border-box;
+  background: ${({ theme }) => theme.colors.bg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.md};
+  color: ${({ theme }) => theme.colors.text}; font-size: .9375rem; outline: none;
+  transition: border-color .2s;
+  &:focus { border-color: ${({ theme }) => theme.colors.accent}; }
+`;
+
+const SupportTextarea = styled.textarea`
+  width: 100%; padding: .625rem .875rem; box-sizing: border-box;
+  background: ${({ theme }) => theme.colors.bg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.md};
+  color: ${({ theme }) => theme.colors.text}; font-size: .9375rem; outline: none;
+  resize: vertical; min-height: 120px; font-family: inherit; line-height: 1.6;
+  transition: border-color .2s;
+  &:focus { border-color: ${({ theme }) => theme.colors.accent}; }
+`;
+
 const Main = styled.main`
   flex: 1;
   max-width: 1000px;
@@ -1640,6 +1711,10 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
   const [upgrading, setUpgrading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showPropertyModal, setShowPropertyModal] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
+  const [supportForm, setSupportForm] = useState({ category: '', subject: '', message: '' });
+  const [supportSending, setSupportSending] = useState(false);
+  const [supportSent, setSupportSent] = useState(false);
 
   const connected = new URLSearchParams(location.search).get('connected') === 'true';
   const upgraded = new URLSearchParams(location.search).get('upgraded') === 'true';
@@ -1726,6 +1801,35 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
     window.location.href = authUrl.toString();
   };
 
+  const handleSupportSubmit = async () => {
+    if (!supportForm.category || !supportForm.message.trim()) return;
+    setSupportSending(true);
+    try {
+      const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+      const SUPABASE_ANON_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
+      await fetch(`${SUPABASE_URL}/functions/v1/send-support-request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          user_email: user.email,
+          user_id: user.id,
+          category: supportForm.category,
+          subject: supportForm.subject,
+          message: supportForm.message,
+          lang,
+        }),
+      });
+      setSupportSent(true);
+      setSupportForm({ category: '', subject: '', message: '' });
+    } catch (err) {
+      console.error('Support error:', err);
+    }
+    setSupportSending(false);
+  };
+
   const handleConnectGoogle = () => {
     const plan  = profile?.plan || 'free';
     const limit = PLAN_LIMITS[plan] ?? 1;
@@ -1764,6 +1868,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
                 <LangToggle $active={lang === 'en'} onClick={() => onLangChange('en')}>EN</LangToggle>
               </div>
             )}
+            <BtnSupport onClick={() => setShowSupportModal(true)}>? Support</BtnSupport>
             <BtnSettings to="/settings">⚙ Settings</BtnSettings>
             <BtnSignOut onClick={handleSignOut}>Sign out</BtnSignOut>
           </TopBarRight>
@@ -1804,6 +1909,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
               <LangToggle $active={lang === 'en'} onClick={() => onLangChange('en')}>EN</LangToggle>
             </div>
           )}
+          <BtnSupport onClick={() => setShowSupportModal(true)}>? Support</BtnSupport>
           <BtnSettings to="/settings">⚙ Settings</BtnSettings>
           <BtnSignOut onClick={handleSignOut}>Sign out</BtnSignOut>
         </TopBarRight>
@@ -1944,6 +2050,80 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
           </>
         )}
       </Main>
+      {showSupportModal && (
+        <SupportOverlay onClick={() => { setShowSupportModal(false); setSupportSent(false); }}>
+          <SupportBox onClick={e => e.stopPropagation()}>
+            {supportSent ? (
+              <>
+                <SupportTitle>{lang === 'de' ? '✅ Nachricht gesendet!' : '✅ Message sent!'}</SupportTitle>
+                <SupportSub>
+                  {lang === 'de'
+                    ? 'Wir haben deine Anfrage erhalten und melden uns so schnell wie möglich bei dir. Schau auch in deinen Spam-Ordner.'
+                    : 'We have received your request and will get back to you as soon as possible. Please also check your spam folder.'}
+                </SupportSub>
+                <BtnPrimary as="button" onClick={() => { setShowSupportModal(false); setSupportSent(false); }}>
+                  {lang === 'de' ? 'Schließen' : 'Close'}
+                </BtnPrimary>
+              </>
+            ) : (
+              <>
+                <SupportTitle>{lang === 'de' ? '💬 Support-Anfrage' : '💬 Support Request'}</SupportTitle>
+                <SupportSub>
+                  {lang === 'de'
+                    ? 'Wir helfen dir gerne. Beschreibe dein Anliegen und wir melden uns schnellstmöglich.'
+                    : 'We are happy to help. Describe your issue and we will get back to you as soon as possible.'}
+                </SupportSub>
+                <SupportField>
+                  <SupportLabel>{lang === 'de' ? 'Kategorie' : 'Category'}</SupportLabel>
+                  <SupportSelect
+                    value={supportForm.category}
+                    onChange={e => setSupportForm(f => ({ ...f, category: e.target.value }))}
+                  >
+                    <option value="">{lang === 'de' ? '— Bitte wählen —' : '— Please select —'}</option>
+                    <option value="report_missing">{lang === 'de' ? 'Report wurde nicht gesendet' : 'Report was not sent'}</option>
+                    <option value="pdf_issue">{lang === 'de' ? 'PDF-Problem' : 'PDF issue'}</option>
+                    <option value="gsc_connection">{lang === 'de' ? 'Google-Verbindung funktioniert nicht' : 'Google connection not working'}</option>
+                    <option value="billing">{lang === 'de' ? 'Zahlung / Abonnement' : 'Billing / Subscription'}</option>
+                    <option value="feature_request">{lang === 'de' ? 'Feature-Wunsch' : 'Feature request'}</option>
+                    <option value="other">{lang === 'de' ? 'Sonstiges' : 'Other'}</option>
+                  </SupportSelect>
+                </SupportField>
+                <SupportField>
+                  <SupportLabel>{lang === 'de' ? 'Betreff (optional)' : 'Subject (optional)'}</SupportLabel>
+                  <SupportInput
+                    type="text"
+                    placeholder={lang === 'de' ? 'Kurze Zusammenfassung...' : 'Brief summary...'}
+                    value={supportForm.subject}
+                    onChange={e => setSupportForm(f => ({ ...f, subject: e.target.value }))}
+                  />
+                </SupportField>
+                <SupportField>
+                  <SupportLabel>{lang === 'de' ? 'Nachricht' : 'Message'} *</SupportLabel>
+                  <SupportTextarea
+                    placeholder={lang === 'de' ? 'Beschreibe dein Anliegen so genau wie möglich...' : 'Describe your issue in as much detail as possible...'}
+                    value={supportForm.message}
+                    onChange={e => setSupportForm(f => ({ ...f, message: e.target.value }))}
+                  />
+                </SupportField>
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                  <BtnGhost as="button" onClick={() => setShowSupportModal(false)}>
+                    {lang === 'de' ? 'Abbrechen' : 'Cancel'}
+                  </BtnGhost>
+                  <BtnPrimary
+                    as="button"
+                    onClick={handleSupportSubmit}
+                    disabled={supportSending || !supportForm.category || !supportForm.message.trim()}
+                  >
+                    {supportSending
+                      ? (lang === 'de' ? 'Sendet...' : 'Sending...')
+                      : (lang === 'de' ? 'Anfrage senden' : 'Send request')}
+                  </BtnPrimary>
+                </div>
+              </>
+            )}
+          </SupportBox>
+        </SupportOverlay>
+      )}
     </Layout>
   );
 }
