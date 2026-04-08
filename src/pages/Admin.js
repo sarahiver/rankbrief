@@ -368,7 +368,7 @@ export default function Admin({ user }) {
       ];
       const ws1 = XLS.utils.aoa_to_sheet(overviewData);
       ws1['!cols'] = [{wch:35},{wch:20},{wch:35},{wch:15}];
-      XLS.utils.book_append_sheet(wb, ws1, '📊 Übersicht');
+      XLS.utils.book_append_sheet(wb, ws1, 'Uebersicht');
 
       // ── Sheet 2: User Detail ──
       const userHeaders = [
@@ -396,7 +396,7 @@ export default function Admin({ user }) {
         {wch:16},{wch:16},{wch:10},{wch:14},{wch:10},{wch:14},
         {wch:8},{wch:14},{wch:14},{wch:10}
       ];
-      XLS.utils.book_append_sheet(wb, ws2, '👤 User Detail');
+      XLS.utils.book_append_sheet(wb, ws2, 'User Detail');
 
       // ── Sheet 3: Promo Tracking ──
       const promoHeaders = [
@@ -420,7 +420,7 @@ export default function Admin({ user }) {
         {wch:18},{wch:10},{wch:12},{wch:14},{wch:10},{wch:12},
         {wch:12},{wch:12},{wch:10},{wch:20},{wch:16},{wch:22},{wch:18}
       ];
-      XLS.utils.book_append_sheet(wb, ws3, '🎟 Promo Tracking');
+      XLS.utils.book_append_sheet(wb, ws3, 'Promo Tracking');
 
       // ── Sheet 4: Reports Monatsübersicht ──
       const reportsByMonth = {};
@@ -441,7 +441,7 @@ export default function Admin({ user }) {
         ]);
       const ws4 = XLS.utils.aoa_to_sheet([monthHeaders, ...monthRows]);
       ws4['!cols'] = [{wch:12},{wch:16},{wch:14},{wch:14},{wch:14}];
-      XLS.utils.book_append_sheet(wb, ws4, '📅 Reports/Monat');
+      XLS.utils.book_append_sheet(wb, ws4, 'Reports Monat');
 
       // Download
       const filename = `RankBrief_Finanzen_${today.replace(/\./g,'-')}.xlsx`;
