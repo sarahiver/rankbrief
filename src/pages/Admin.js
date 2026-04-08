@@ -81,6 +81,7 @@ const Alert     = styled.div`padding:.75rem 1rem;border-radius:${({theme})=>them
 const ADMIN_PW_KEY = 'rb_admin_unlocked';
 const ADMIN_PW     = process.env.REACT_APP_ADMIN_PW || 'rankbrief-admin';
 const PLANS = ['free','basic','pro','agency'];
+const PLAN_PRICES = { free: 0, basic: 19, pro: 39, agency: 79 };
 const COLS_USERS = '2fr 1fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr';
 const COLS_REPORTS = '2fr 1fr 1fr 1fr 1fr';
 const COLS_PROPS = '2fr 1fr 1fr 1fr 1fr';
@@ -108,6 +109,7 @@ export default function Admin({ user }) {
   const [saving, setSaving]     = useState(false);
   const [newPlan, setNewPlan]   = useState('free');
   const [promoForm, setPromoForm] = useState({ code: '', plan: 'pro', max_uses: 50, report_limit: 6, notes: '' });
+  const [exportingXlsx, setExportingXlsx] = useState(false);
   const [openUser, setOpenUser]   = useState(null);
 
   // Guard: only admin
@@ -311,6 +313,146 @@ export default function Admin({ user }) {
     loadAll();
   };
 
+  // ── XLSX Export ─────────────────────────────────────────────────────────────
+  const generateXlsx = async () => {
+    setExportingXlsx(true);
+    try {
+      // Dynamically load SheetJS
+      if (!window.XLSX) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+      const XLS = window.XLSX;
+      const wb = XLS.utils.book_new();
+
+      const today = new Date().toLocaleDateString('de-DE');
+      const fmt = (d) => d ? new Date(d).toLocaleDateString('de-DE') : '–';
+      const eur = (n) => n != null ? Number(n).toFixed(2) : '0.00';
+
+      // ── Sheet 1: Übersicht ──
+      const paidUsers = users.filter(u => ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used);
+      const promoUsers = users.filter(u => u.promo_code_used);
+      const freeUsers = users.filter(u => u.plan === 'free');
+      const mrr = paidUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
+      const promoMrr = promoUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
+
+      const overviewData = [
+        ['RankBrief — Finanz-Dashboard', '', '', ''],
+        ['Exportdatum:', today, '', ''],
+        ['', '', '', ''],
+        ['▌ KEY METRICS', '', '', ''],
+        ['Metric', 'Wert', 'Hinweis', ''],
+        ['Gesamt User', users.length, '', ''],
+        ['Zahlende User (ohne Promo)', paidUsers.length, '', ''],
+        ['Promo User (noch nicht zahlend)', promoUsers.length, 'Werden zahlend nach Promo-Ablauf', ''],
+        ['Free User', freeUsers.length, '', ''],
+        ['MRR zahlende User (€)', eur(mrr), 'Ohne Promo-User', ''],
+        ['MRR inkl. Promo-Potential (€)', eur(mrr + promoMrr), 'Wenn alle Promo-User konvertieren', ''],
+        ['ARR zahlende User (€)', eur(mrr * 12), '', ''],
+        ['ARR inkl. Promo-Potential (€)', eur((mrr + promoMrr) * 12), '', ''],
+        ['Ø Revenue/zahlender User (€)', eur(paidUsers.length ? mrr / paidUsers.length : 0), '', ''],
+        ['', '', '', ''],
+        ['▌ PLAN-MIX', '', '', ''],
+        ['Plan', 'Preis/Mo (€)', 'Anzahl User', 'MRR Anteil (€)'],
+        ...['basic','pro','agency','free'].map(plan => {
+          const planUsers = users.filter(u => u.plan === plan && !u.promo_code_used);
+          return [plan.charAt(0).toUpperCase()+plan.slice(1), PLAN_PRICES[plan], planUsers.length, eur(planUsers.length * PLAN_PRICES[plan])];
+        }),
+        ['GESAMT', '', users.length, eur(mrr)],
+      ];
+      const ws1 = XLS.utils.aoa_to_sheet(overviewData);
+      ws1['!cols'] = [{wch:35},{wch:20},{wch:35},{wch:15}];
+      XLS.utils.book_append_sheet(wb, ws1, '📊 Übersicht');
+
+      // ── Sheet 2: User Detail ──
+      const userHeaders = [
+        'E-Mail','Plan','Plan-Status','Promo-Code','Promo-Plan','Report-Limit',
+        'Reports verbraucht','Reports verbleibend','Promo %','Registriert',
+        'Properties','Reports gesamt','Sprache','Mo-Wert (€)','Jahreswert (€)','Zahlend?'
+      ];
+      const userRows = users.map(u => {
+        const promoLeft = u.promo_reports_limit ? Math.max(0, u.promo_reports_limit - (u.promo_reports_used||0)) : '∞';
+        const promoPct = u.promo_reports_limit ? Math.round(((u.promo_reports_used||0)/u.promo_reports_limit)*100)+'%' : '–';
+        const moVal = PLAN_PRICES[u.plan] || 0;
+        const isPaid = ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used;
+        return [
+          u.email, u.plan, u.plan_status, u.promo_code_used||'–',
+          u.promo_code_used ? u.plan : '–',
+          u.promo_reports_limit||'∞', u.promo_reports_used||0, promoLeft, promoPct,
+          fmt(u.created_at), u.property_count||0, u.report_count||0,
+          (u.report_language||'–').toUpperCase(),
+          eur(moVal), eur(moVal*12), isPaid ? 'Ja' : (u.promo_code_used ? 'Promo' : 'Nein')
+        ];
+      });
+      const ws2 = XLS.utils.aoa_to_sheet([userHeaders, ...userRows]);
+      ws2['!cols'] = [
+        {wch:28},{wch:10},{wch:12},{wch:18},{wch:12},{wch:12},
+        {wch:16},{wch:16},{wch:10},{wch:14},{wch:10},{wch:14},
+        {wch:8},{wch:14},{wch:14},{wch:10}
+      ];
+      XLS.utils.book_append_sheet(wb, ws2, '👤 User Detail');
+
+      // ── Sheet 3: Promo Tracking ──
+      const promoHeaders = [
+        'Code','Plan','Preis/Mo (€)','Max Einlösungen','Genutzt','Verbleibend',
+        'Auslastung %','Report-Limit','Aktiv','Notiz',
+        'Aktive Promo User','Erwarteter MRR nach Conv. (€)','Erwarteter ARR (€)'
+      ];
+      const promoRows = promos.map(p => {
+        const activePromoUsers = users.filter(u => u.promo_code_used === p.code).length;
+        const expMrr = activePromoUsers * (PLAN_PRICES[p.plan]||0);
+        return [
+          p.code, p.plan, PLAN_PRICES[p.plan]||0,
+          p.max_uses, p.uses_count, p.max_uses - p.uses_count,
+          Math.round((p.uses_count/p.max_uses)*100)+'%',
+          p.report_limit||'∞', p.active?'Aktiv':'Inaktiv', p.notes||'–',
+          activePromoUsers, eur(expMrr), eur(expMrr*12)
+        ];
+      });
+      const ws3 = XLS.utils.aoa_to_sheet([promoHeaders, ...promoRows]);
+      ws3['!cols'] = [
+        {wch:18},{wch:10},{wch:12},{wch:14},{wch:10},{wch:12},
+        {wch:12},{wch:12},{wch:10},{wch:20},{wch:16},{wch:22},{wch:18}
+      ];
+      XLS.utils.book_append_sheet(wb, ws3, '🎟 Promo Tracking');
+
+      // ── Sheet 4: Reports Monatsübersicht ──
+      const reportsByMonth = {};
+      reports.forEach(r => {
+        if (!r.report_month) return;
+        const key = r.report_month.slice(0,7);
+        if (!reportsByMonth[key]) reportsByMonth[key] = { total: 0, done: 0, pdf: 0 };
+        reportsByMonth[key].total++;
+        if (r.status === 'done') reportsByMonth[key].done++;
+        if (r.pdf_url) reportsByMonth[key].pdf++;
+      });
+      const monthHeaders = ['Monat','Reports gesamt','Reports done','PDFs erstellt','Erfolgsrate %'];
+      const monthRows = Object.entries(reportsByMonth)
+        .sort(([a],[b]) => a.localeCompare(b))
+        .map(([month, d]) => [
+          month, d.total, d.done, d.pdf,
+          d.total ? Math.round((d.done/d.total)*100)+'%' : '–'
+        ]);
+      const ws4 = XLS.utils.aoa_to_sheet([monthHeaders, ...monthRows]);
+      ws4['!cols'] = [{wch:12},{wch:16},{wch:14},{wch:14},{wch:14}];
+      XLS.utils.book_append_sheet(wb, ws4, '📅 Reports/Monat');
+
+      // Download
+      const filename = `RankBrief_Finanzen_${today.replace(/\./g,'-')}.xlsx`;
+      XLS.writeFile(wb, filename);
+      showAlert('✅ XLSX exportiert: ' + filename);
+    } catch (err) {
+      console.error('XLSX export error:', err);
+      showAlert('Fehler beim Export: ' + err.message, true);
+    }
+    setExportingXlsx(false);
+  };
+
   // ── Filter ──────────────────────────────────────────────────────────────────
   const q = search.toLowerCase();
   const filteredUsers   = users.filter(u => u.email?.toLowerCase().includes(q) || u.plan?.includes(q));
@@ -412,6 +554,7 @@ export default function Admin({ user }) {
             <Tab $active={tab==='props'}   onClick={()=>setTab('props')}>🌐 Properties ({props.length})</Tab>
             <Tab $active={tab==='reports'} onClick={()=>setTab('reports')}>📄 Reports ({reports.length})</Tab>
             <Tab $active={tab==='promos'}  onClick={()=>setTab('promos')}>🎟 Promo-Codes ({promos.length})</Tab>
+            <Tab $active={tab==='finanzen'} onClick={()=>setTab('finanzen')}>💰 Finanzen</Tab>
           </Tabs>
           <SearchInput placeholder="Suchen…" value={search} onChange={e => setSearch(e.target.value)} />
         </div>
@@ -552,6 +695,130 @@ export default function Admin({ user }) {
             )}
 
             {/* ── PROMO CODES TAB ── */}
+            {tab === 'finanzen' && (() => {
+              const paidUsers = users.filter(u => ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used);
+              const promoUsers = users.filter(u => u.promo_code_used);
+              const freeUsers = users.filter(u => u.plan === 'free');
+              const mrr = paidUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
+              const promoMrr = promoUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
+              return (
+                <div>
+                  {/* Export Button */}
+                  <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:'1.5rem' }}>
+                    <BtnPrimary
+                      style={{ width:'auto', padding:'0.625rem 1.5rem', fontSize:'0.875rem', display:'flex', alignItems:'center', gap:'0.5rem' }}
+                      onClick={generateXlsx}
+                      disabled={exportingXlsx}
+                    >
+                      {exportingXlsx ? '⏳ Wird exportiert…' : '⬇ XLSX exportieren'}
+                    </BtnPrimary>
+                  </div>
+
+                  {/* KPI Cards */}
+                  <StatsGrid style={{ gridTemplateColumns:'repeat(4,1fr)', marginBottom:'1.5rem' }}>
+                    <StatCard $color="#10B981">
+                      <StatLabel>MRR (zahlend)</StatLabel>
+                      <StatValue>€{mrr.toFixed(0)}</StatValue>
+                      <div style={{ fontSize:'0.75rem', color:'#888', marginTop:'0.25rem' }}>{paidUsers.length} User</div>
+                    </StatCard>
+                    <StatCard $color="#6C63FF">
+                      <StatLabel>MRR Potential (inkl. Promo)</StatLabel>
+                      <StatValue>€{(mrr + promoMrr).toFixed(0)}</StatValue>
+                      <div style={{ fontSize:'0.75rem', color:'#888', marginTop:'0.25rem' }}>wenn alle Promo-User konvertieren</div>
+                    </StatCard>
+                    <StatCard $color="#F59E0B">
+                      <StatLabel>ARR (zahlend)</StatLabel>
+                      <StatValue>€{(mrr * 12).toFixed(0)}</StatValue>
+                      <div style={{ fontSize:'0.75rem', color:'#888', marginTop:'0.25rem' }}>hochgerechnet</div>
+                    </StatCard>
+                    <StatCard $color="#A78BFA">
+                      <StatLabel>Ø Revenue/User</StatLabel>
+                      <StatValue>€{paidUsers.length ? (mrr / paidUsers.length).toFixed(0) : 0}</StatValue>
+                      <div style={{ fontSize:'0.75rem', color:'#888', marginTop:'0.25rem' }}>pro Monat</div>
+                    </StatCard>
+                  </StatsGrid>
+
+                  {/* Plan Mix */}
+                  <div style={{ marginBottom:'1.5rem' }}>
+                    <div style={{ fontSize:'0.75rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', color:'#888', marginBottom:'0.75rem' }}>Plan-Mix (zahlende User)</div>
+                    <TableWrap>
+                      <THead $cols="1.5fr 1fr 1fr 1fr 1fr">
+                        <div>Plan</div><div>Preis/Mo</div><div>User (zahlend)</div><div>User (Promo)</div><div>MRR Anteil</div>
+                      </THead>
+                      {['basic','pro','agency','free'].map(plan => {
+                        const paid = users.filter(u => u.plan === plan && !u.promo_code_used).length;
+                        const promo = users.filter(u => u.plan === plan && u.promo_code_used).length;
+                        const planMrr = paid * (PLAN_PRICES[plan] || 0);
+                        return (
+                          <TRow key={plan} $cols="1.5fr 1fr 1fr 1fr 1fr">
+                            <TCell><PlanBadge $plan={plan}>{plan}</PlanBadge></TCell>
+                            <TCell>€{PLAN_PRICES[plan]}/Mo</TCell>
+                            <TCell style={{ fontWeight: paid > 0 ? 700 : 400 }}>{paid}</TCell>
+                            <TCell style={{ color: promo > 0 ? '#F59E0B' : '#ccc' }}>{promo}</TCell>
+                            <TCell style={{ fontWeight: 600, color: '#10B981' }}>€{planMrr.toFixed(0)}</TCell>
+                          </TRow>
+                        );
+                      })}
+                      <TRow $cols="1.5fr 1fr 1fr 1fr 1fr" style={{ borderTop:'2px solid #e8e8f0' }}>
+                        <TCell style={{ fontWeight:700 }}>GESAMT</TCell>
+                        <TCell>–</TCell>
+                        <TCell style={{ fontWeight:700 }}>{paidUsers.length}</TCell>
+                        <TCell style={{ fontWeight:700, color:'#F59E0B' }}>{promoUsers.length}</TCell>
+                        <TCell style={{ fontWeight:700, color:'#10B981' }}>€{mrr.toFixed(0)}</TCell>
+                      </TRow>
+                    </TableWrap>
+                  </div>
+
+                  {/* User Zahlungsstatus */}
+                  <div>
+                    <div style={{ fontSize:'0.75rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'.08em', color:'#888', marginBottom:'0.75rem' }}>User Zahlungsstatus</div>
+                    <TableWrap>
+                      <THead $cols="2fr 1fr 1fr 1fr 1fr 1fr 1fr">
+                        <div>E-Mail</div><div>Plan</div><div>Status</div><div>Promo-Code</div><div>Reports verbl.</div><div>Mo-Wert</div><div>Zahlend?</div>
+                      </THead>
+                      {users.map(u => {
+                        const isPaid = ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used;
+                        const isPromo = !!u.promo_code_used;
+                        const promoLeft = u.promo_reports_limit
+                          ? Math.max(0, u.promo_reports_limit - (u.promo_reports_used||0))
+                          : '∞';
+                        const moVal = PLAN_PRICES[u.plan] || 0;
+                        return (
+                          <TRow key={u.id} $cols="2fr 1fr 1fr 1fr 1fr 1fr 1fr">
+                            <TCell style={{ fontWeight:500 }}>{u.email}</TCell>
+                            <TCell><PlanBadge $plan={u.plan}>{u.plan}</PlanBadge></TCell>
+                            <TCell><StatusDot $status={u.plan_status} />{u.plan_status}</TCell>
+                            <TCell>
+                              {isPromo
+                                ? <span style={{ fontSize:'.7rem', fontWeight:700, color:'#F59E0B', background:'rgba(245,158,11,.1)', padding:'.15rem .5rem', borderRadius:99 }}>
+                                    🎟 {u.promo_code_used}
+                                  </span>
+                                : <span style={{ color:'#ccc' }}>–</span>}
+                            </TCell>
+                            <TCell>
+                              {isPromo
+                                ? <span style={{ color: promoLeft === 0 ? '#EF4444' : '#F59E0B', fontWeight:600 }}>{promoLeft} Reports</span>
+                                : <span style={{ color:'#ccc' }}>–</span>}
+                            </TCell>
+                            <TCell style={{ fontWeight:600, color: moVal > 0 ? '#10B981' : '#ccc' }}>
+                              {moVal > 0 ? `€${moVal}` : '–'}
+                            </TCell>
+                            <TCell>
+                              {isPaid
+                                ? <span style={{ color:'#10B981', fontWeight:700 }}>✓ Zahlend</span>
+                                : isPromo
+                                  ? <span style={{ color:'#F59E0B', fontWeight:600 }}>⏳ Promo</span>
+                                  : <span style={{ color:'#94A3B8' }}>Free</span>}
+                            </TCell>
+                          </TRow>
+                        );
+                      })}
+                    </TableWrap>
+                  </div>
+                </div>
+              );
+            })()}
+
             {tab === 'promos' && (
               <>
                 <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:'1rem' }}>
