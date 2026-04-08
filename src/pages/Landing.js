@@ -1317,8 +1317,8 @@ export default function Landing({ lang = 'en' }) {
           <UrgencyTop>
             <span>⚡</span>
             {lang === 'de'
-              ? 'Beta-Aktion: 3 Monate Pro kostenlos für Gründer-User'
-              : 'Beta deal: 3 months Pro free for founding users'}
+              ? 'Early Access: 3 Monate Pro gratis'
+              : 'Early Access: 3 Months Pro Free'}
           </UrgencyTop>
           {promoUsed !== null && (
             <UrgencySlots>
