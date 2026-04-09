@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import TestPage from './pages/Test';
 import { ThemeProvider } from 'styled-components';
 import { theme, GlobalStyle } from './styles/GlobalStyle';
 import { supabase } from './lib/supabase';
@@ -72,7 +73,7 @@ function AuthCallback() {
   );
 }
 
-const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings', '/admin'];
+const noNavRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings', '/admin', '/test'];
 const noFooterRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/docs', '/settings', '/admin'];
 
 function AppInner() {
@@ -125,6 +126,7 @@ function AppInner() {
         <Route path="/de/terms" element={<TermsDE />} />
         <Route path="/admin" element={user ? <Admin user={user} /> : <Navigate to="/login" />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/test" element={<TestPage lang={lang} />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       {showFooter && <Footer />}
