@@ -1660,13 +1660,28 @@ function PropertyItem({ property, isAgency, plan, lang = 'en', onReauth }) {
                         <span style={{ fontWeight: 600 }}>
                           {lang === 'de' ? '📊 Google Analytics nicht verbunden' : '📊 Google Analytics not connected'}
                         </span><br />
-                        <span style={{ fontSize: '0.8125rem', fontWeight: 300 }}>
-                          {lang === 'de'
-                            ? 'Verbinde GA4 in den Einstellungen um Sessions, Nutzer und Engagement Rate im Report zu sehen. '
-                            : 'Connect GA4 in Settings to see sessions, users and engagement rate in your report. '}
-                          <a href="/settings" style={{ color: 'inherit', fontWeight: 600, textDecoration: 'underline' }}>
-                            {lang === 'de' ? 'Jetzt einrichten →' : 'Set up now →'}
-                          </a>
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 300, lineHeight: 1.7, display: 'block', marginTop: '0.375rem' }}>
+                          {lang === 'de' ? (
+                            <>
+                              Mit GA4 ergänzt RankBrief deinen Report um:<br />
+                              → <strong>Sessions & Unique Visitors</strong> — wie viele Menschen kommen wirklich?<br />
+                              → <strong>Engagement Rate</strong> — interagieren Besucher mit deiner Seite?<br />
+                              → <strong>Business Impact</strong> — Leads und Umsatzpotenzial aus deinem Traffic<br />
+                              <a href="/settings" style={{ color: 'inherit', fontWeight: 600, textDecoration: 'underline', marginTop: '0.5rem', display: 'inline-block' }}>
+                                Jetzt GA4 einrichten →
+                              </a>
+                            </>
+                          ) : (
+                            <>
+                              With GA4, RankBrief adds to your report:<br />
+                              → <strong>Sessions & Unique Visitors</strong> — how many people actually visit?<br />
+                              → <strong>Engagement Rate</strong> — are visitors interacting with your site?<br />
+                              → <strong>Business Impact</strong> — lead and revenue potential from your traffic<br />
+                              <a href="/settings" style={{ color: 'inherit', fontWeight: 600, textDecoration: 'underline', marginTop: '0.5rem', display: 'inline-block' }}>
+                                Set up GA4 now →
+                              </a>
+                            </>
+                          )}
                         </span>
                       </Alert>
                     );
