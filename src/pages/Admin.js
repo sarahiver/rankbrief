@@ -82,6 +82,8 @@ const ADMIN_PW_KEY = 'rb_admin_unlocked';
 const ADMIN_PW     = process.env.REACT_APP_ADMIN_PW || 'rankbrief-admin';
 const PLANS = ['free','basic','pro','agency'];
 const PLAN_PRICES = { free: 0, basic: 19, pro: 39, agency: 79 };
+const isDemo = (u) => u.email?.includes('@rankbrief-demo.invalid');
+const isRealPaid = (u) => ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used && !isDemo(u);
 const COLS_USERS = '2fr 1fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr';
 const COLS_REPORTS = '2fr 2fr 1fr 1fr 1fr 1fr';
 const COLS_PROPS = '2fr 1fr 1fr 1fr 1fr';
@@ -148,7 +150,7 @@ export default function Admin({ user }) {
     ] = await Promise.all([
       supabase.from('profiles').select('id, plan, plan_status, free_report_sent, promo_code_used, promo_reports_limit, promo_reports_used, trial_ends_at, created_at, report_language, email').order('created_at', { ascending: false }),
       supabase.from('reports').select('id, property_id, report_month, clicks, status, pdf_url, summary_text, created_at').order('created_at', { ascending: false }).limit(200),
-      supabase.from('properties').select('id, user_id, gsc_property_url, display_name, status, ga_property_id, created_at').eq('status', 'active').order('created_at', { ascending: false }),
+      supabase.from('properties').select('id, user_id, gsc_property_url, display_name, status, ga_property_id, created_at').order('created_at', { ascending: false }),
       supabase.from('promo_codes').select('*').order('created_at', { ascending: false }),
     ]);
 
@@ -235,7 +237,7 @@ export default function Admin({ user }) {
 
     setStats({
       total_users:    (profiles || []).length,
-      paid_users:     (profiles || []).filter(p => ['basic','pro','agency'].includes(p.plan) && !p.promo_code_used).length,
+      paid_users:     (profiles || []).filter(p => isRealPaid(p)).length,
       promo_users:    (profiles || []).filter(p => p.promo_code_used).length,
       free_users:     (profiles || []).filter(p => p.plan === 'free').length,
       total_reports:  (allReports || []).length,
@@ -347,7 +349,7 @@ export default function Admin({ user }) {
       const eur = (n) => n != null ? Number(n).toFixed(2) : '0.00';
 
       // ── Sheet 1: Übersicht ──
-      const paidUsers = users.filter(u => ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used);
+      const paidUsers = users.filter(u => isRealPaid(u));
       const promoUsers = users.filter(u => u.promo_code_used);
       const freeUsers = users.filter(u => u.plan === 'free');
       const mrr = paidUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
@@ -372,7 +374,7 @@ export default function Admin({ user }) {
         ['▌ PLAN-MIX', '', '', ''],
         ['Plan', 'Preis/Mo (€)', 'Anzahl User', 'MRR Anteil (€)'],
         ...['basic','pro','agency','free'].map(plan => {
-          const planUsers = users.filter(u => u.plan === plan && !u.promo_code_used);
+          const planUsers = users.filter(u => isRealPaid(u) && u.plan === plan);
           return [plan.charAt(0).toUpperCase()+plan.slice(1), PLAN_PRICES[plan], planUsers.length, eur(planUsers.length * PLAN_PRICES[plan])];
         }),
         ['GESAMT', '', users.length, eur(mrr)],
@@ -391,7 +393,7 @@ export default function Admin({ user }) {
         const promoLeft = u.promo_reports_limit ? Math.max(0, u.promo_reports_limit - (u.promo_reports_used||0)) : '∞';
         const promoPct = u.promo_reports_limit ? Math.round(((u.promo_reports_used||0)/u.promo_reports_limit)*100)+'%' : '–';
         const moVal = PLAN_PRICES[u.plan] || 0;
-        const isPaid = ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used;
+        const isPaid = isRealPaid(u);
         return [
           u.email, u.plan, u.plan_status, u.promo_code_used||'–',
           u.promo_code_used ? u.plan : '–',
@@ -764,7 +766,7 @@ export default function Admin({ user }) {
 
             {/* ── PROMO CODES TAB ── */}
             {tab === 'finanzen' && (() => {
-              const paidUsers = users.filter(u => ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used);
+              const paidUsers = users.filter(u => isRealPaid(u));
               const promoUsers = users.filter(u => u.promo_code_used);
               const freeUsers = users.filter(u => u.plan === 'free');
               const mrr = paidUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
@@ -814,7 +816,7 @@ export default function Admin({ user }) {
                         <div>Plan</div><div>Preis/Mo</div><div>User (zahlend)</div><div>User (Promo)</div><div>MRR Anteil</div>
                       </THead>
                       {['basic','pro','agency','free'].map(plan => {
-                        const paid = users.filter(u => u.plan === plan && !u.promo_code_used).length;
+                        const paid = users.filter(u => isRealPaid(u) && u.plan === plan).length;
                         const promo = users.filter(u => u.plan === plan && u.promo_code_used).length;
                         const planMrr = paid * (PLAN_PRICES[plan] || 0);
                         return (
@@ -845,7 +847,7 @@ export default function Admin({ user }) {
                         <div>E-Mail</div><div>Plan</div><div>Status</div><div>Promo-Code</div><div>Reports verbl.</div><div>Mo-Wert</div><div>Zahlend?</div>
                       </THead>
                       {users.map(u => {
-                        const isPaid = ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used;
+                        const isPaid = isRealPaid(u);
                         const isPromo = !!u.promo_code_used;
                         const promoLeft = u.promo_reports_limit
                           ? Math.max(0, u.promo_reports_limit - (u.promo_reports_used||0))
