@@ -148,7 +148,7 @@ export default function Admin({ user }) {
     ] = await Promise.all([
       supabase.from('profiles').select('id, plan, plan_status, free_report_sent, promo_code_used, promo_reports_limit, promo_reports_used, trial_ends_at, created_at, report_language, email').order('created_at', { ascending: false }),
       supabase.from('reports').select('id, property_id, report_month, clicks, status, pdf_url, summary_text, created_at').order('created_at', { ascending: false }).limit(200),
-      supabase.from('properties').select('id, user_id, gsc_property_url, display_name, status, ga_property_id, created_at').order('created_at', { ascending: false }),
+      supabase.from('properties').select('id, user_id, gsc_property_url, display_name, status, ga_property_id, created_at').eq('status', 'active').order('created_at', { ascending: false }),
       supabase.from('promo_codes').select('*').order('created_at', { ascending: false }),
     ]);
 
