@@ -208,6 +208,9 @@ export default function ForgotPassword() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 onKeyDown={handleKey}
+                autoComplete="email"
+                name="email"
+                id="email"
                 autoFocus
               />
             </Field>

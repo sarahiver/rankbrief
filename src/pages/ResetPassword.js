@@ -264,6 +264,9 @@ export default function ResetPassword() {
                 placeholder="At least 8 characters"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+                autoComplete="new-password"
+                name="new-password"
+                id="new-password"
                 autoFocus
               />
               {password && (
@@ -281,6 +284,9 @@ export default function ResetPassword() {
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+                autoComplete="new-password"
+                name="confirm-password"
+                id="confirm-password"
               />
             </Field>
 

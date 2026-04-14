@@ -339,6 +339,9 @@ export default function Auth({ mode = 'login', lang = 'en' }) {
               value={email}
               onChange={e => setEmail(e.target.value)}
               onKeyDown={handleKey}
+              autoComplete={isLogin ? "email" : "email"}
+              name="email"
+              id="email"
             />
           </Field>
 
@@ -350,6 +353,9 @@ export default function Auth({ mode = 'login', lang = 'en' }) {
               value={password}
               onChange={e => setPassword(e.target.value)}
               onKeyDown={handleKey}
+              autoComplete={isLogin ? "current-password" : "new-password"}
+              name="password"
+              id="password"
             />
           </Field>
 

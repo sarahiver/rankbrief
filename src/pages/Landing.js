@@ -1050,8 +1050,8 @@ const FaqA = styled.div`
 const i18n = {
   en: {
     badge: 'Automated SEO reporting for agencies & freelancers',
-    heroTitle1: 'Your SEO report,',
-    heroTitle2: 'delivered automatically.',
+    heroTitle1: 'Client-ready SEO Reports',
+    heroTitle2: 'in 3 min, not 2 hours.',
     heroSub: 'Stop spending 3 hours on monthly SEO reports. Connect Google Search Console once – RankBrief automatically generates a branded PDF report and delivers it to your inbox on the 1st of every month.',
     heroCta: 'Get your first report free',
     heroSeeHow: '▶ See a real client report',
@@ -1116,8 +1116,8 @@ const i18n = {
   },
   de: {
     badge: 'Automatisches SEO-Reporting für Agenturen & Freelancer',
-    heroTitle1: 'Dein SEO-Report,',
-    heroTitle2: 'automatisch geliefert.',
+    heroTitle1: 'Client-ready SEO Reports',
+    heroTitle2: 'in 3 Min statt 2h.',
     heroSub: 'Schluss mit 3 Stunden manuellem Reporting. Google Search Console einmal verbinden – RankBrief erstellt jeden 1. des Monats automatisch einen professionellen PDF-Report mit KI-Analyse – automatisch per Mail, ohne weiteres Zutun.',
     heroCta: 'Ersten Report kostenlos erhalten',
     heroSeeHow: '▶ Echten Kunden-Report sehen',
@@ -1186,7 +1186,7 @@ const i18n = {
 const PROMO_CODE = 'EARLY2026';
 const PROMO_MAX  = 50;
 
-export default function Landing({ lang = 'en' }) {
+export default function Landing({ lang = 'de' }) {
   const [openFaq, setOpenFaq] = React.useState(null);
   const [annual, setAnnual] = React.useState(false);
   const [sampleOpen, setSampleOpen] = React.useState(null);
