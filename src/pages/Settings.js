@@ -1017,12 +1017,12 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
         <ModalOverlay onClick={() => setDowngradeModal(null)}>
           <ModalCard onClick={e => e.stopPropagation()} style={{ maxWidth: '480px' }}>
             <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.1rem', fontWeight: 800 }}>
-              {branding.report_language === 'en'
+              {lang === 'en'
                 ? `Downgrade to ${PLAN_LIMITS[downgradeModal.targetPlan]?.label}`
                 : `Wechsel zu ${PLAN_LIMITS[downgradeModal.targetPlan]?.label}`}
             </h3>
             <p style={{ margin: '0 0 1rem', fontSize: '13px', color: '#666' }}>
-              {branding.report_language === 'en'
+              {lang === 'en'
                 ? `Your new plan supports ${downgradeModal.maxDomains} domain(s). Please select which domain(s) you want to keep active.`
                 : `Dein neuer Plan unterstützt ${downgradeModal.maxDomains} Domain(s). Bitte wähle aus, welche Domain(s) aktiv bleiben sollen.`}
             </p>
@@ -1049,10 +1049,10 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
               <Btn onClick={() => setDowngradeModal(null)}>
-                {branding.report_language === 'en' ? 'Cancel' : 'Abbrechen'}
+                {lang === 'en' ? 'Cancel' : 'Abbrechen'}
               </Btn>
               <Btn $variant="primary" onClick={confirmDowngrade} disabled={selectedProperties.length !== downgradeModal.maxDomains}>
-                {branding.report_language === 'en' ? 'Confirm & Switch Plan →' : t(lang, lang === 'de' ? 'Bestätigen & Plan wechseln →' : 'Confirm & Switch Plan →')}
+                {lang === 'en' ? 'Confirm & Switch Plan →' : 'Confirm & Switch Plan →'}
               </Btn>
             </div>
           </ModalCard>
@@ -1132,7 +1132,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
         <Section>
           <SectionHead>
             <div>
-              <SectionTitle>Plan & Billing</SectionTitle>
+              <SectionTitle>{t(lang, 'set.plan_billing')}</SectionTitle>
               <SectionSub>{t(lang, 'set.plan_sub')}</SectionSub>
             </div>
             <PlanBadge $plan={plan}>
@@ -1143,18 +1143,18 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
           <SectionBody>
             <InfoRow>
               <InfoLabel>{t(lang, 'set.current_plan')}</InfoLabel>
-              <InfoValue>{planInfo?.label} – bis zu {planInfo?.domains} Domain{planInfo?.domains > 1 ? 's' : ''}</InfoValue>
+              <InfoValue>{planInfo?.label} – {lang === 'de' ? `bis zu ${planInfo?.domains} Domain${planInfo?.domains > 1 ? 's' : ''}` : `up to ${planInfo?.domains} domain${planInfo?.domains > 1 ? 's' : ''}`}</InfoValue>
             </InfoRow>
             <InfoRow>
               <InfoLabel>{t(lang, 'set.status')}</InfoLabel>
               <InfoValue>
-                {profile?.plan_status === 'frozen' ? '⏸ Pausiert' :
-                 profile?.plan_status === 'active' ? '✅ Aktiv' : profile?.plan_status}
+                {profile?.plan_status === 'frozen' ? (lang === 'de' ? '⏸ Pausiert' : '⏸ Paused') :
+                 profile?.plan_status === 'active' ? (lang === 'de' ? '✅ Aktiv' : '✅ Active') : profile?.plan_status}
               </InfoValue>
             </InfoRow>
             {profile?.trial_ends_at && (
               <InfoRow>
-                <InfoLabel>Freimonat endet am</InfoLabel>
+                <InfoLabel>{lang === 'de' ? 'Freimonat endet am' : 'Trial ends on'}</InfoLabel>
                 <InfoValue>{new Date(profile.trial_ends_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB')}</InfoValue>
               </InfoRow>
             )}
@@ -1163,45 +1163,45 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
             {isFree && (
               <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: '10px' }}>
                 <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>
-                  {branding.report_language === 'en' ? '🚀 Upgrade to Basic' : '🚀 Upgrade auf Basic'}
+                  {lang === 'en' ? '🚀 Upgrade to Basic' : '🚀 Upgrade auf Basic'}
                 </div>
                 <div style={{ fontSize: '13px', color: 'var(--color-text-secondary, #666)', marginBottom: '0.75rem' }}>
-                  {branding.report_language === 'en'
+                  {lang === 'en'
                     ? 'Get monthly SEO reports automatically – starting at €19/month.'
                     : 'Monatliche SEO-Reports automatisch – ab €19/Monat.'}
                 </div>
                 <Btn $variant="primary" onClick={() => handleUpgrade('basic')}>
-                  {branding.report_language === 'en' ? 'Upgrade to Basic – €19/mo →' : 'Upgrade auf Basic – €19/mo →'}
+                  {lang === 'en' ? 'Upgrade to Basic – €19/mo →' : 'Upgrade auf Basic – €19/mo →'}
                 </Btn>
               </div>
             )}
             {plan === 'basic' && (
               <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: '10px' }}>
                 <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>
-                  {branding.report_language === 'en' ? '⚡ Upgrade to Pro' : '⚡ Upgrade auf Pro'}
+                  {lang === 'en' ? '⚡ Upgrade to Pro' : '⚡ Upgrade auf Pro'}
                 </div>
                 <div style={{ fontSize: '13px', color: 'var(--color-text-secondary, #666)', marginBottom: '0.75rem' }}>
-                  {branding.report_language === 'en'
+                  {lang === 'en'
                     ? '3 domains + AI recommendations – €39/month.'
                     : '3 Domains + KI-Empfehlungen – €39/Monat.'}
                 </div>
                 <Btn $variant="primary" onClick={() => handleUpgrade('pro')}>
-                  {branding.report_language === 'en' ? 'Upgrade to Pro – €39/mo →' : 'Upgrade auf Pro – €39/mo →'}
+                  {lang === 'en' ? 'Upgrade to Pro – €39/mo →' : 'Upgrade auf Pro – €39/mo →'}
                 </Btn>
               </div>
             )}
             {plan === 'pro' && (
               <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: '10px' }}>
                 <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>
-                  {branding.report_language === 'en' ? '🏆 Upgrade to Agency' : '🏆 Upgrade auf Agency'}
+                  {lang === 'en' ? '🏆 Upgrade to Agency' : '🏆 Upgrade auf Agency'}
                 </div>
                 <div style={{ fontSize: '13px', color: 'var(--color-text-secondary, #666)', marginBottom: '0.75rem' }}>
-                  {branding.report_language === 'en'
+                  {lang === 'en'
                     ? '10 domains + white-label reports – €79/month.'
                     : '10 Domains + White-Label Reports – €79/Monat.'}
                 </div>
                 <Btn $variant="primary" onClick={() => handleUpgrade('agency')}>
-                  {branding.report_language === 'en' ? 'Upgrade to Agency – €79/mo →' : 'Upgrade auf Agency – €79/mo →'}
+                  {lang === 'en' ? 'Upgrade to Agency – €79/mo →' : 'Upgrade auf Agency – €79/mo →'}
                 </Btn>
               </div>
             )}
