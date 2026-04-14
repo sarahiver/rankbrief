@@ -191,7 +191,7 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export default function PropertySelectModal({ user, onDone, onNewAccount, plan = 'free', activeCount = 0, lang = 'en' }) {
+export default function PropertySelectModal({ user, onDone, onNewAccount, plan = 'free', activeCount = 0, lang = 'de' }) {
   const limit = PLAN_LIMITS[plan] ?? 1;
   const isPro = ['pro', 'agency'].includes(plan);
 

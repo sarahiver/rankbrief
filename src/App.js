@@ -79,7 +79,11 @@ const noFooterRoutes = ['/login', '/register', '/dashboard', '/onboarding', '/do
 function AppInner() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [lang, setLang] = useState(() => localStorage.getItem('rb_lang') || 'de');
+  const [lang, setLang] = useState(() => {
+    const stored = localStorage.getItem('rb_lang');
+    if (!stored) { localStorage.setItem('rb_lang', 'de'); return 'de'; }
+    return stored;
+  });
   const location = useLocation();
   const path = location.pathname;
   usePageTracking();

@@ -609,7 +609,7 @@ const PLAN_LIMITS = {
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function Settings({ user, lang = 'en', onLangChange }) {
+export default function Settings({ user, lang = 'de', onLangChange }) {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [googleAccounts, setGoogleAccounts] = useState([]);

@@ -308,7 +308,7 @@ export default function Navbar({ user, lang, onLangChange }) {
   const location = useLocation();
   const navigate = useNavigate();
   const isLanding = location.pathname === '/';
-  const t = labels[lang || 'en'];
+  const t = labels[lang || 'de'];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);

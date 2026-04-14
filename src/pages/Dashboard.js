@@ -1151,7 +1151,7 @@ function fmtPos(n) {
 }
 
 // ── Frozen Wall Component ─────────────────────────────────────────────────────
-function FrozenWallView({ onUpgrade, upgrading, lang = 'en' }) {
+function FrozenWallView({ onUpgrade, upgrading, lang = 'de' }) {
   const plans = [
     {
       key: 'basic',
@@ -1213,7 +1213,7 @@ function fmtMonth(dateStr) {
 }
 
 // ── UpgradeModal ──────────────────────────────────────────────────────────────
-function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading, lang = 'en' }) {
+function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading, lang = 'de' }) {
   const opts = currentPlan === 'pro'
     ? [{ key: 'agency', name: 'Agency', price: '79', highlight: true, features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', 'Endkunden-Email', 'Agency Branding'] }]
     : [
@@ -1246,7 +1246,7 @@ function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading, lang = 'en' 
 }
 
 // ── PropertyItem (expandable) ─────────────────────────────────────────────────
-function PropertyItem({ property, isAgency, plan, lang = 'en', onReauth }) {
+function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
   const [open, setOpen]                       = useState(false);
   const [reports, setReports]                 = useState([]);
   const [reportsLoading, setReportsLoading]   = useState(false);
@@ -1713,7 +1713,7 @@ function PropertyItem({ property, isAgency, plan, lang = 'en', onReauth }) {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange }) {
+export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -1903,6 +1903,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
           onUpgrade={handleUpgrade}
           onClose={() => setShowUpgradeModal(false)}
           upgrading={upgrading}
+          lang={lang}
         />
       )}
       {showPropertyModal && (
@@ -1912,6 +1913,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'en', onLangChange
           activeCount={activeProperties.length}
           onDone={() => { setShowPropertyModal(false); loadProperties(); }}
           onNewAccount={() => { setShowPropertyModal(false); startGoogleOAuth(); }}
+          lang={lang}
         />
       )}
       <TopBar>

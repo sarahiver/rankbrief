@@ -248,7 +248,7 @@ const PromoLabel = styled.label`
   gap: 0.375rem;
 `;
 
-export default function Auth({ mode = 'login', lang = 'en' }) {
+export default function Auth({ mode = 'login', lang = 'de' }) {
   const [isLogin, setIsLogin] = useState(mode === 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
