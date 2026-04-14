@@ -1069,9 +1069,9 @@ const i18n = {
     sampleSub: 'This is exactly what lands in your client\'s inbox on the 1st of every month. Click to preview – then imagine sending this to all your clients automatically.',
     samplePopular: 'Most popular',
     sampleCards: [
-      { plan: 'Basic',  slug: 'basic',  icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: '/samples/sample-basic-en.html', featured: false },
-      { plan: 'Pro',    slug: 'pro',    icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: '/samples/sample-pro-en.html', featured: true },
-      { plan: 'Agency', slug: 'agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: '/samples/sample-agency-en.html', featured: false },
+      { plan: 'Basic',  slug: 'basic',  icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000001/RankBrief_zahnarzt-meier-hamburg-de_Maerz-2026.pdf', featured: false },
+      { plan: 'Pro',    slug: 'pro',    icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000002/RankBrief_naturkosmetik-shop-de_Maerz-2026.pdf', featured: true },
+      { plan: 'Agency', slug: 'agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000003/RankBrief_autohaus-brenner-de_Maerz-2026.pdf', featured: false },
     ],
     sampleCta: 'See exactly what your clients get →',
     sampleClose: 'Close preview',
@@ -1135,9 +1135,9 @@ const i18n = {
     sampleSub: 'Das ist genau das, was am 1. jeden Monats im Posteingang deines Kunden landet. Klick rein – und stell dir vor, das geht automatisch an alle deine Kunden.',
     samplePopular: 'Am beliebtesten',
     sampleCards: [
-      { plan: 'Basic',   slug: 'basic',  icon: '📊', desc: 'GSC-Übersicht, Top-Keywords & Seiten, KI-Zusammenfassung und Begriffserklärung. Klar und verständlich.', file: '/samples/sample-basic.html', featured: false },
-      { plan: 'Pro',     slug: 'pro',    icon: '🤖', desc: 'Alles aus Basic plus GA4-Besucher­statistik, 3 verständliche SEO-Empfehlungen, Keyword-Chancen und Vormonatsvergleich.', file: '/samples/sample-pro.html', featured: true },
-      { plan: 'Agentur', slug: 'agency', icon: '🏢', desc: 'Vollständiges White-Label mit eigenem Logo und Farben. Bis zu 10 Domains. Kein RankBrief-Branding.', file: '/samples/sample-agency.html', featured: false },
+      { plan: 'Basic',   slug: 'basic',  icon: '📊', desc: 'GSC-Übersicht, Top-Keywords & Seiten, KI-Zusammenfassung und Begriffserklärung. Klar und verständlich.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000001/RankBrief_zahnarzt-meier-hamburg-de_Maerz-2026.pdf', featured: false },
+      { plan: 'Pro',     slug: 'pro',    icon: '🤖', desc: 'Alles aus Basic plus GA4-Besucher­statistik, 3 verständliche SEO-Empfehlungen, Keyword-Chancen und Vormonatsvergleich.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000002/RankBrief_naturkosmetik-shop-de_Maerz-2026.pdf', featured: true },
+      { plan: 'Agentur', slug: 'agency', icon: '🏢', desc: 'Vollständiges White-Label mit eigenem Logo und Farben. Bis zu 10 Domains. Kein RankBrief-Branding.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000003/RankBrief_autohaus-brenner-de_Maerz-2026.pdf', featured: false },
     ],
     sampleCta: 'Sieh genau was deine Kunden bekommen →',
     sampleClose: 'Vorschau schließen',
@@ -1220,57 +1220,12 @@ export default function Landing({ lang = 'en' }) {
   const t = i18n[lang] || i18n.en;
 
   const downloadSamplePdf = async (sample) => {
-    if (pdfLoading) return;
-    setPdfLoading(true);
-    try {
-      const SUPABASE_URL  = process.env.REACT_APP_SUPABASE_URL;
-      const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
-      const planSlug = sample.slug || sample.plan.toLowerCase().replace('agentur', 'agency');
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/generate-sample-pdf`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON}`,
-          'apikey': SUPABASE_ANON,
-        },
-        body: JSON.stringify({ plan: planSlug, lang }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const contentType = res.headers.get('Content-Type') || '';
-      if (contentType.includes('application/pdf')) {
-        const blob = await res.blob();
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        a.href     = url;
-        a.download = `rankbrief-sample-${planSlug}.pdf`;
-        a.click();
-        URL.revokeObjectURL(url);
-      } else {
-        // Fallback: HTML response – inject print button + auto-print
-        const html = await res.text();
-        const printBtn = `<div style="position:fixed;top:16px;right:16px;z-index:9999;display:flex;gap:8px;font-family:Inter,sans-serif;">
-          <button onclick="window.print()" style="background:#6C63FF;color:white;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 12px rgba(108,99,255,0.3);">
-            ↓ Als PDF speichern
-          </button>
-          <button onclick="this.parentElement.style.display='none'" style="background:#f0f0f4;color:#666;border:none;padding:8px 12px;border-radius:8px;font-size:13px;cursor:pointer;">✕</button>
-        </div>
-        <style>@media print{div[style*="position:fixed"]{display:none!important}}</style>`;
-        const htmlWithBtn = html.replace('</body>', printBtn + '</body>');
-        const blob = new Blob([htmlWithBtn], { type: 'text/html' });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        a.href     = url;
-        a.target   = '_blank';
-        a.rel      = 'noopener noreferrer';
-        a.click();
-        URL.revokeObjectURL(url);
-      }
-    } catch (err) {
-      console.error('PDF download failed:', err);
-      alert(lang === 'de' ? 'PDF konnte nicht erstellt werden. Bitte versuche es erneut.' : 'Could not generate PDF. Please try again.');
-    } finally {
-      setPdfLoading(false);
-    }
+    // Direct link to pre-generated PDF in Storage
+    const a = document.createElement('a');
+    a.href = sample.file;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.click();
   };
 
   // Reset open FAQ when language changes
@@ -1547,13 +1502,9 @@ export default function Landing({ lang = 'en' }) {
               </LightboxTitle>
               <LightboxActions>
                 <LightboxDownloadBtn
-                  $loading={pdfLoading}
                   onClick={() => downloadSamplePdf(sampleOpen)}
-                  disabled={pdfLoading}
                 >
-                  {pdfLoading
-                    ? (lang === 'de' ? '⏳ PDF wird erstellt…' : '⏳ Generating PDF…')
-                    : (lang === 'de' ? '↓ Als PDF herunterladen' : '↓ Download as PDF')}
+                  {lang === 'de' ? '↓ Als PDF herunterladen' : '↓ Download as PDF'}
                 </LightboxDownloadBtn>
                 <LightboxClose onClick={() => setSampleOpen(null)} aria-label={t.sampleClose}>✕</LightboxClose>
               </LightboxActions>
