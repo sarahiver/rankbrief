@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import { supabase } from '../lib/supabase';
 import t from '../lib/i18n';
+import { trackEvent } from '../analytics';
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(16px); }
@@ -278,6 +279,9 @@ export default function Auth({ mode = 'login', lang = 'en' }) {
             { onConflict: 'id' }
           );
         }
+
+        // Track successful registration
+        trackEvent('register_success', { has_promo: !!promoCode.trim() });
 
         // Promo code einloesen falls angegeben
         if (promoCode.trim() && signUpData?.user?.id) {

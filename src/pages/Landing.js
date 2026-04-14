@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { trackEvent } from '../analytics';
 
 // ── Animations ────────────────────────────────────────────────────────────────
 const fadeUp = keyframes`
@@ -1209,6 +1210,7 @@ export default function Landing({ lang = 'de' }) {
   const handleCopy = () => {
     navigator.clipboard.writeText(PROMO_CODE).then(() => {
       setCopied(true);
+      trackEvent('promo_code_copy', { code: PROMO_CODE });
       setTimeout(() => setCopied(false), 2000);
     });
   };
@@ -1220,6 +1222,7 @@ export default function Landing({ lang = 'de' }) {
   const t = i18n[lang] || i18n.en;
 
   const downloadSamplePdf = async (sample) => {
+    trackEvent('sample_pdf_open', { plan: sample.slug || sample.plan.toLowerCase() });
     // Direct link to pre-generated PDF in Storage
     const a = document.createElement('a');
     a.href = sample.file;
@@ -1250,7 +1253,7 @@ export default function Landing({ lang = 'de' }) {
         <HeroSub>{t.heroSub}</HeroSub>
 
         <HeroCTA>
-          <BtnPrimary to="/register">
+          <BtnPrimary to="/register" onClick={() => trackEvent('cta_click', { button: 'hero_register', lang })}>
             {t.heroCta}
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1472,7 +1475,14 @@ export default function Landing({ lang = 'de' }) {
         <SectionSub>{t.sampleSub}</SectionSub>
         <SampleGrid>
           {t.sampleCards.map(s => (
-            <SampleCard key={s.plan} $featured={s.featured} onClick={() => isMobile ? downloadSamplePdf(s) : setSampleOpen(s)}>
+            <SampleCard key={s.plan} $featured={s.featured} onClick={() => {
+              if (isMobile) {
+                downloadSamplePdf(s);
+              } else {
+                trackEvent('sample_pdf_open', { plan: s.slug || s.plan.toLowerCase() });
+                setSampleOpen(s);
+              }
+            }}>
               {s.featured && <SamplePopularBadge>{t.samplePopular}</SamplePopularBadge>}
               <SampleCardHead>
                 <SampleIcon>{s.icon}</SampleIcon>
@@ -1593,7 +1603,7 @@ export default function Landing({ lang = 'de' }) {
           <p style={{ color: '#52526E', fontSize: '1.0625rem', marginBottom: '2rem', fontWeight: 300 }}>
             {t.ctaSub}
           </p>
-          <BtnPrimary to="/register">{t.ctaBtn}</BtnPrimary>
+          <BtnPrimary to="/register" onClick={() => trackEvent('cta_click', { button: 'bottom_register', lang })}>{t.ctaBtn}</BtnPrimary>
         </div>
       </Section>
     </Page>
