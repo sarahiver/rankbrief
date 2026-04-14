@@ -79,8 +79,8 @@ const AccountChevron = styled.span`
 const AccountBody = styled.div`
   padding: ${({ $open }) => $open ? '0.75rem' : '0'};
   max-height: ${({ $open }) => $open ? '400px' : '0'};
-  overflow: hidden;
-  transition: all 0.25s ease;
+  overflow-y: ${({ $open }) => $open ? 'auto' : 'hidden'};
+  transition: max-height 0.25s ease, padding 0.25s ease;
 `;
 const CheckboxList = styled.div`display: flex; flex-direction: column; gap: 0.4rem;`;
 const CheckboxItem = styled.div`
@@ -409,7 +409,13 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
             ) : (
               accounts.map(account => (
                 <AccountBlock key={account.google_account_id}>
-                  <AccountHeader onClick={() => setOpenAccounts(p => ({ ...p, [account.google_account_id]: !p[account.google_account_id] }))}>
+                  <AccountHeader
+                    onClick={() => setOpenAccounts(p => ({ ...p, [account.google_account_id]: !p[account.google_account_id] }))}
+                    tabIndex={0}
+                    role="button"
+                    aria-expanded={!!openAccounts[account.google_account_id]}
+                    onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpenAccounts(p => ({ ...p, [account.google_account_id]: !p[account.google_account_id] }))}
+                  >
                     <AccountEmail>
                       <GoogleIcon />
                       {account.google_email}
@@ -423,10 +429,18 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
                       <EmptyNote>{t(lang, 'modal.no_sites')}</EmptyNote>
                     ) : (
                       <CheckboxList>
-                        {(account.sites ?? []).filter(site => site.url.startsWith('sc-domain:')).map(site => {
+                        {(account.sites ?? []).map(site => {
                           const isSelected = site.url in selected;
                           return (
-                            <CheckboxItem key={site.url} $checked={isSelected} onClick={() => toggleProperty(site.url, account.google_account_id)}>
+                            <CheckboxItem
+                              key={site.url}
+                              $checked={isSelected}
+                              onClick={() => toggleProperty(site.url, account.google_account_id)}
+                              tabIndex={0}
+                              role="checkbox"
+                              aria-checked={isSelected}
+                              onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && toggleProperty(site.url, account.google_account_id)}
+                            >
                               <CheckboxBox $checked={isSelected}>{isSelected && '✓'}</CheckboxBox>
                               <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {site.url}
