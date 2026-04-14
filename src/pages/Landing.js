@@ -1069,9 +1069,9 @@ const i18n = {
     sampleSub: 'This is exactly what lands in your client\'s inbox on the 1st of every month. Click to preview – then imagine sending this to all your clients automatically.',
     samplePopular: 'Most popular',
     sampleCards: [
-      { plan: 'Basic',  slug: 'basic',  icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000001/RankBrief_zahnarzt-meier-hamburg-de_Maerz-2026.pdf', featured: false },
-      { plan: 'Pro',    slug: 'pro',    icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000002/RankBrief_naturkosmetik-shop-de_Maerz-2026.pdf', featured: true },
-      { plan: 'Agency', slug: 'agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000003/RankBrief_autohaus-brenner-de_Maerz-2026.pdf', featured: false },
+      { plan: 'Basic',  slug: 'basic',  icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000004/RankBrief_zahnarzt-meier-hamburg-de_March-2026.pdf', featured: false },
+      { plan: 'Pro',    slug: 'pro',    icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000005/RankBrief_naturkosmetik-shop-de_March-2026.pdf', featured: true },
+      { plan: 'Agency', slug: 'agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000006/RankBrief_autohaus-brenner-de_March-2026.pdf', featured: false },
     ],
     sampleCta: 'See exactly what your clients get →',
     sampleClose: 'Close preview',
