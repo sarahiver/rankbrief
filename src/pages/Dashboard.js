@@ -1186,7 +1186,7 @@ function FrozenWallView({ onUpgrade, upgrading, lang = 'de' }) {
       <PlanGrid>
         {plans.map(plan => (
           <PlanCard key={plan.key} $highlight={plan.highlight}>
-            {plan.highlight && <PlanBadge>Empfohlen</PlanBadge>}
+            {plan.highlight && <PlanBadge>{lang === 'de' ? 'Empfohlen' : 'Recommended'}</PlanBadge>}
             <PlanName $highlight={plan.highlight}>{plan.name}</PlanName>
             <PlanPrice $highlight={plan.highlight}>
               €{plan.price}<span>/mo</span>
@@ -1215,18 +1215,20 @@ function fmtMonth(dateStr) {
 // ── UpgradeModal ──────────────────────────────────────────────────────────────
 function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading, lang = 'de' }) {
   const opts = currentPlan === 'pro'
-    ? [{ key: 'agency', name: 'Agency', price: '79', highlight: true, features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', 'Endkunden-Email', 'Agency Branding'] }]
+    ? [{ key: 'agency', name: 'Agency', price: '79', highlight: true, features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', lang === 'de' ? 'Endkunden-Email' : 'Client Email', 'Agency Branding'] }]
     : [
-        { key: 'pro',    name: 'Pro',    price: '39', highlight: true, features: ['3 Domains', 'White-Label', 'SEO-Empfehlungen', 'Endkunden-Email'] },
-        { key: 'agency', name: 'Agency', price: '79', highlight: false, features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', 'Endkunden-Email'] },
+        { key: 'pro',    name: 'Pro',    price: '39', highlight: true, features: ['3 Domains', 'White-Label', lang === 'de' ? 'SEO-Empfehlungen' : 'SEO Recommendations', lang === 'de' ? 'Endkunden-Email' : 'Client Email'] },
+        { key: 'agency', name: 'Agency', price: '79', highlight: false, features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', lang === 'de' ? 'Endkunden-Email' : 'Client Email'] },
       ];
   return (
     <ModalOverlay onClick={onClose}>
       <ModalBox onClick={e => e.stopPropagation()}>
         <ModalClose onClick={onClose}>✕</ModalClose>
-        <ModalTitle>Mehr Domains? Upgrade erforderlich</ModalTitle>
+        <ModalTitle>{lang === 'de' ? 'Mehr Domains? Upgrade erforderlich' : 'Need more domains? Upgrade required'}</ModalTitle>
         <ModalSub>
-          Du hast das Domain-Limit deines aktuellen Plans erreicht. Upgrade um weitere Websites zu verbinden.
+          {lang === 'de'
+            ? 'Du hast das Domain-Limit deines aktuellen Plans erreicht. Upgrade um weitere Websites zu verbinden.'
+            : "You've reached the domain limit of your current plan. Upgrade to connect more websites."}
         </ModalSub>
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${opts.length}, 1fr)`, gap: '1rem' }}>
           {opts.map(p => (
@@ -1235,7 +1237,7 @@ function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading, lang = 'de' 
               <PlanPrice $highlight={p.highlight}>€{p.price}<span>/mo</span></PlanPrice>
               {p.features.map(f => <PlanFeature key={f} $highlight={p.highlight}>{f}</PlanFeature>)}
               <PlanBtn $highlight={p.highlight} onClick={() => onUpgrade(p.key)} disabled={upgrading}>
-                {upgrading ? t(lang, 'dash.upgrade_loading') : `Upgrade auf ${p.name} →`}
+                {upgrading ? t(lang, 'dash.upgrade_loading') : lang === 'de' ? `Upgrade auf ${p.name} →` : `Upgrade to ${p.name} →`}
               </PlanBtn>
             </PlanCard>
           ))}
@@ -1331,7 +1333,7 @@ function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
           {isAgency && (
             <>
               <RecipientRow>
-                <RecipientLabel>📧 Endkunden-Email (optional):</RecipientLabel>
+                <RecipientLabel>📧 {lang === 'de' ? 'Endkunden-Email (optional):' : 'Client Email (optional):'}</RecipientLabel>
                 <RecipientInput
                   type="email"
                   placeholder="kunde@beispiel.de"
@@ -1339,11 +1341,13 @@ function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
                   onChange={e => setRecipientEmail(e.target.value)}
                 />
                 <RecipientSaveBtn onClick={handleSaveEmail} disabled={savingEmail}>
-                  {savingEmail ? <SpinnerSm /> : emailSaved ? '✓ Gespeichert' : 'Speichern'}
+                  {savingEmail ? <SpinnerSm /> : emailSaved ? (lang === 'de' ? '✓ Gespeichert' : '✓ Saved') : (lang === 'de' ? 'Speichern' : 'Save')}
                 </RecipientSaveBtn>
               </RecipientRow>
               <RecipientHint>
-                Wenn gesetzt, bekommt der Endkunde den Report zusätzlich zu dir – mit deinem White-Label Branding als PDF-Anhang. Leer lassen = nur du bekommst den Report.
+                {lang === 'de'
+                  ? 'Wenn gesetzt, bekommt der Endkunde den Report zusätzlich zu dir – mit deinem White-Label Branding als PDF-Anhang. Leer lassen = nur du bekommst den Report.'
+                  : 'If set, your client receives the report in addition to you – with your white-label branding as a PDF attachment. Leave empty = only you receive the report.'}
               </RecipientHint>
             </>
           )}
@@ -1385,7 +1389,7 @@ function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
           )}
 
           {/* Report-Verlauf */}
-          <ReportHistoryTitle>Report-Verlauf</ReportHistoryTitle>
+          <ReportHistoryTitle>{lang === 'de' ? 'Report-Verlauf' : 'Report History'}</ReportHistoryTitle>
           {reportsLoading ? (
             <Spinner />
           ) : reports.length === 0 ? (
@@ -1444,47 +1448,47 @@ function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
               ) : selectedReport && (
                 <div style={{ marginTop: '0.5rem' }}>
                   <div style={{ fontSize: '0.8125rem', color: 'var(--text-dim)', marginBottom: '1.25rem', fontFamily: 'monospace' }}>
-                    Details: {fmtMonth(selectedReport.report_month)}
+                    {lang === 'de' ? 'Details:' : 'Details:'} {fmtMonth(selectedReport.report_month)}
                   </div>
                   <KpiGrid>
                     <KpiCard>
                       <KpiLabel>Clicks</KpiLabel>
                       <KpiValue>{fmt(selectedReport.clicks)}</KpiValue>
                       {selectedReport.clicks_delta != null
-                        ? <KpiDelta $up={selectedReport.clicks_delta >= 0}>{Math.abs(selectedReport.clicks_delta).toFixed(1)}% ggü. Vormonat</KpiDelta>
-                        : <KpiEmpty>Kein Vergleich</KpiEmpty>}
+                        ? <KpiDelta $up={selectedReport.clicks_delta >= 0}>{Math.abs(selectedReport.clicks_delta).toFixed(1)}% {lang === 'de' ? 'ggü. Vormonat' : 'vs. prev. month'}</KpiDelta>
+                        : <KpiEmpty>{lang === 'de' ? 'Kein Vergleich' : 'No comparison'}</KpiEmpty>}
                     </KpiCard>
                     <KpiCard>
-                      <KpiLabel>Impressionen</KpiLabel>
+                      <KpiLabel>{lang === 'de' ? 'Impressionen' : 'Impressions'}</KpiLabel>
                       <KpiValue>{fmt(selectedReport.impressions)}</KpiValue>
                       {selectedReport.impressions_delta != null
                         ? <KpiDelta $up={selectedReport.impressions_delta >= 0}>{Math.abs(selectedReport.impressions_delta).toFixed(1)}%</KpiDelta>
-                        : <KpiEmpty>Kein Vergleich</KpiEmpty>}
+                        : <KpiEmpty>{lang === 'de' ? 'Kein Vergleich' : 'No comparison'}</KpiEmpty>}
                     </KpiCard>
                     <KpiCard>
                       <KpiLabel>Ø CTR</KpiLabel>
                       <KpiValue>{fmtPct(selectedReport.ctr)}</KpiValue>
                       {selectedReport.ctr_delta != null
                         ? <KpiDelta $up={selectedReport.ctr_delta >= 0}>{Math.abs(selectedReport.ctr_delta).toFixed(2)}%</KpiDelta>
-                        : <KpiEmpty>Kein Vergleich</KpiEmpty>}
+                        : <KpiEmpty>{lang === 'de' ? 'Kein Vergleich' : 'No comparison'}</KpiEmpty>}
                     </KpiCard>
                     <KpiCard>
-                      <KpiLabel>Ø Position</KpiLabel>
+                      <KpiLabel>{lang === 'de' ? 'Ø Position' : 'Avg. Position'}</KpiLabel>
                       <KpiValue>{fmtPos(selectedReport.avg_position)}</KpiValue>
                       {selectedReport.position_delta != null
                         ? <KpiDelta $up={selectedReport.position_delta <= 0}>{Math.abs(selectedReport.position_delta).toFixed(1)}</KpiDelta>
-                        : <KpiEmpty>Kein Vergleich</KpiEmpty>}
+                        : <KpiEmpty>{lang === 'de' ? 'Kein Vergleich' : 'No comparison'}</KpiEmpty>}
                     </KpiCard>
                   </KpiGrid>
 
                   {plan === 'basic' && (
                     <UpgradeHint>
                       <UpgradeHintText>
-                        <h3>🚀 Mit Pro bekommst du noch mehr</h3>
+                        <h3>{lang === 'de' ? '🚀 Mit Pro bekommst du noch mehr' : '🚀 Get even more with Pro'}</h3>
                         <ul>
-                          <li><strong>3 Domains:</strong> Mehrere Websites in einem Account verwalten</li>
+                          <li><strong>3 Domains:</strong> {lang === 'de' ? 'Mehrere Websites in einem Account verwalten' : 'Manage multiple websites in one account'}</li>
                           <li><strong>{t(lang, 'dash.seo_recs')}</strong> {t(lang, 'dash.seo_recs_sub')}</li>
-                          <li><strong>White-Label Reports:</strong> Reports mit eigenem Logo und Branding</li>
+                          <li><strong>White-Label Reports:</strong> {lang === 'de' ? 'Reports mit eigenem Logo und Branding' : 'Reports with your own logo and branding'}</li>
                         </ul>
                       </UpgradeHintText>
                     </UpgradeHint>
@@ -1492,7 +1496,7 @@ function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
 
                   {['basic', 'pro', 'agency'].includes(plan) && (
                     <>
-                      <SectionTitle>KI-Zusammenfassung</SectionTitle>
+                      <SectionTitle>{lang === 'de' ? 'KI-Zusammenfassung' : 'AI Summary'}</SectionTitle>
                       <SummaryCard>
                         {selectedReport.summary_text
                           ? <SummaryText>{selectedReport.summary_text}</SummaryText>
@@ -1634,21 +1638,21 @@ function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
                         ? keywords.map(k => (
                             <TableRow key={k.id}>
                               <TableLabel title={k.keyword}>{k.keyword}</TableLabel>
-                              <TableVal>{k.clicks} Klicks</TableVal>
+                              <TableVal>{k.clicks} {lang === 'de' ? 'Klicks' : 'clicks'}</TableVal>
                             </TableRow>
                           ))
-                        : <TableEmpty>Keine Keyword-Daten.<br /><a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" style={{ color: '#6C63FF' }}>GSC einrichten →</a></TableEmpty>}
+                        : <TableEmpty>{lang === 'de' ? 'Keine Keyword-Daten.' : 'No keyword data.'}<br /><a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" style={{ color: '#6C63FF' }}>{lang === 'de' ? 'GSC einrichten →' : 'Set up GSC →'}</a></TableEmpty>}
                     </TableCard>
                     <TableCard>
-                      <TableHeader>Top Seiten</TableHeader>
+                      <TableHeader>{lang === 'de' ? 'Top Seiten' : 'Top Pages'}</TableHeader>
                       {pages.length > 0
                         ? pages.map(p => (
                             <TableRow key={p.id}>
                               <TableLabel title={p.page_url}>{p.page_url.replace(/^https?:\/\/[^/]+/, '') || '/'}</TableLabel>
-                              <TableVal>{p.clicks} Klicks</TableVal>
+                              <TableVal>{p.clicks} {lang === 'de' ? 'Klicks' : 'clicks'}</TableVal>
                             </TableRow>
                           ))
-                        : <TableEmpty>Keine Seiten-Daten.<br /><a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" style={{ color: '#6C63FF' }}>GSC einrichten →</a></TableEmpty>}
+                        : <TableEmpty>{lang === 'de' ? 'Keine Seiten-Daten.' : 'No page data.'}<br /><a href="https://search.google.com/search-console" target="_blank" rel="noreferrer" style={{ color: '#6C63FF' }}>{lang === 'de' ? 'GSC einrichten →' : 'Set up GSC →'}</a></TableEmpty>}
                     </TableCard>
                   </TableGrid>
 
@@ -1954,12 +1958,12 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
             </TrialUpgradeTop>
             <TrialPlanGrid>
               {[
-                { key: 'basic', name: 'Basic', price: '19', features: ['1 Domain', t(lang, 'dash.feature_monthly_report'), 'GSC-Daten', t(lang, 'dash.feature_ai_summary'), t(lang, 'dash.feature_email')] },
-                { key: 'pro', name: 'Pro', price: '39', highlight: true, features: ['3 Domains', t(lang, 'dash.feature_all_basic'), 'GA4-Daten', 'SEO-Empfehlungen', 'White-Label'] },
+                { key: 'basic', name: 'Basic', price: '19', features: ['1 Domain', t(lang, 'dash.feature_monthly_report'), lang === 'de' ? 'GSC-Daten' : 'GSC Data', t(lang, 'dash.feature_ai_summary'), t(lang, 'dash.feature_email')] },
+                { key: 'pro', name: 'Pro', price: '39', highlight: true, features: ['3 Domains', t(lang, 'dash.feature_all_basic'), lang === 'de' ? 'GA4-Daten' : 'GA4 Data', lang === 'de' ? 'SEO-Empfehlungen' : 'SEO Recommendations', 'White-Label'] },
                 { key: 'agency', name: 'Agency', price: '79', features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', 'Bulk Reporting', 'Agency Branding'] },
               ].map(plan => (
                 <TrialPlanCard key={plan.key} $highlight={plan.highlight}>
-                  {plan.highlight && <TrialPlanBadge>Empfohlen</TrialPlanBadge>}
+                  {plan.highlight && <TrialPlanBadge>{lang === 'de' ? 'Empfohlen' : 'Recommended'}</TrialPlanBadge>}
                   <PlanName $highlight={plan.highlight}>{plan.name}</PlanName>
                   <PlanPrice $highlight={plan.highlight}>€{plan.price}<span>/mo</span></PlanPrice>
                   {plan.features.map(f => (
@@ -1999,7 +2003,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
                     disabled={upgrading}
                     style={{ fontSize: '0.8125rem', padding: '0.5rem 1rem', background: 'transparent', border: '1px solid rgba(108,99,255,0.4)', color: '#6C63FF' }}
                   >
-                    + Property hinzufügen
+                    {lang === 'de' ? '+ Property hinzufügen' : '+ Add Property'}
                   </BtnConnect>
                 )}
 
@@ -2022,7 +2026,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
 
                 {!canAdd && (
                   <BtnConnect onClick={() => setShowUpgradeModal(true)} disabled={upgrading} style={{ fontSize: '0.8125rem', padding: '0.5rem 1rem' }}>
-                    Upgrade für mehr Domains →
+                    {lang === 'de' ? 'Upgrade für mehr Domains →' : 'Upgrade for more domains →'}
                   </BtnConnect>
                 )}
               </div>
@@ -2040,13 +2044,19 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
                 fontWeight: 300,
                 lineHeight: 1.6,
               }}>
-                Verbinde dein Google-Konto um GSC-Properties auszuwählen und monatliche Reports zu erhalten. <strong>Der erste Monat ist kostenlos.</strong>
+                {lang === 'de'
+                  ? <>Verbinde dein Google-Konto um GSC-Properties auszuwählen und monatliche Reports zu erhalten. <strong>Der erste Monat ist kostenlos.</strong></>
+                  : <>Connect your Google account to select GSC properties and receive monthly reports. <strong>The first month is free.</strong></>
+                }
               </div>
             )}
 
             {activeProperties.length > 0 && (
               <div style={{ fontSize: '0.75rem', color: '#9898B8', fontWeight: 300, marginBottom: '0.5rem', textAlign: 'right' }}>
-                Properties verwalten oder entfernen → <a href="/settings" style={{ color: '#6C63FF', textDecoration: 'none' }}>Einstellungen</a>
+                {lang === 'de'
+                  ? <>Properties verwalten oder entfernen → <a href="/settings" style={{ color: '#6C63FF', textDecoration: 'none' }}>Einstellungen</a></>
+                  : <>Manage or remove properties → <a href="/settings" style={{ color: '#6C63FF', textDecoration: 'none' }}>Settings</a></>
+                }
               </div>
             )}
 
