@@ -706,22 +706,22 @@ const LightboxFallback = styled.div`
   text-align: center;
 `;
 
-const LightboxFallbackIcon = styled.div\`font-size: 4rem; line-height: 1;\`;
+const LightboxFallbackIcon = styled.div`font-size: 4rem; line-height: 1;`;
 
-const LightboxFallbackTitle = styled.div\`
+const LightboxFallbackTitle = styled.div`
   font-size: 1.1rem;
   font-weight: 700;
   color: #1C1C2E;
-\`;
+`;
 
-const LightboxFallbackSub = styled.div\`
+const LightboxFallbackSub = styled.div`
   font-size: 0.85rem;
   color: #7A7A96;
   max-width: 320px;
   line-height: 1.6;
-\`;
+`;
 
-const LightboxOpenBtn = styled.a\`
+const LightboxOpenBtn = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -733,7 +733,7 @@ const LightboxOpenBtn = styled.a\`
   border-radius: 8px;
   text-decoration: none;
   &:hover { background: #5a52e0; }
-\`;
+`;
 
 // ── Features ──────────────────────────────────────────────────────────────────
 const FeaturesGrid = styled.div`
@@ -1090,7 +1090,7 @@ const FaqA = styled.div`
   background: ${({ theme }) => theme.colors.bgCard};
 `;
 
-
+// ── i18n content ──────────────────────────────────────────────────────────────
 const i18n = {
   en: {
     badge: 'Automated SEO reporting for agencies & freelancers',
