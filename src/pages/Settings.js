@@ -770,6 +770,15 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  // Sync tier selector with current subscription
+  useEffect(() => {
+    if (profile && !tierInitialized) {
+      setTargetProps(profile.property_limit ?? 1);
+      setWlAddon(profile.white_label_enabled === true);
+      setTierInitialized(true);
+    }
+  }, [profile, tierInitialized]);
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/');
@@ -1415,7 +1424,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                       </div>
 
                       {/* Diff display */}
-                      {(targetProps !== currentProps || wlAddon !== hasWL) && (
+                      {tierInitialized && (targetProps !== currentProps || wlAddon !== hasWL) && (
                         <div style={{ marginTop:12, padding:'10px 14px', background: diff > 0 ? 'rgba(108,99,255,0.06)' : 'rgba(16,185,129,0.06)', border:`1px solid ${diff > 0 ? 'rgba(108,99,255,0.2)' : 'rgba(16,185,129,0.2)'}`, borderRadius:10, fontSize:'0.82rem' }}>
                           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
                             <span style={{ color:'var(--color-text-secondary)' }}>{isDE ? 'Neuer Monatsbetrag:' : 'New monthly amount:'}</span>
@@ -1430,7 +1439,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                       )}
 
                       {/* Downgrade warning */}
-                      {needsPropertySelection && (
+                      {tierInitialized && needsPropertySelection && (
                         <div style={{ marginTop:10, padding:'10px 14px', background:'rgba(245,158,11,0.08)', border:'1px solid rgba(245,158,11,0.25)', borderRadius:10, fontSize:'0.80rem', color:'#92400E' }}>
                           ⚠️ {isDE
                             ? `Du hast ${activePropsCount} Properties verbunden, der neue Plan erlaubt nur ${targetProps}. Beim Wechsel kannst du auswählen welche du behältst — die anderen werden am Ende der aktuellen Abrechnungsperiode deaktiviert.`
