@@ -941,7 +941,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
       .update({ ga_property_id: val || null })
       .eq('id', propertyId);
     if (error) showAlert(lang === 'de' ? 'Fehler beim Speichern.' : 'Error saving. Please try again.', 'error');
-    else showAlert('GA4 Property ID gespeichert.');
+    else showAlert(lang === 'de' ? '🎉 GA4 verbunden! Dein nächster Report enthält Besucher, Sessions & Engagement.' : '🎉 GA4 connected! Your next report will include visitors, sessions & engagement.');
     setGa4Saving(s => ({ ...s, [propertyId]: false }));
   };
 
@@ -1920,7 +1920,13 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
           user={user}
           plan={profile?.plan || 'free'}
           activeCount={properties.length}
-          onDone={() => { setShowPropertyModal(false); loadData(); }}
+          onDone={() => {
+            setShowPropertyModal(false);
+            loadData();
+            showAlert(lang === 'de'
+              ? '🎉 Geschafft! Jetzt zurücklehnen und auf den 1. warten – dein Report kommt automatisch.'
+              : '🎉 Done! Sit back and wait for the 1st – your report will arrive automatically.', 'success');
+          }}
           onNewAccount={() => { setShowPropertyModal(false); startOAuth(); }}
         />
       )}
