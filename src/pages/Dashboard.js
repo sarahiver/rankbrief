@@ -20,7 +20,7 @@ const fadeIn = keyframes`
 `;
 
 // ── Plan limits ────────────────────────────────────────────────────────────────
-const PLAN_LIMITS = { free: 1, basic: 1, pro: 3, agency: 10 };
+const PLAN_LIMITS = { free: 1, basic: 1, pro: 3, agency: 15 };
 
 // ── Layout ────────────────────────────────────────────────────────────────────
 const Layout = styled.div`
@@ -1164,13 +1164,13 @@ function FrozenWallView({ onUpgrade, upgrading, lang = 'de' }) {
       name: 'Pro',
       price: '39',
       highlight: true,
-      features: ['3 Domains', t(lang, 'dash.feature_all_basic'), t(lang, 'dash.feature_white_label'), t(lang, 'dash.feature_own_logo'), 'Priority Delivery'],
+      features: ['3 Domains', t(lang, 'dash.feature_all_basic'), 'White-Label + eigenes Logo', 'Kunden-E-Mail eintragbar', 'GA4-Daten'],
     },
     {
       key: 'agency',
       name: 'Agency',
       price: '79',
-      features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', 'Bulk Reporting', 'Agency Branding'],
+      features: ['15 Domains', t(lang, 'dash.feature_all_pro'), 'GEO-Readiness Score', 'Client Management', 'Bulk Reporting'],
     },
   ];
 
@@ -1870,6 +1870,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
   const plan     = profile?.plan || 'free';
   const limit    = PLAN_LIMITS[plan] ?? 1;
   const isAgency = plan === 'agency';
+  const isPro = ['pro', 'agency'].includes(plan);
   const activeProperties = properties.filter(p => p.status === 'active');
   const canAdd   = activeProperties.length < limit;
 
@@ -2066,7 +2067,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
                   <PropertyItem
                     key={p.id}
                     property={p}
-                    isAgency={isAgency}
+                    isAgency={isPro}
                     plan={plan}
                     lang={lang}
                     onReauth={startGoogleOAuth}

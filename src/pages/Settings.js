@@ -605,7 +605,7 @@ const PLAN_LIMITS = {
   free: { label: 'Free', domains: 1 },
   basic: { label: 'Basic', domains: 1 },
   pro: { label: 'Pro', domains: 3 },
-  agency: { label: 'Agency', domains: 10 },
+  agency: { label: 'Agency', domains: 15 },
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -997,6 +997,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
   const isFree = plan === 'free';
   const isPaid = ['basic', 'pro', 'agency'].includes(plan);
   const isPro  = ['pro', 'agency'].includes(plan);
+  const isAgency = plan === 'agency';
   const activeFontFF = FONTS.find(f => f.key === branding.brand_font)?.ff || 'Inter, sans-serif';
 
   if (loading) return (
