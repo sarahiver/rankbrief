@@ -612,6 +612,55 @@ const SampleBtn = styled.div`
   ${SampleCard}:hover & svg { transform: translateX(3px); }
 `;
 
+
+const SampleSingleWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+`;
+
+const SampleSingleBtn = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: ${({ theme }) => theme.colors.bgCard};
+  border: 1px solid rgba(108,99,255,0.3);
+  border-radius: 14px;
+  padding: 1.25rem 1.75rem;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 4px 24px rgba(108,99,255,0.10);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(108,99,255,0.18);
+  }
+`;
+
+const SampleSingleIcon = styled.div`
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+`;
+
+const SampleSingleText = styled.div`
+  flex: 1;
+`;
+
+const SampleSingleTitle = styled.div`
+  font-size: 1rem;
+  font-weight: 700;
+  color: #6C63FF;
+  margin-bottom: 3px;
+`;
+
+const SampleSingleSub = styled.div`
+  font-size: 0.78rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-family: monospace;
+`;
+
 const SampleHint = styled.p`
   font-size: 0.78rem; color: ${({ theme }) => theme.colors.textMuted};
   opacity: 0.55; text-align: center;
@@ -1108,18 +1157,14 @@ const i18n = {
     featLabel: 'Features',
     featTitle: 'Everything you need.\nNothing you don\'t.',
     featSub: 'No more time wasted on manual reports. Connect Google once, and RankBrief takes care of the rest.',
-    sampleLabel: 'Sample Reports',
-    sampleTitle: 'See a real client report.\n2 pages. Delivered automatically.',
-    sampleSub: 'This is exactly what lands in your client\'s inbox on the 1st of every month. Click to preview – then imagine sending this to all your clients automatically.',
+    sampleLabel: 'Sample Report',
+    sampleTitle: 'See exactly what your clients receive.',
+    sampleSub: 'A real RankBrief report — automatically generated, professionally formatted, ready to send.',
     samplePopular: 'Most popular',
-    sampleCards: [
-      { plan: 'Basic',  slug: 'basic',  icon: '📊', desc: 'GSC overview, top keywords & pages, AI summary and a plain-language legend. Clean and informative.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000004/RankBrief_zahnarzt-meier-hamburg-de_March-2026.pdf', featured: false },
-      { plan: 'Pro',    slug: 'pro',    icon: '🤖', desc: 'Everything in Basic, plus GA4 stats, 3 plain-language SEO recommendations, keyword opportunities and month-over-month tracking.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000005/RankBrief_naturkosmetik-shop-de_March-2026.pdf', featured: true },
-      { plan: 'Agency', slug: 'agency', icon: '🏢', desc: 'Full white-label with your logo and brand colors. Up to 10 domains. No RankBrief branding anywhere.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000006/RankBrief_autohaus-brenner-de_March-2026.pdf', featured: false },
-    ],
-    sampleCta: 'See exactly what your clients get →',
-    sampleClose: 'Close preview',
-    sampleHint: 'Open in browser → Ctrl+P → Save as PDF to get the exact file your clients receive.',
+    sampleFile: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000002/RankBrief_naturkosmetik-shop-de_Maerz-2026.pdf',
+    sampleCta: 'Open sample report →',
+    sampleClose: 'Close',
+    sampleHint: 'This is an automatically generated report — exactly what your clients receive every month.',
     pricingLabel: 'Pricing',
     pricingTitle: 'Simple pricing.\nNo surprises.',
     pricingSub: 'First month free. No credit card required.',
@@ -1174,18 +1219,14 @@ const i18n = {
     featLabel: 'Features',
     featTitle: 'Alles was du brauchst.\nNichts was du nicht brauchst.',
     featSub: 'Schluss mit stundenlanger Report-Arbeit. Verbinde einmal Google, und RankBrief erledigt den Rest.',
-    sampleLabel: 'Beispiel-Reports',
-    sampleTitle: 'Ein echter Kunden-Report.\n2 Seiten. Automatisch geliefert.',
-    sampleSub: 'Das ist genau das, was am 1. jeden Monats im Posteingang deines Kunden landet. Klick rein – und stell dir vor, das geht automatisch an alle deine Kunden.',
+    sampleLabel: 'Beispiel-Report',
+    sampleTitle: 'Sieh genau was deine Kunden erhalten.',
+    sampleSub: 'Ein echter RankBrief-Report — automatisch generiert, professionell aufbereitet, bereit zum Versand.',
     samplePopular: 'Am beliebtesten',
-    sampleCards: [
-      { plan: 'Basic',   slug: 'basic',  icon: '📊', desc: 'GSC-Übersicht, Top-Keywords & Seiten, KI-Zusammenfassung und Begriffserklärung. Klar und verständlich.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000001/RankBrief_zahnarzt-meier-hamburg-de_Maerz-2026.pdf', featured: false },
-      { plan: 'Pro',     slug: 'pro',    icon: '🤖', desc: 'Alles aus Basic plus GA4-Besucher­statistik, 3 verständliche SEO-Empfehlungen, Keyword-Chancen und Vormonatsvergleich.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000002/RankBrief_naturkosmetik-shop-de_Maerz-2026.pdf', featured: true },
-      { plan: 'Agentur', slug: 'agency', icon: '🏢', desc: 'Vollständiges White-Label mit eigenem Logo und Farben. Bis zu 10 Domains. Kein RankBrief-Branding.', file: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000003/RankBrief_autohaus-brenner-de_Maerz-2026.pdf', featured: false },
-    ],
-    sampleCta: 'Sieh genau was deine Kunden bekommen →',
-    sampleClose: 'Vorschau schließen',
-    sampleHint: 'Im Browser öffnen → Strg+P → Als PDF speichern – so kommt der Report beim Kunden an.',
+    sampleFile: 'https://ubexqxxkqjzhsgidsseh.supabase.co/storage/v1/object/public/reports/00000000-0000-0000-0000-000000000002/RankBrief_naturkosmetik-shop-de_Maerz-2026.pdf',
+    sampleCta: 'Beispiel-Report öffnen →',
+    sampleClose: 'Schließen',
+    sampleHint: 'Automatisch generiert — genau so kommt der Report jeden Monat bei deinen Kunden an.',
     pricingLabel: 'Preise',
     pricingTitle: 'Einfache Preise.\nKeine Überraschungen.',
     pricingSub: 'Erster Monat kostenlos. Keine Kreditkarte erforderlich.',
@@ -1516,36 +1557,34 @@ export default function Landing({ lang = 'de' }) {
         <ScrollHint className="mobile-only">← {lang === 'de' ? 'Wischen zum Erkunden' : 'Swipe to explore'} →</ScrollHint>
       </Section>
 
-      {/* SAMPLE REPORTS */}
+      {/* SAMPLE REPORT */}
       <Section>
         <SectionLabel>{t.sampleLabel}</SectionLabel>
-        <SectionTitle>{t.sampleTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>)}</SectionTitle>
+        <SectionTitle>{t.sampleTitle}</SectionTitle>
         <SectionSub>{t.sampleSub}</SectionSub>
-        <SampleGrid>
-          {t.sampleCards.map(s => (
-            <SampleCard key={s.plan} $featured={s.featured} onClick={() => {
-              if (isMobile) {
-                downloadSamplePdf(s);
-              } else {
-                trackEvent('sample_pdf_open', { plan: s.slug || s.plan.toLowerCase() });
-                setSampleOpen(s);
-              }
-            }}>
-              {s.featured && <SamplePopularBadge>{t.samplePopular}</SamplePopularBadge>}
-              <SampleCardHead>
-                <SampleIcon>{s.icon}</SampleIcon>
-                <SamplePlan>{s.plan}</SamplePlan>
-              </SampleCardHead>
-              <SampleDesc>{s.desc}</SampleDesc>
-              <SampleBtn>
-                {isMobile ? (lang === 'de' ? '↓ Als PDF herunterladen' : '↓ Download PDF') : t.sampleCta}
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M3 7h8M7 3l4 4-4 4" stroke="#6C63FF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </SampleBtn>
-            </SampleCard>
-          ))}
-        </SampleGrid>
+        <SampleSingleWrap>
+          <SampleSingleBtn onClick={() => {
+            if (isMobile) {
+              const a = document.createElement('a');
+              a.href = t.sampleFile;
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              a.click();
+            } else {
+              trackEvent('sample_pdf_open', { plan: 'pro' });
+              setSampleOpen({ plan: 'Pro', icon: '📄', file: t.sampleFile });
+            }
+          }}>
+            <SampleSingleIcon>📄</SampleSingleIcon>
+            <SampleSingleText>
+              <SampleSingleTitle>{t.sampleCta}</SampleSingleTitle>
+              <SampleSingleSub>naturkosmetik-shop.de · {lang === 'de' ? 'März 2026' : 'March 2026'} · Pro Plan</SampleSingleSub>
+            </SampleSingleText>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M4 10h12M10 4l6 6-6 6" stroke="#6C63FF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </SampleSingleBtn>
+        </SampleSingleWrap>
         <SampleHint>💡 {t.sampleHint}</SampleHint>
       </Section>
 
@@ -1556,7 +1595,7 @@ export default function Landing({ lang = 'de' }) {
             <LightboxHeader>
               <LightboxTitle>
                 <span>{sampleOpen.icon}</span>
-                <span>{sampleOpen.plan} – {t.sampleLabel}</span>
+                <span>{t.sampleLabel} · {sampleOpen.plan}</span>
               </LightboxTitle>
               <LightboxActions>
                 <LightboxDownloadBtn
