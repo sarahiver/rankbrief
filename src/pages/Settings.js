@@ -1474,45 +1474,66 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
             <SectionHead>
               <div>
                 <SectionTitle>🎟️ Promo-Code einlösen</SectionTitle>
-                <SectionSub>Hast du einen Code? Hier upgraden ohne Kreditkarte.</SectionSub>
+                <SectionSub>
+                  {profile?.promo_code_used && profile?.subscription_status === 'promo'
+                    ? (lang === 'de' ? 'Du hast bereits einen Code eingelöst.' : 'You have already redeemed a code.')
+                    : (lang === 'de' ? 'Hast du einen Code? Hier upgraden ohne Kreditkarte.' : 'Have a code? Upgrade here without a credit card.')}
+                </SectionSub>
               </div>
             </SectionHead>
             <SectionBody>
-              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                <input
-                  type="text"
-                  placeholder="z.B. 2026RANKBRIEFPROMO"
-                  value={promoCode}
-                  onChange={e => setPromoCode(e.target.value.toUpperCase())}
-                  onKeyDown={e => e.key === 'Enter' && handleRedeemPromo()}
-                  style={{
-                    padding: '0.625rem 1rem', borderRadius: '8px', fontSize: '0.875rem',
-                    letterSpacing: '0.06em', textTransform: 'uppercase', outline: 'none',
-                    border: '1px solid var(--border)', background: 'var(--bg)',
-                    color: 'var(--text)', width: '220px',
-                  }}
-                />
-                <button
-                  onClick={handleRedeemPromo}
-                  disabled={promoLoading || !promoCode.trim()}
-                  style={{
-                    padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700,
-                    fontSize: '0.875rem', background: '#6C63FF', color: '#fff',
-                    border: 'none', cursor: 'pointer', opacity: (promoLoading || !promoCode.trim()) ? 0.5 : 1,
-                  }}
-                >
-                  {promoLoading ? 'Prüfe…' : 'Einlösen →'}
-                </button>
-              </div>
-              {promoResult && (
-                <div style={{
-                  marginTop: '0.75rem', fontSize: '0.8125rem', fontWeight: 500,
-                  color: promoResult.success ? '#10B981' : '#EF4444',
-                }}>
-                  {promoResult.success
-                    ? `✅ Code aktiviert! Dein ${promoResult.plan}-Plan ist jetzt aktiv.`
-                    : `❌ ${promoResult.message}`}
+              {profile?.promo_code_used && profile?.subscription_status === 'promo' ? (
+                <div style={{ padding:'12px 16px', background:'rgba(0,0,0,0.03)', border:'1px solid var(--border)', borderRadius:10, opacity:0.6 }}>
+                  <div style={{ fontSize:'0.8rem', fontWeight:700, color:'var(--text-muted)', marginBottom:4 }}>
+                    {lang === 'de' ? 'Aktiver Code:' : 'Active code:'}
+                  </div>
+                  <div style={{ fontFamily:'monospace', fontSize:'1rem', fontWeight:700, letterSpacing:'0.1em', color:'#F59E0B' }}>
+                    {profile.promo_code_used}
+                  </div>
+                  <div style={{ fontSize:'0.75rem', color:'var(--text-muted)', marginTop:4 }}>
+                    {lang === 'de'
+                      ? 'Promo-Codes können nur einmal eingelöst werden. Nach Ablauf kannst du hier einen neuen Code eingeben.'
+                      : 'Promo codes can only be redeemed once. After expiry, you can enter a new code here.'}
+                  </div>
                 </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <input
+                      type="text"
+                      placeholder={lang === 'de' ? 'z.B. EARLY2026' : 'e.g. EARLY2026'}
+                      value={promoCode}
+                      onChange={e => setPromoCode(e.target.value.toUpperCase())}
+                      onKeyDown={e => e.key === 'Enter' && handleRedeemPromo()}
+                      style={{
+                        padding: '0.625rem 1rem', borderRadius: '8px', fontSize: '0.875rem',
+                        letterSpacing: '0.06em', textTransform: 'uppercase', outline: 'none',
+                        border: '1px solid var(--border)', background: 'var(--bg)',
+                        color: 'var(--text)', width: '220px',
+                      }}
+                    />
+                    <button
+                      onClick={handleRedeemPromo}
+                      disabled={promoLoading || !promoCode.trim()}
+                      style={{
+                        padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700,
+                        fontSize: '0.875rem', background: '#6C63FF', color: '#fff',
+                        border: 'none', cursor: 'pointer', opacity: (promoLoading || !promoCode.trim()) ? 0.5 : 1,
+                      }}
+                    >
+                      {promoLoading ? (lang === 'de' ? 'Prüfe…' : 'Checking…') : (lang === 'de' ? 'Einlösen →' : 'Redeem →')}
+                    </button>
+                  </div>
+                  {promoResult && (
+                    <div style={{ marginTop: '0.75rem', fontSize: '0.8125rem', fontWeight: 500, color: promoResult.success ? '#10B981' : '#EF4444' }}>
+                      {promoResult.success
+                        ? (lang === 'de'
+                          ? `✅ Aktiviert! ${promoResult.property_limit || 1} Properties${promoResult.white_label_enabled ? ' + White-Label' : ''} freigeschaltet.`
+                          : `✅ Activated! ${promoResult.property_limit || 1} properties${promoResult.white_label_enabled ? ' + white-label' : ''} unlocked.`)
+                        : `❌ ${promoResult.message}`}
+                    </div>
+                  )}
+                </>
               )}
             </SectionBody>
               </Section>
