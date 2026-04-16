@@ -1299,13 +1299,31 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                       ? (isDE ? '🚀 Abo wählen' : '🚀 Choose your plan')
                       : (isDE ? '📦 Plan anpassen' : '📦 Adjust plan')}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '0.75rem' }}>
-                      <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{isDE ? 'Properties:' : 'Properties:'}</span>
-                      <button onClick={() => setTargetProps(p => Math.max(1,p-1))} style={{ width:28, height:28, borderRadius:6, border:'1px solid rgba(108,99,255,0.3)', background:'transparent', cursor:'pointer', color:'#6C63FF' }}>−</button>
-                      <strong style={{ minWidth:24, textAlign:'center' }}>{targetProps}</strong>
-                      <button onClick={() => setTargetProps(p => p+1)} style={{ width:28, height:28, borderRadius:6, border:'1px solid rgba(108,99,255,0.3)', background:'transparent', cursor:'pointer', color:'#6C63FF' }}>+</button>
-                      <input type="range" min="1" max="30" value={targetProps} onChange={e => setTargetProps(+e.target.value)} style={{ flex:1, accentColor:'#6C63FF' }} />
-                    </div>
+                    <TierGrid style={{ marginBottom: '0.75rem' }}>
+                      {[
+                        { props:1,  price:19,  addons:[],                   labelDE:'1 Webseite',    labelEN:'1 website',    subDE:'Basis inklusive',       subEN:'Base included' },
+                        { props:4,  price:43,  addons:['prop_3'],           labelDE:'4 Webseiten',   labelEN:'4 websites',   subDE:'Basis + 3er Paket',     subEN:'Base + 3 pack' },
+                        { props:6,  price:49,  addons:['prop_5'],           labelDE:'6 Webseiten',   labelEN:'6 websites',   subDE:'Basis + 5er Paket',     subEN:'Base + 5 pack' },
+                        { props:11, price:69,  addons:['prop_10'],          labelDE:'11 Webseiten',  labelEN:'11 websites',  subDE:'Basis + 10er Paket',    subEN:'Base + 10 pack' },
+                        { props:16, price:99,  addons:['prop_10','prop_5'], labelDE:'16 Webseiten',  labelEN:'16 websites',  subDE:'Basis + 10er + 5er',    subEN:'Base + 10 + 5 pack' },
+                        { props:21, price:119, addons:['prop_10','prop_10'],labelDE:'21 Webseiten',  labelEN:'21 websites',  subDE:'Basis + 2× 10er Paket', subEN:'Base + 2× 10 pack' },
+                      ].map(tier => {
+                        const sel = targetProps === tier.props;
+                        const ppp = (tier.price / tier.props).toFixed(2);
+                        return (
+                          <TierRow key={tier.props} $selected={sel} onClick={() => setTargetProps(tier.props)}>
+                            <div>
+                              <TierLabel $selected={sel}>{isDE ? tier.labelDE : tier.labelEN}</TierLabel>
+                              <TierSub>{isDE ? tier.subDE : tier.subEN}</TierSub>
+                            </div>
+                            <TierPrice>
+                              <TierPriceMain $selected={sel}>€{tier.price}<span style={{fontWeight:400,fontSize:'0.72rem',color:'#888'}}>/mo</span></TierPriceMain>
+                              <TierPricePer>€{ppp}/{isDE?'Seite':'site'}</TierPricePer>
+                            </TierPrice>
+                          </TierRow>
+                        );
+                      })}
+                    </TierGrid>
                     <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:'1rem', cursor:'pointer' }} onClick={() => setWlAddon(w => !w)}>
                       <div style={{ width:32, height:18, borderRadius:9, background: wlAddon?'#6C63FF':'#E0E0E8', position:'relative', flexShrink:0 }}>
                         <div style={{ width:14, height:14, borderRadius:7, background:'#fff', position:'absolute', top:2, left: wlAddon?16:2, transition:'left 0.15s' }} />

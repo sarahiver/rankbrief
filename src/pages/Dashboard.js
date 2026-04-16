@@ -1807,7 +1807,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
   const loadProfile = async () => {
     const { data } = await supabase
       .from('profiles')
-      .select('plan, plan_status, free_report_sent, trial_ends_at, promo_code_used')
+      .select('plan, plan_status, free_report_sent, trial_ends_at, promo_code_used, property_limit, white_label_enabled, subscription_status')
       .eq('id', user.id)
       .single();
     setProfile(data);
