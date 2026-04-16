@@ -1356,52 +1356,104 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                     )}
                   </div>
 
-                  <div style={{ fontSize:'0.72rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em', color:'var(--color-text-secondary)', marginBottom:8 }}>
-                    {isDE ? 'Plan ändern oder erweitern' : 'Change or expand plan'}
-                  </div>
-                  <TierGrid>
-                    {[
-                      { props:1,  price:19,  addons:[],                   labelDE:'1 Webseite',    labelEN:'1 website',    subDE:'Basis inklusive',       subEN:'Base included' },
-                      { props:4,  price:43,  addons:['prop_3'],           labelDE:'4 Webseiten',   labelEN:'4 websites',   subDE:'Basis + 3er Paket',     subEN:'Base + 3 pack' },
-                      { props:6,  price:49,  addons:['prop_5'],           labelDE:'6 Webseiten',   labelEN:'6 websites',   subDE:'Basis + 5er Paket',     subEN:'Base + 5 pack' },
-                      { props:11, price:69,  addons:['prop_10'],          labelDE:'11 Webseiten',  labelEN:'11 websites',  subDE:'Basis + 10er Paket',    subEN:'Base + 10 pack' },
-                      { props:16, price:99,  addons:['prop_10','prop_5'], labelDE:'16 Webseiten',  labelEN:'16 websites',  subDE:'Basis + 10er + 5er',    subEN:'Base + 10 + 5 pack' },
-                      { props:21, price:119, addons:['prop_10','prop_10'],labelDE:'21 Webseiten',  labelEN:'21 websites',  subDE:'Basis + 2× 10er Paket', subEN:'Base + 2× 10 pack' },
-                    ].map(tier => {
-                      const sel = currentProps === tier.props;
-                      const ppp = (tier.price / tier.props).toFixed(2);
-                      return (
-                        <TierRow key={tier.props} $selected={sel} onClick={() => setTargetProps(tier.props)}
-                          style={{ opacity: sel ? 1 : 0.85 }}>
-                          <div>
-                            <TierLabel $selected={sel}>
-                              {isDE ? tier.labelDE : tier.labelEN}
-                              {sel && <span style={{ marginLeft:6, fontSize:'0.65rem', background:'rgba(16,185,129,0.15)', color:'#059669', borderRadius:4, padding:'1px 6px' }}>{isDE ? 'aktuell' : 'current'}</span>}
-                            </TierLabel>
-                            <TierSub>{isDE ? tier.subDE : tier.subEN}</TierSub>
-                          </div>
-                          <TierPrice>
-                            <TierPriceMain $selected={sel}>€{tier.price}<span style={{fontWeight:400,fontSize:'0.72rem',color:'#888'}}>/mo</span></TierPriceMain>
-                            <TierPricePer>€{ppp}/{isDE?'Seite':'site'}</TierPricePer>
-                          </TierPrice>
-                        </TierRow>
-                      );
-                    })}
-                  </TierGrid>
+                  {(() => {
+                    const tierPrices = { 1:19, 4:43, 6:49, 11:69, 16:99, 21:119 };
+                    const tierAddonsMap = { 1:[], 4:['prop_3'], 6:['prop_5'], 11:['prop_10'], 16:['prop_10','prop_5'], 21:['prop_10','prop_10'] };
+                    const currentTierPrice = (tierPrices[currentProps] || 19) + (hasWL ? 5 : 0);
+                    const selectedPrice = (tierPrices[targetProps] || 19) + (wlAddon ? 5 : 0);
+                    const diff = selectedPrice - currentTierPrice;
+                    const isDowngrade = targetProps < currentProps;
+                    const activePropsCount = properties.filter(p => p.status === 'active').length;
+                    const needsPropertySelection = isDowngrade && activePropsCount > targetProps;
 
-                  <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginTop:'1rem' }}>
-                    <Btn $variant="primary" onClick={handlePortal}>
-                      {isDE ? '💳 Abo verwalten →' : '💳 Manage subscription →'}
-                    </Btn>
-                    {!hasWL && (
-                      <Btn onClick={() => handleUpgrade(['whitelabel'])}>
-                        {isDE ? '+ White-Label (€5/Monat)' : '+ White-Label (€5/month)'}
-                      </Btn>
-                    )}
-                  </div>
-                  <FieldHint style={{ marginTop:'0.5rem' }}>
-                    {isDE ? 'Plan-Änderungen über das Stripe Billing Portal vornehmen.' : 'Make plan changes via the Stripe billing portal.'}
-                  </FieldHint>
+                    return (<>
+                      <div style={{ fontSize:'0.72rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em', color:'var(--color-text-secondary)', marginBottom:8 }}>
+                        {isDE ? 'Plan ändern oder erweitern' : 'Change or expand plan'}
+                      </div>
+                      <TierGrid>
+                        {[
+                          { props:1,  price:19,  labelDE:'1 Webseite',   labelEN:'1 website',   subDE:'Basis inklusive',       subEN:'Base included' },
+                          { props:4,  price:43,  labelDE:'4 Webseiten',  labelEN:'4 websites',  subDE:'Basis + 3er Paket',     subEN:'Base + 3 pack' },
+                          { props:6,  price:49,  labelDE:'6 Webseiten',  labelEN:'6 websites',  subDE:'Basis + 5er Paket',     subEN:'Base + 5 pack' },
+                          { props:11, price:69,  labelDE:'11 Webseiten', labelEN:'11 websites', subDE:'Basis + 10er Paket',    subEN:'Base + 10 pack' },
+                          { props:16, price:99,  labelDE:'16 Webseiten', labelEN:'16 websites', subDE:'Basis + 10er + 5er',    subEN:'Base + 10 + 5 pack' },
+                          { props:21, price:119, labelDE:'21 Webseiten', labelEN:'21 websites', subDE:'Basis + 2× 10er Paket', subEN:'Base + 2× 10 pack' },
+                        ].map(tier => {
+                          const isCurrent = currentProps === tier.props;
+                          const isSel = targetProps === tier.props;
+                          const ppp = (tier.price / tier.props).toFixed(2);
+                          return (
+                            <TierRow key={tier.props} $selected={isSel} onClick={() => { setTargetProps(tier.props); setWlAddon(hasWL); }}
+                              style={{ opacity: isSel ? 1 : 0.8 }}>
+                              <div>
+                                <TierLabel $selected={isSel}>
+                                  {isDE ? tier.labelDE : tier.labelEN}
+                                  {isCurrent && <span style={{ marginLeft:6, fontSize:'0.62rem', background:'rgba(16,185,129,0.15)', color:'#059669', borderRadius:4, padding:'1px 6px' }}>{isDE?'aktuell':'current'}</span>}
+                                </TierLabel>
+                                <TierSub>{isDE ? tier.subDE : tier.subEN}</TierSub>
+                              </div>
+                              <TierPrice>
+                                <TierPriceMain $selected={isSel}>€{tier.price}<span style={{fontWeight:400,fontSize:'0.72rem',color:'#888'}}>/mo</span></TierPriceMain>
+                                <TierPricePer>€{ppp}/{isDE?'Seite':'site'}</TierPricePer>
+                              </TierPrice>
+                            </TierRow>
+                          );
+                        })}
+                      </TierGrid>
+
+                      {/* White-Label toggle */}
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px', background:'var(--color-bg-elevated,#f8f8fc)', border:'1px solid rgba(0,0,0,0.08)', borderRadius:10, cursor:'pointer', marginTop:8 }}
+                        onClick={() => setWlAddon(w => !w)}>
+                        <div>
+                          <div style={{ fontWeight:600, fontSize:'0.85rem' }}>White-Label <span style={{ fontSize:'0.72rem', color:'#6C63FF', fontWeight:600 }}>+€5/Monat</span></div>
+                          <div style={{ fontSize:'0.70rem', color:'#888' }}>{isDE ? 'Eigenes Logo, kein RankBrief-Branding' : 'Your logo, no RankBrief branding'}</div>
+                        </div>
+                        <div style={{ width:36, height:20, borderRadius:10, background: wlAddon?'#6C63FF':'#D0D0E0', position:'relative', flexShrink:0 }}>
+                          <div style={{ width:16, height:16, borderRadius:8, background:'#fff', position:'absolute', top:2, left: wlAddon?18:2, transition:'left 0.15s' }} />
+                        </div>
+                      </div>
+
+                      {/* Diff display */}
+                      {(targetProps !== currentProps || wlAddon !== hasWL) && (
+                        <div style={{ marginTop:12, padding:'10px 14px', background: diff > 0 ? 'rgba(108,99,255,0.06)' : 'rgba(16,185,129,0.06)', border:`1px solid ${diff > 0 ? 'rgba(108,99,255,0.2)' : 'rgba(16,185,129,0.2)'}`, borderRadius:10, fontSize:'0.82rem' }}>
+                          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
+                            <span style={{ color:'var(--color-text-secondary)' }}>{isDE ? 'Neuer Monatsbetrag:' : 'New monthly amount:'}</span>
+                            <span style={{ fontWeight:800, fontSize:'1.1rem' }}>€{selectedPrice}/mo</span>
+                          </div>
+                          <div style={{ color: diff > 0 ? '#6C63FF' : '#10B981', fontWeight:600, marginTop:3 }}>
+                            {diff > 0
+                              ? `+ €${diff} ${isDE ? 'mehr als bisher' : 'more than current'}`
+                              : `− €${Math.abs(diff)} ${isDE ? 'Ersparnis' : 'savings'}`}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Downgrade warning */}
+                      {needsPropertySelection && (
+                        <div style={{ marginTop:10, padding:'10px 14px', background:'rgba(245,158,11,0.08)', border:'1px solid rgba(245,158,11,0.25)', borderRadius:10, fontSize:'0.80rem', color:'#92400E' }}>
+                          ⚠️ {isDE
+                            ? `Du hast ${activePropsCount} Properties verbunden, der neue Plan erlaubt nur ${targetProps}. Beim Wechsel kannst du auswählen welche du behältst — die anderen werden am Ende der aktuellen Abrechnungsperiode deaktiviert.`
+                            : `You have ${activePropsCount} properties connected, the new plan allows only ${targetProps}. When switching, you can choose which ones to keep — the others will be deactivated at the end of your current billing period.`}
+                        </div>
+                      )}
+
+                      {/* CTA */}
+                      <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginTop:'1rem' }}>
+                        {(targetProps !== currentProps || wlAddon !== hasWL) ? (
+                          <Btn $variant="primary" onClick={handlePortal}>
+                            {isDE ? '💳 Plan ändern im Billing Portal →' : '💳 Change plan in billing portal →'}
+                          </Btn>
+                        ) : (
+                          <Btn $variant="primary" onClick={handlePortal}>
+                            {isDE ? '💳 Abo verwalten →' : '💳 Manage subscription →'}
+                          </Btn>
+                        )}
+                      </div>
+                      <FieldHint style={{ marginTop:'0.5rem' }}>
+                        {isDE ? 'Änderungen werden über das Stripe Billing Portal vorgenommen.' : 'Changes are made via the Stripe billing portal.'}
+                      </FieldHint>
+                    </>);
+                  })()}
                 </div>
               );
             })()}
