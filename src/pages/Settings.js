@@ -696,6 +696,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
   const [targetProps, setTargetProps] = useState(1);
   const [wlAddon, setWlAddon] = useState(false);
   const [activeTab, setActiveTab] = useState('plan');
+  const [tierInitialized, setTierInitialized] = useState(false);
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoResult, setPromoResult] = useState(null);
   const [properties, setProperties] = useState([]);
@@ -1282,7 +1283,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
             {/* ── Add-ons / Upgrade ── */}
             {(() => {
               const isDE = lang === 'de';
-              const hasActiveSub = ['active', 'past_due'].includes(profile?.subscription_status);
+              const hasActiveSub = ['active', 'past_due', 'promo'].includes(profile?.subscription_status);
               const currentProps = profile?.property_limit ?? 1;
               const hasWL = profile?.white_label_enabled === true;
 
