@@ -1542,8 +1542,11 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               }}>
                 <div>
                   <div style={{ fontSize: '0.9375rem', fontWeight: 600 }}>
-                    {lang === 'de' ? 'Aktueller Plan' : 'Current Plan'}:{' '}
-                    <span style={{ color: '#6C63FF', textTransform: 'capitalize' }}>{profile.plan}</span>
+                    {lang === 'de' ? 'Aktueller Plan' : 'Current plan'}:{' '}
+                    <span style={{ color: '#6C63FF', fontWeight: 700 }}>
+                      {propertyLimit} {propertyLimit === 1 ? 'Property' : 'Properties'}
+                      {whiteLabelEnabled ? (lang === 'de' ? ' + White-Label' : ' + White-label') : ''}
+                    </span>
                   </div>
                   <div style={{ fontSize: '0.8125rem', color: '#888', marginTop: '0.2rem', fontWeight: 300 }}>
                     {lang === 'de'

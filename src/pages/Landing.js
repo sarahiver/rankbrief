@@ -1532,8 +1532,8 @@ export default function Landing({ lang = 'de' }) {
           <UrgencyTop>
             <span>⚡</span>
             {lang === 'de'
-              ? 'Early Access: 3 Monate Pro gratis'
-              : 'Early Access: 3 Months Pro Free'}
+              ? 'Early Access: Ersten Report + 3 Monate kostenlos'
+              : 'Early Access: First report + 3 months free'}
           </UrgencyTop>
           {promoUsed !== null && (
             <UrgencySlots>
