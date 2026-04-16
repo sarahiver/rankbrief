@@ -1880,28 +1880,82 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                   </PdfHeadLeft>
                   <PdfPeriod>SEO Report · {new Date().toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}</PdfPeriod>
                 </PdfHead>
+                {/* Cover strip */}
+                <div style={{ background: `linear-gradient(135deg, ${branding.brand_primary_color}22 0%, transparent 100%)`, borderBottom: `2px solid ${branding.brand_primary_color}30`, padding: '6px 14px', fontSize: '0.62rem', color: '#999', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                  {lang === 'de' ? 'Berichtsmonat' : 'Report period'}: {new Date().toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { month: 'long', year: 'numeric' })}
+                </div>
+
+                {/* KPI Cards */}
                 <PdfKpis>
-                  {[{l:'Clicks',v:'4.821',d:'▲ 12.4%'},{l:'Impressionen',v:'89.3k',d:'▲ 8.1%'},{l:'Ø CTR',v:'5.4%',d:'▲ 0.8%'},{l:'Ø Position',v:'14.2',d:'▲ 2.1'}].map(k => (
+                  {[
+                    {l: lang === 'de' ? 'Klicks' : 'Clicks', v:'4.821', d:'▲ 12.4%', up:true},
+                    {l:'Impressionen', v:'89.3k', d:'▲ 8.1%', up:true},
+                    {l:'Ø CTR', v:'5.4%', d:'▼ 0.3%', up:false},
+                    {l:'Ø Position', v:'14.2', d:'▲ 2.1', up:true}
+                  ].map(k => (
                     <PdfKpi key={k.l} $c={branding.brand_primary_color} $ff={activeFontFF}>
                       <div className="label">{k.l}</div>
                       <div className="val">{k.v}</div>
-                      <div className="delta">{k.d}</div>
+                      <div className="delta" style={{ color: k.up ? '#10B981' : '#EF4444' }}>{k.d}</div>
                     </PdfKpi>
                   ))}
                 </PdfKpis>
+
+                {/* SEO Score strip */}
+                <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 14px', background:'#f8f8fc', borderBottom:'1px solid #eee', fontSize:'0.72rem' }}>
+                  <div style={{ width:28, height:28, borderRadius:'50%', border:`3px solid #10B981`, display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:'0.7rem', color:'#10B981' }}>85</div>
+                  <div>
+                    <div style={{ fontWeight:700, fontSize:'0.75rem' }}>SEO Score: <span style={{ color: branding.brand_primary_color }}>85 / 100</span> — {lang === 'de' ? 'Sehr gut' : 'Excellent'}</div>
+                    <div style={{ color:'#999', fontSize:'0.62rem' }}>{lang === 'de' ? 'Berechnet aus CTR, Position und Klickentwicklung' : 'Calculated from CTR, position and click trend'}</div>
+                  </div>
+                </div>
+
+                {/* AI Summary */}
                 <PdfSummary $c={branding.brand_primary_color} $ff={activeFontFF}>
-                  🤖 KI-Zusammenfassung: Im vergangenen Monat verzeichnete deine Website starkes Wachstum. Die Klickrate stieg auf 5.4 %, getrieben durch bessere Rankings für deine Top-Keywords.
+                  {lang === 'de'
+                    ? '✦ Im März verzeichnete deine Website starkes Wachstum: Klicks +12,4 %, Positionen verbessert. Die CTR sank leicht — Snippet-Optimierung der Top-Seiten empfohlen.'
+                    : '✦ Strong growth this month: clicks +12.4%, rankings improved. CTR dipped slightly — snippet optimization recommended for top pages.'}
                 </PdfSummary>
-                <PdfTableHead $c={branding.brand_primary_color}><span>Top Keywords</span><span>Klicks</span></PdfTableHead>
-                {[['seo agentur hamburg',142],['website optimierung',98],['google ranking verbessern',76]].map(([kw,cl]) => (
+
+                {/* Markt-Radar mini */}
+                <div style={{ padding:'8px 14px 4px', borderBottom:'1px solid #f0f0f8' }}>
+                  <div style={{ fontSize:'0.60rem', fontWeight:800, textTransform:'uppercase', letterSpacing:'0.12em', color: branding.brand_primary_color, marginBottom:6 }}>
+                    🎯 {lang === 'de' ? 'Markt-Radar' : 'Market Radar'}
+                  </div>
+                  <div style={{ display:'flex', gap:6 }}>
+                    {[
+                      { label: lang === 'de' ? '🏆 Revier' : '🏆 Territory', kw:'naturkosmetik online', pos:'5.7', color:'rgba(16,185,129,0.12)', border:'rgba(16,185,129,0.3)', text:'#065F46' },
+                      { label: lang === 'de' ? '⚡ Angriff' : '⚡ Attack', kw:'bio sonnencreme', pos:'9.5', color:'rgba(14,165,233,0.10)', border:'rgba(14,165,233,0.3)', text:'#0369A1' },
+                      { label: lang === 'de' ? '💤 Potenzial' : '💤 Potential', kw:'ohne mikroplastik', pos:'22.3', color:'rgba(245,158,11,0.10)', border:'rgba(245,158,11,0.3)', text:'#92400E' },
+                    ].map(r => (
+                      <div key={r.label} style={{ flex:1, background:r.color, border:`1px solid ${r.border}`, borderRadius:6, padding:'5px 8px' }}>
+                        <div style={{ fontSize:'0.55rem', fontWeight:800, color:r.text, marginBottom:2 }}>{r.label}</div>
+                        <div style={{ fontSize:'0.65rem', fontWeight:600, color:'#333' }}>{r.kw}</div>
+                        <div style={{ fontSize:'0.58rem', color:'#888' }}>Pos. {r.pos}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Top Keywords */}
+                <PdfTableHead $c={branding.brand_primary_color}><span>{lang === 'de' ? 'Top Keywords' : 'Top Keywords'}</span><span>{lang === 'de' ? 'Klicks' : 'Clicks'}</span></PdfTableHead>
+                {[
+                  [lang === 'de' ? 'naturkosmetik online shop' : 'organic skincare shop', 642],
+                  [lang === 'de' ? 'gesichtscreme naturkosmetik' : 'natural face cream', 387],
+                  [lang === 'de' ? 'bio sonnencreme lsf50' : 'organic sunscreen spf50', 312],
+                ].map(([kw,cl]) => (
                   <PdfTableRow key={kw} $ff={activeFontFF}>
                     <span>{kw}</span>
-                    <span style={{ color: branding.brand_accent_color, fontWeight: 600 }}>{cl}</span>
+                    <span style={{ color: branding.brand_primary_color, fontWeight: 600 }}>{cl}</span>
                   </PdfTableRow>
                 ))}
+
+                {/* Footer */}
                 <PdfFoot $ff={activeFontFF}>
-                  <span>{branding.brand_company_name || 'RankBrief'} · Automatischer SEO-Report</span>
-                  <span style={{ color: branding.brand_accent_color }}>Powered by RankBrief</span>
+                  <span>{branding.brand_company_name || 'RankBrief'} · {lang === 'de' ? 'Automatischer SEO-Report' : 'Automated SEO Report'}</span>
+                  <span style={{ color: branding.brand_primary_color, fontWeight:700 }}>
+                    {whiteLabelEnabled && branding.brand_company_name ? branding.brand_company_name : 'RankBrief'}
+                  </span>
                 </PdfFoot>
               </PdfShell>
               <FieldHint>{lang === 'de' ? 'Echtzeit-Vorschau — das finale PDF kann minimal abweichen' : 'Real-time preview — the final PDF may differ slightly'}</FieldHint>
