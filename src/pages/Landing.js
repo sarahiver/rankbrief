@@ -1803,30 +1803,17 @@ export default function Landing({ lang = 'de' }) {
         {(() => {
           const isDE = lang === 'de';
           // Price calculation
-          const calcTotal = (props, wl) => {
-            let cost = 19, rem = Math.max(0, props - 1);
-            while (rem >= 10) { cost += 50; rem -= 10; }
-            if (rem >= 5) { cost += 30; rem -= 5; }
-            if (rem >= 1) { cost += 24; rem = 0; }
-            if (wl) cost += 5;
-            return cost;
-          };
-          const pricePerProp = (props) => {
-            if (props <= 1) return null;
-            const addCost = calcTotal(props, false) - 19;
-            const extra = props - 1;
-            return (addCost / extra).toFixed(2);
-          };
-          const total = calcTotal(configProps, configWL);
-          const ppp = pricePerProp(configProps);
+          const tierPrices = { 1:19, 4:43, 6:49, 11:69, 16:99, 21:119 };
+          const basePrice = tierPrices[configProps] || 19;
+          const total = basePrice + (configWL ? 5 : 0);
 
-          // Build register URL with config
+          // Build register URL from selected tier
+          const tierAddons = {
+            1: [], 4: ['prop_3'], 6: ['prop_5'], 11: ['prop_10'],
+            16: ['prop_10','prop_5'], 21: ['prop_10','prop_10']
+          };
           const buildUrl = () => {
-            const pkgs = [];
-            let rem = Math.max(0, configProps - 1);
-            while (rem >= 10) { pkgs.push('prop_10'); rem -= 10; }
-            if (rem >= 5) { pkgs.push('prop_5'); rem -= 5; }
-            if (rem >= 1) { pkgs.push('prop_3'); rem = 0; }
+            const pkgs = [...(tierAddons[configProps] || [])];
             if (configWL) pkgs.push('whitelabel');
             return `/register?addons=${pkgs.join(',')}&props=${configProps}`;
           };
@@ -1865,20 +1852,32 @@ export default function Landing({ lang = 'de' }) {
               <ConfigRight>
                 <SliderWrap>
                   <ConfigLabel>{isDE ? 'Wie viele Webseiten betreust du?' : 'How many websites do you manage?'}</ConfigLabel>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-                    <button onClick={() => setConfigProps(p => Math.max(1, p-1))}
-                      style={{ width:28, height:28, borderRadius:6, border:'1px solid rgba(108,99,255,0.3)', background:'transparent', cursor:'pointer', fontSize:'1rem', color:'#6C63FF', display:'flex', alignItems:'center', justifyContent:'center' }}>−</button>
-                    <strong style={{ fontSize:'1.4rem', fontWeight:800, minWidth:32, textAlign:'center' }}>{configProps}</strong>
-                    <button onClick={() => setConfigProps(p => p+1)}
-                      style={{ width:28, height:28, borderRadius:6, border:'1px solid rgba(108,99,255,0.3)', background:'transparent', cursor:'pointer', fontSize:'1rem', color:'#6C63FF', display:'flex', alignItems:'center', justifyContent:'center' }}>+</button>
-                    <SliderTrack type="range" min="1" max="21" value={configProps} onChange={e => setConfigProps(+e.target.value)} />
+                  <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:8 }}>
+                    {[
+                      { props:1,  price:19,  addons:[],                     label:isDE?'1 Webseite':'1 website',         sub:isDE?'Basis inklusive':'Base included' },
+                      { props:4,  price:43,  addons:['prop_3'],              label:isDE?'4 Webseiten':'4 websites',       sub:isDE?'Basis + 3er Paket':'Base + 3 pack' },
+                      { props:6,  price:49,  addons:['prop_5'],              label:isDE?'6 Webseiten':'6 websites',       sub:isDE?'Basis + 5er Paket':'Base + 5 pack' },
+                      { props:11, price:69,  addons:['prop_10'],             label:isDE?'11 Webseiten':'11 websites',     sub:isDE?'Basis + 10er Paket':'Base + 10 pack' },
+                      { props:16, price:99,  addons:['prop_10','prop_5'],    label:isDE?'16 Webseiten':'16 websites',     sub:isDE?'Basis + 10er + 5er':'Base + 10 + 5 pack' },
+                      { props:21, price:119, addons:['prop_10','prop_10'],   label:isDE?'21 Webseiten':'21 websites',     sub:isDE?'Basis + 2x 10er Paket':'Base + 2x 10 pack' },
+                    ].map(tier => {
+                      const selected = configProps === tier.props;
+                      const pppTier = (tier.price / tier.props).toFixed(2);
+                      return (
+                        <div key={tier.props} onClick={() => setConfigProps(tier.props)}
+                          style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px', borderRadius:10, border: selected ? '2px solid #6C63FF' : '1px solid rgba(0,0,0,0.1)', background: selected ? 'rgba(108,99,255,0.06)' : 'transparent', cursor:'pointer', transition:'all 0.15s' }}>
+                          <div>
+                            <div style={{ fontWeight:700, fontSize:'0.88rem', color: selected?'#6C63FF':'inherit' }}>{tier.label}</div>
+                            <div style={{ fontSize:'0.70rem', color:'#888', marginTop:1 }}>{tier.sub}</div>
+                          </div>
+                          <div style={{ textAlign:'right' }}>
+                            <div style={{ fontWeight:800, fontSize:'1rem', color: selected?'#6C63FF':'inherit' }}>€{tier.price}<span style={{ fontWeight:400, fontSize:'0.72rem', color:'#888' }}>/mo</span></div>
+                            <div style={{ fontSize:'0.65rem', color:'#10B981', fontWeight:600 }}>€{pppTier}/{isDE?'Seite':'site'}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <SliderSteps>
-                    <span>1</span><span>4</span><span>6</span><span>11</span><span>21</span>
-                  </SliderSteps>
-                  <SliderHint>
-                    {configProps > 1 && ppp ? (isDE ? `Nur ${ppp} € pro zusätzliche Webseite` : `Only €${ppp} per additional website`) : ''}
-                  </SliderHint>
                 </SliderWrap>
 
                 <WLToggleRow onClick={() => setConfigWL(w => !w)}>
