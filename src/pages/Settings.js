@@ -144,6 +144,89 @@ const PageTitle = styled.h1`
   margin-bottom: 2rem;
 `;
 
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+const TabBar = styled.div`
+  display: flex;
+  gap: 2px;
+  background: ${({ theme }) => theme.colors.bgElevated};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+`;
+
+const Tab = styled.button`
+  flex: 1;
+  min-width: 80px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.80rem;
+  font-weight: ${({ $active }) => $active ? 700 : 500};
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  background: ${({ $active, theme }) => $active ? theme.colors.bgCard : 'transparent'};
+  color: ${({ $active, theme }) => $active ? theme.colors.text : theme.colors.textMuted};
+  border: ${({ $active }) => $active ? '1px solid rgba(108,99,255,0.2)' : '1px solid transparent'};
+  box-shadow: ${({ $active }) => $active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none'};
+  &:hover {
+    background: ${({ $active, theme }) => $active ? theme.colors.bgCard : theme.colors.bgElevated};
+    color: ${({ theme }) => theme.colors.text};
+  }
+`;
+
+// ── Tier selector (settings) ──────────────────────────────────────────────────
+const TierGrid = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 1rem;
+`;
+
+const TierRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: ${({ $selected }) => $selected ? '2px solid #6C63FF' : '1px solid rgba(0,0,0,0.1)'};
+  background: ${({ $selected }) => $selected ? 'rgba(108,99,255,0.06)' : 'transparent'};
+  cursor: pointer;
+  transition: all 0.15s;
+  &:hover { border-color: rgba(108,99,255,0.3); }
+`;
+
+const TierLabel = styled.div`
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: ${({ $selected }) => $selected ? '#6C63FF' : 'inherit'};
+`;
+
+const TierSub = styled.div`
+  font-size: 0.68rem;
+  color: var(--color-text-muted, #888);
+  margin-top: 1px;
+`;
+
+const TierPrice = styled.div`
+  text-align: right;
+`;
+
+const TierPriceMain = styled.div`
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: ${({ $selected }) => $selected ? '#6C63FF' : 'inherit'};
+`;
+
+const TierPricePer = styled.div`
+  font-size: 0.65rem;
+  color: #10B981;
+  font-weight: 600;
+`;
+
 // ── Section ───────────────────────────────────────────────────────────────────
 const Section = styled.div`
   background: ${({ theme }) => theme.colors.bgCard};
@@ -617,6 +700,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
   const [promoCode, setPromoCode] = useState('');
   const [targetProps, setTargetProps] = useState(1);
   const [wlAddon, setWlAddon] = useState(false);
+  const [activeTab, setActiveTab] = useState('plan');
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoResult, setPromoResult] = useState(null);
   const [properties, setProperties] = useState([]);
@@ -1145,8 +1229,23 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
 
         {alert && <Alert $type={alert.type}>{alert.msg}</Alert>}
 
-        {/* ── Plan & Billing ─────────────────────────────────────────────── */}
-        <Section>
+        <TabBar>
+          {[
+            { id: 'plan',       labelDE: '💳 Plan & Abo',      labelEN: '💳 Plan & billing' },
+            { id: 'properties', labelDE: '🌐 Properties',       labelEN: '🌐 Properties' },
+            { id: 'branding',   labelDE: '🎨 Branding',         labelEN: '🎨 Branding' },
+            { id: 'google',     labelDE: '🔗 Google-Konten',    labelEN: '🔗 Google accounts' },
+            { id: 'account',    labelDE: '👤 Account',          labelEN: '👤 Account' },
+          ].map(tab => (
+            <Tab key={tab.id} $active={activeTab === tab.id} onClick={() => setActiveTab(tab.id)}>
+              {lang === 'de' ? tab.labelDE : tab.labelEN}
+            </Tab>
+          ))}
+        </TabBar>
+
+        {activeTab === 'plan' && (
+          <>
+            <Section>
           <SectionHead>
             <div>
               <SectionTitle>{t(lang, 'set.plan_billing')}</SectionTitle>
@@ -1185,14 +1284,9 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
 
               if (!hasActiveSub) {
                 // Not subscribed yet — show configurator
-                const calcPrice = (props, wl) => {
-                  let cost = 19, rem = Math.max(0, props - 1);
-                  while (rem >= 10) { cost += 50; rem -= 10; }
-                  if (rem >= 5) { cost += 30; rem -= 5; }
-                  if (rem >= 1) { cost += 24; rem = 0; }
-                  if (wl) cost += 5;
-                  return cost;
-                };
+                const tierPrices = { 1:19, 4:43, 6:49, 11:69, 16:99, 21:119 };
+                const tierAddons = { 1:[], 4:['prop_3'], 6:['prop_5'], 11:['prop_10'], 16:['prop_10','prop_5'], 21:['prop_10','prop_10'] };
+                const calcPrice = (props, wl) => (tierPrices[props] || 19) + (wl ? 5 : 0);
 
                 return (
                   <div style={{ marginTop: '1.25rem', padding: '1.25rem', background: 'rgba(108,99,255,0.06)', border: '1px solid rgba(108,99,255,0.18)', borderRadius: 12 }}>
@@ -1215,8 +1309,9 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                     <div style={{ display:'flex', alignItems:'baseline', gap:6, marginBottom:'0.75rem' }}>
                       <span style={{ fontSize:'1.8rem', fontWeight:800, color:'#1C1C2E' }}>€{calcPrice(targetProps, wlAddon)}</span>
                       <span style={{ fontSize:'13px', color:'#888' }}>{isDE ? '/Monat' : '/month'}</span>
+                      {targetProps > 1 && <span style={{ fontSize:'12px', color:'#10B981', fontWeight:600 }}>· €{(calcPrice(targetProps,false)/targetProps).toFixed(2)}/{isDE?'Seite':'site'}</span>}
                     </div>
-                    <Btn $variant="primary" onClick={() => { const pkgs = calcCheckoutPackages(targetProps); if (wlAddon) pkgs.push('whitelabel'); handleUpgrade(pkgs); }}>
+                    <Btn $variant="primary" onClick={() => { const pkgs = [...(tierAddons[targetProps] || [])]; if (wlAddon) pkgs.push('whitelabel'); handleUpgrade(pkgs); }}>
                       {isDE ? 'Jetzt starten →' : 'Get started →'}
                     </Btn>
                   </div>
@@ -1253,10 +1348,100 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               );
             })()}
           </SectionBody>
-        </Section>
+                    </Section>
 
-        {/* ── Properties ─────────────────────────────────────────────────── */}
-        <Section>
+            <Section>
+            <SectionHead>
+              <div>
+                <SectionTitle>🎟️ Promo-Code einlösen</SectionTitle>
+                <SectionSub>Hast du einen Code? Hier upgraden ohne Kreditkarte.</SectionSub>
+              </div>
+            </SectionHead>
+            <SectionBody>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  placeholder="z.B. 2026RANKBRIEFPROMO"
+                  value={promoCode}
+                  onChange={e => setPromoCode(e.target.value.toUpperCase())}
+                  onKeyDown={e => e.key === 'Enter' && handleRedeemPromo()}
+                  style={{
+                    padding: '0.625rem 1rem', borderRadius: '8px', fontSize: '0.875rem',
+                    letterSpacing: '0.06em', textTransform: 'uppercase', outline: 'none',
+                    border: '1px solid var(--border)', background: 'var(--bg)',
+                    color: 'var(--text)', width: '220px',
+                  }}
+                />
+                <button
+                  onClick={handleRedeemPromo}
+                  disabled={promoLoading || !promoCode.trim()}
+                  style={{
+                    padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700,
+                    fontSize: '0.875rem', background: '#6C63FF', color: '#fff',
+                    border: 'none', cursor: 'pointer', opacity: (promoLoading || !promoCode.trim()) ? 0.5 : 1,
+                  }}
+                >
+                  {promoLoading ? 'Prüfe…' : 'Einlösen →'}
+                </button>
+              </div>
+              {promoResult && (
+                <div style={{
+                  marginTop: '0.75rem', fontSize: '0.8125rem', fontWeight: 500,
+                  color: promoResult.success ? '#10B981' : '#EF4444',
+                }}>
+                  {promoResult.success
+                    ? `✅ Code aktiviert! Dein ${promoResult.plan}-Plan ist jetzt aktiv.`
+                    : `❌ ${promoResult.message}`}
+                </div>
+              )}
+            </SectionBody>
+              </Section>
+
+            <Section>
+            <SectionHead>
+              <div>
+                <SectionTitle>💳 {lang === 'de' ? 'Billing & Rechnungen' : 'Billing & Invoices'}</SectionTitle>
+                <SectionSub>
+                  {lang === 'de'
+                    ? 'Zahlungsmethode ändern, Rechnungen downloaden und Abo verwalten.'
+                    : 'Update payment method, download invoices and manage your subscription.'}
+                </SectionSub>
+              </div>
+            </SectionHead>
+            <SectionBody>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                padding: '1rem 1.25rem',
+                background: 'rgba(108,99,255,0.05)',
+                border: '1px solid rgba(108,99,255,0.15)',
+                borderRadius: '10px',
+              }}>
+                <div>
+                  <div style={{ fontSize: '0.9375rem', fontWeight: 600 }}>
+                    {lang === 'de' ? 'Aktueller Plan' : 'Current Plan'}:{' '}
+                    <span style={{ color: '#6C63FF', textTransform: 'capitalize' }}>{profile.plan}</span>
+                  </div>
+                  <div style={{ fontSize: '0.8125rem', color: '#888', marginTop: '0.2rem', fontWeight: 300 }}>
+                    {lang === 'de'
+                      ? 'Rechnungen, Zahlungsmethode & Abo im Stripe-Portal verwalten.'
+                      : 'Manage invoices, payment method & subscription in the Stripe portal.'}
+                  </div>
+                </div>
+                <Btn $variant="primary" onClick={handlePortal} disabled={portalLoading} style={{ whiteSpace: 'nowrap' }}>
+                  {portalLoading ? '...' : (lang === 'de' ? '🧾 Rechnungen & Billing →' : '🧾 Invoices & Billing →')}
+                </Btn>
+              </div>
+            </SectionBody>
+              </Section>
+          </>
+        )}
+
+        {activeTab === 'properties' && (
+          <Section>
           <SectionHead>
             <div>
               <SectionTitle>Properties</SectionTitle>
@@ -1410,11 +1595,11 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               </FieldHint>
             )}
           </SectionBody>
-        </Section>
+          </Section>
+        )}
 
-
-        {/* ── Branding & White-Label ───────────────────────────────────── */}
-        <Section>
+        {activeTab === 'branding' && (
+          <Section>
           <SectionHead>
             <div>
               <SectionTitle>Branding & White-Label <ProTag>Pro / Agency</ProTag></SectionTitle>
@@ -1615,104 +1800,11 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               {brandingSaving ? (lang === 'de' ? 'Wird gespeichert...' : 'Saving...') : (lang === 'de' ? 'Branding speichern' : 'Save Branding')}
             </Btn>
           </SectionBody>
-        </Section>
-
-        {/* ── Promo Code ──────────────────────────────────────────────────── */}
-        {profile?.plan === 'free' && !profile?.promo_code_used && (
-          <Section>
-            <SectionHead>
-              <div>
-                <SectionTitle>🎟️ Promo-Code einlösen</SectionTitle>
-                <SectionSub>Hast du einen Code? Hier upgraden ohne Kreditkarte.</SectionSub>
-              </div>
-            </SectionHead>
-            <SectionBody>
-              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                <input
-                  type="text"
-                  placeholder="z.B. 2026RANKBRIEFPROMO"
-                  value={promoCode}
-                  onChange={e => setPromoCode(e.target.value.toUpperCase())}
-                  onKeyDown={e => e.key === 'Enter' && handleRedeemPromo()}
-                  style={{
-                    padding: '0.625rem 1rem', borderRadius: '8px', fontSize: '0.875rem',
-                    letterSpacing: '0.06em', textTransform: 'uppercase', outline: 'none',
-                    border: '1px solid var(--border)', background: 'var(--bg)',
-                    color: 'var(--text)', width: '220px',
-                  }}
-                />
-                <button
-                  onClick={handleRedeemPromo}
-                  disabled={promoLoading || !promoCode.trim()}
-                  style={{
-                    padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700,
-                    fontSize: '0.875rem', background: '#6C63FF', color: '#fff',
-                    border: 'none', cursor: 'pointer', opacity: (promoLoading || !promoCode.trim()) ? 0.5 : 1,
-                  }}
-                >
-                  {promoLoading ? 'Prüfe…' : 'Einlösen →'}
-                </button>
-              </div>
-              {promoResult && (
-                <div style={{
-                  marginTop: '0.75rem', fontSize: '0.8125rem', fontWeight: 500,
-                  color: promoResult.success ? '#10B981' : '#EF4444',
-                }}>
-                  {promoResult.success
-                    ? `✅ Code aktiviert! Dein ${promoResult.plan}-Plan ist jetzt aktiv.`
-                    : `❌ ${promoResult.message}`}
-                </div>
-              )}
-            </SectionBody>
           </Section>
         )}
 
-        {/* ── Billing ─────────────────────────────────────────────────── */}
-        {profile?.plan && profile.plan !== 'free' && (
+        {activeTab === 'google' && (
           <Section>
-            <SectionHead>
-              <div>
-                <SectionTitle>💳 {lang === 'de' ? 'Billing & Rechnungen' : 'Billing & Invoices'}</SectionTitle>
-                <SectionSub>
-                  {lang === 'de'
-                    ? 'Zahlungsmethode ändern, Rechnungen downloaden und Abo verwalten.'
-                    : 'Update payment method, download invoices and manage your subscription.'}
-                </SectionSub>
-              </div>
-            </SectionHead>
-            <SectionBody>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '1rem',
-                padding: '1rem 1.25rem',
-                background: 'rgba(108,99,255,0.05)',
-                border: '1px solid rgba(108,99,255,0.15)',
-                borderRadius: '10px',
-              }}>
-                <div>
-                  <div style={{ fontSize: '0.9375rem', fontWeight: 600 }}>
-                    {lang === 'de' ? 'Aktueller Plan' : 'Current Plan'}:{' '}
-                    <span style={{ color: '#6C63FF', textTransform: 'capitalize' }}>{profile.plan}</span>
-                  </div>
-                  <div style={{ fontSize: '0.8125rem', color: '#888', marginTop: '0.2rem', fontWeight: 300 }}>
-                    {lang === 'de'
-                      ? 'Rechnungen, Zahlungsmethode & Abo im Stripe-Portal verwalten.'
-                      : 'Manage invoices, payment method & subscription in the Stripe portal.'}
-                  </div>
-                </div>
-                <Btn $variant="primary" onClick={handlePortal} disabled={portalLoading} style={{ whiteSpace: 'nowrap' }}>
-                  {portalLoading ? '...' : (lang === 'de' ? '🧾 Rechnungen & Billing →' : '🧾 Invoices & Billing →')}
-                </Btn>
-              </div>
-            </SectionBody>
-          </Section>
-        )}
-
-        {/* ── Google-Konten ─────────────────────────────────────────────── */}
-        <Section>
           <SectionHead>
             <div>
               <SectionTitle>{lang === 'de' ? 'Verbundene Google-Konten' : 'Connected Google Accounts'}</SectionTitle>
@@ -1751,10 +1843,12 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               </div>
             )}
           </SectionBody>
-        </Section>
+          </Section>
+        )}
 
-        {/* ── Account ─────────────────────────────────────────────────────── */}
-        <Section>
+        {activeTab === 'account' && (
+          <>
+            <Section>
           <SectionHead>
             <div>
               <SectionTitle>Account</SectionTitle>
@@ -1785,10 +1879,9 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               {pwLoading ? t(lang, 'saving') : t(lang, 'set.save_password')}
             </Btn>
           </SectionBody>
-        </Section>
+            </Section>
 
-        {/* ── Danger Zone ────────────────────────────────────────────────── */}
-        <Section>
+            <Section>
           <SectionHead>
             <div>
               <SectionTitle style={{ color: '#EF4444' }}>Danger Zone</SectionTitle>
@@ -1807,7 +1900,9 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               </Btn>
             </DangerZone>
           </SectionBody>
-        </Section>
+            </Section>
+          </>
+        )}
       </Main>
     </Layout>
 
