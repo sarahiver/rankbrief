@@ -1482,21 +1482,85 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               </div>
             </SectionHead>
             <SectionBody>
-              {profile?.promo_code_used && profile?.subscription_status === 'promo' ? (
-                <div style={{ padding:'12px 16px', background:'rgba(0,0,0,0.03)', border:'1px solid var(--border)', borderRadius:10, opacity:0.6 }}>
-                  <div style={{ fontSize:'0.8rem', fontWeight:700, color:'var(--text-muted)', marginBottom:4 }}>
-                    {lang === 'de' ? 'Aktiver Code:' : 'Active code:'}
-                  </div>
-                  <div style={{ fontFamily:'monospace', fontSize:'1rem', fontWeight:700, letterSpacing:'0.1em', color:'#F59E0B' }}>
-                    {profile.promo_code_used}
-                  </div>
-                  <div style={{ fontSize:'0.75rem', color:'var(--text-muted)', marginTop:4 }}>
-                    {lang === 'de'
-                      ? 'Promo-Codes können nur einmal eingelöst werden. Nach Ablauf kannst du hier einen neuen Code eingeben.'
-                      : 'Promo codes can only be redeemed once. After expiry, you can enter a new code here.'}
-                  </div>
-                </div>
-              ) : (
+              {(() => {
+                const isPromoActive = profile?.promo_code_used && profile?.subscription_status === 'promo';
+                const isPromoExpired = profile?.promo_code_used && ['expired', 'trial', null].includes(profile?.subscription_status) && profile?.subscription_status !== 'active';
+                const reportsLeft = profile?.promo_reports_limit != null
+                  ? Math.max(0, (profile.promo_reports_limit || 0) - (profile.promo_reports_used || 0))
+                  : null;
+                const propLimit = profile?.property_limit ?? 1;
+                const hasWLPromo = profile?.white_label_enabled === true;
+
+                if (isPromoActive) {
+                  return (
+                    <div style={{ borderRadius:10, overflow:'hidden', border:'1px solid rgba(245,158,11,0.25)' }}>
+                      {/* Active promo header */}
+                      <div style={{ padding:'10px 14px', background:'rgba(245,158,11,0.08)', borderBottom:'1px solid rgba(245,158,11,0.15)', display:'flex', alignItems:'center', gap:8 }}>
+                        <span style={{ fontSize:'1rem' }}>🎟️</span>
+                        <div>
+                          <div style={{ fontWeight:700, fontSize:'0.85rem', color:'#92400E' }}>
+                            {lang === 'de' ? 'Promo-Code aktiv:' : 'Promo code active:'}
+                            <span style={{ fontFamily:'monospace', marginLeft:6, color:'#D97706', letterSpacing:'0.08em' }}>{profile.promo_code_used}</span>
+                          </div>
+                          <div style={{ fontSize:'0.72rem', color:'#B45309', marginTop:2 }}>
+                            {lang === 'de'
+                              ? `Du zahlst ${reportsLeft != null ? `für die nächsten ${reportsLeft} Report${reportsLeft !== 1 ? 's' : ''}` : 'für diesen Zeitraum'} nichts für ${propLimit} ${propLimit === 1 ? 'Property' : 'Properties'}${hasWLPromo ? ' + White-Label' : ''}.`
+                              : `You pay nothing for ${reportsLeft != null ? `the next ${reportsLeft} report${reportsLeft !== 1 ? 's' : ''}` : 'this period'} for ${propLimit} ${propLimit === 1 ? 'property' : 'properties'}${hasWLPromo ? ' + white-label' : ''}.`}
+                          </div>
+                        </div>
+                      </div>
+                      {/* Optional upgrade */}
+                      <div style={{ padding:'10px 14px', fontSize:'0.78rem', color:'var(--text-muted)' }}>
+                        {lang === 'de'
+                          ? 'Möchtest du trotzdem jetzt upgraden? '
+                          : 'Want to upgrade early? '}
+                        <span
+                          style={{ color:'#6C63FF', fontWeight:600, cursor:'pointer', textDecoration:'underline' }}
+                          onClick={() => setActiveTab('plan')}
+                        >
+                          {lang === 'de' ? 'Plan wählen →' : 'Choose plan →'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (isPromoExpired) {
+                  return (
+                    <div style={{ borderRadius:10, border:'1px solid rgba(239,68,68,0.25)', overflow:'hidden' }}>
+                      <div style={{ padding:'10px 14px', background:'rgba(239,68,68,0.06)', borderBottom:'1px solid rgba(239,68,68,0.12)' }}>
+                        <div style={{ fontWeight:700, fontSize:'0.85rem', color:'#DC2626', marginBottom:3 }}>
+                          ⚠️ {lang === 'de' ? 'Promo-Zeitraum abgelaufen' : 'Promo period expired'}
+                        </div>
+                        <div style={{ fontSize:'0.75rem', color:'#991B1B' }}>
+                          {lang === 'de'
+                            ? 'Dein kostenloser Zeitraum ist vorbei. Es werden keine neuen Reports mehr generiert.'
+                            : 'Your free period has ended. No new reports will be generated.'}
+                        </div>
+                      </div>
+                      <div style={{ padding:'12px 14px' }}>
+                        <Btn $variant="primary" onClick={() => setActiveTab('plan')} style={{ marginBottom:'0.75rem', width:'100%' }}>
+                          {lang === 'de' ? '🚀 Jetzt Plan wählen →' : '🚀 Choose a plan now →'}
+                        </Btn>
+                        <div style={{ fontSize:'0.72rem', color:'var(--text-muted)', marginBottom:'0.5rem' }}>
+                          {lang === 'de' ? 'Oder weiteren Promo-Code eingeben:' : 'Or enter another promo code:'}
+                        </div>
+                        <div style={{ display:'flex', gap:8 }}>
+                          <input type="text" placeholder={lang === 'de' ? 'Neuer Code' : 'New code'}
+                            value={promoCode} onChange={e => setPromoCode(e.target.value.toUpperCase())}
+                            onKeyDown={e => e.key === 'Enter' && handleRedeemPromo()}
+                            style={{ flex:1, padding:'0.5rem 0.75rem', borderRadius:8, fontSize:'0.85rem', letterSpacing:'0.06em', textTransform:'uppercase', border:'1px solid var(--border)', background:'var(--bg)', color:'var(--text)' }} />
+                          <button onClick={handleRedeemPromo} disabled={promoLoading || !promoCode.trim()}
+                            style={{ padding:'0.5rem 1rem', borderRadius:8, fontWeight:700, fontSize:'0.85rem', background:'#6C63FF', color:'#fff', border:'none', cursor:'pointer', opacity: (promoLoading || !promoCode.trim()) ? 0.5 : 1 }}>
+                            {promoLoading ? '…' : (lang === 'de' ? 'Einlösen' : 'Redeem')}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (<>
                 <>
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
                     <input
@@ -1533,8 +1597,8 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                         : `❌ ${promoResult.message}`}
                     </div>
                   )}
-                </>
-              )}
+                </>);
+              })()}
             </SectionBody>
               </Section>
 
