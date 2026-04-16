@@ -2047,7 +2047,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap' }}>
                 {activeProperties.length > 0 && (
                   <PropertyCountBadge>
-                    {activeProperties.length} / {limit} ({plan === 'free' ? 'Free' : plan.charAt(0).toUpperCase() + plan.slice(1)})
+                    {activeProperties.length} / {propertyLimit}
                   </PropertyCountBadge>
                 )}
 

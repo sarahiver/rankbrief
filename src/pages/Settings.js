@@ -615,6 +615,8 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
   const [googleAccounts, setGoogleAccounts] = useState([]);
   const [showPropertyModal, setShowPropertyModal] = useState(false);
   const [promoCode, setPromoCode] = useState('');
+  const [targetProps, setTargetProps] = useState(1);
+  const [wlAddon, setWlAddon] = useState(false);
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoResult, setPromoResult] = useState(null);
   const [properties, setProperties] = useState([]);
@@ -1183,9 +1185,6 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
 
               if (!hasActiveSub) {
                 // Not subscribed yet — show configurator
-                const [targetProps, setTargetProps] = React.useState(1);
-                const [wlAddon, setWlAddon] = React.useState(false);
-
                 const calcPrice = (props, wl) => {
                   let cost = 19, rem = Math.max(0, props - 1);
                   while (rem >= 10) { cost += 50; rem -= 10; }
