@@ -1923,11 +1923,10 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
   };
 
   const plan     = profile?.plan || 'free';
-  const limit    = PLAN_LIMITS[plan] ?? 1;
   const whiteLabelEnabled = profile?.white_label_enabled === true;
   const propertyLimit = profile?.property_limit ?? 1;
   const activeProperties = properties.filter(p => p.status === 'active');
-  const canAdd   = activeProperties.length < limit;
+  const canAdd   = activeProperties.length < propertyLimit;
 
   // ── Frozen Account ──────────────────────────────────────────────────────────
   if (profile?.plan_status === 'frozen') {
@@ -2122,7 +2121,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
                   <PropertyItem
                     key={p.id}
                     property={p}
-                    isAgency={isPro}
+                    isAgency={whiteLabelEnabled}
                     plan={plan}
                     lang={lang}
                     onReauth={startGoogleOAuth}

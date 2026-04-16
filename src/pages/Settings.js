@@ -1253,13 +1253,6 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                 </div>
               );
             })()}
-                {isPaid && (
-                  <Btn onClick={handlePortal} disabled={portalLoading} style={{ fontSize: '13px', padding: '6px 14px' }}>
-                    {portalLoading ? '...' : t(lang, 'set.billing_portal')}
-                  </Btn>
-                )}
-              </div>
-            </div>
           </SectionBody>
         </Section>
 
