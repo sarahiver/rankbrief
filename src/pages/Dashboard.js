@@ -20,7 +20,7 @@ const fadeIn = keyframes`
 `;
 
 // ── Plan limits ────────────────────────────────────────────────────────────────
-const PLAN_LIMITS = { free: 1, basic: 1, pro: 3, agency: 15 };
+// Property limit now comes from profiles.property_limit
 
 // ── Layout ────────────────────────────────────────────────────────────────────
 const Layout = styled.div`
@@ -1151,59 +1151,129 @@ function fmtPos(n) {
 }
 
 // ── Frozen Wall Component ─────────────────────────────────────────────────────
-function FrozenWallView({ onUpgrade, upgrading, lang = 'de' }) {
-  const plans = [
-    {
-      key: 'basic',
-      name: 'Basic',
-      price: '19',
-      features: ['1 Domain', t(lang, 'dash.feature_monthly_report'), t(lang, 'dash.feature_gsc_ga4'), t(lang, 'dash.feature_ai_summary'), t(lang, 'dash.feature_email')],
-    },
-    {
-      key: 'pro',
-      name: 'Pro',
-      price: '39',
-      highlight: true,
-      features: ['3 Domains', t(lang, 'dash.feature_all_basic'), 'White-Label + eigenes Logo', 'Kunden-E-Mail eintragbar', 'GA4-Daten'],
-    },
-    {
-      key: 'agency',
-      name: 'Agency',
-      price: '79',
-      features: ['15 Domains', t(lang, 'dash.feature_all_pro'), 'GEO-Readiness Score', 'Client Management', 'Bulk Reporting'],
-    },
-  ];
+// ── Property Configurator (shared between FrozenWall + UpgradeModal) ─────────
+function PropertyConfigurator({ onCheckout, upgrading, lang = 'de' }) {
+  const isDE = lang === 'de';
+  const [targetProps, setTargetProps] = React.useState(1);
+  const [whiteLabel, setWhiteLabel] = React.useState(false);
 
+  // Calculate cheapest package combination
+  function calcPackages(extraProps) {
+    const pkgs = [];
+    let remaining = extraProps;
+    while (remaining >= 10) { pkgs.push('prop_10'); remaining -= 10; }
+    if (remaining >= 5) { pkgs.push('prop_5'); remaining -= 5; }
+    if (remaining >= 1) { pkgs.push('prop_3'); remaining -= 3; remaining = Math.max(0, remaining); }
+    // Check if 3er is overkill for last step
+    return pkgs;
+  }
+
+  function calcPrice(props, wl) {
+    const extra = Math.max(0, props - 1);
+    let cost = 19;
+    let remaining = extra;
+    while (remaining >= 10) { cost += 50; remaining -= 10; }
+    if (remaining >= 5) { cost += 30; remaining -= 5; }
+    if (remaining >= 1) { cost += 24; remaining = 0; }
+    if (wl) cost += 5;
+    return cost;
+  }
+
+  // Optimal suggestion
+  function optimalPath(props) {
+    const extra = Math.max(0, props - 1);
+    const parts = [];
+    let rem = extra;
+    let total = 19;
+    while (rem >= 10) { parts.push(isDE ? '+10 Properties (€50)' : '+10 properties (€50)'); total += 50; rem -= 10; }
+    if (rem >= 5) { parts.push(isDE ? '+5 Properties (€30)' : '+5 properties (€30)'); total += 30; rem -= 5; }
+    if (rem >= 1) { parts.push(isDE ? '+3 Properties (€24)' : '+3 properties (€24)'); total += 24; rem = 0; }
+    return parts;
+  }
+
+  const totalPrice = calcPrice(targetProps, whiteLabel);
+  const packages = calcPackages(Math.max(0, targetProps - 1));
+  if (whiteLabel) packages.push('whitelabel');
+  const pathParts = optimalPath(targetProps);
+
+  return (
+    <div style={{ maxWidth: 520, margin: '0 auto' }}>
+      <div style={{ background: 'var(--color-bg-card, #fff)', border: '1px solid rgba(108,99,255,0.15)', borderRadius: 16, padding: '1.5rem' }}>
+
+        <div style={{ marginBottom: '1.25rem' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--color-text-muted, #888)', marginBottom: 8 }}>
+            {isDE ? 'Wie viele Properties?' : 'How many properties?'}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button onClick={() => setTargetProps(p => Math.max(1, p-1))}
+              style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(108,99,255,0.3)', background: 'transparent', cursor: 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6C63FF' }}>−</button>
+            <div style={{ fontSize: '2rem', fontWeight: 800, color: '#1C1C2E', minWidth: 40, textAlign: 'center' }}>{targetProps}</div>
+            <button onClick={() => setTargetProps(p => p+1)}
+              style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(108,99,255,0.3)', background: 'transparent', cursor: 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6C63FF' }}>+</button>
+            <input type="range" min="1" max="30" value={targetProps} onChange={e => setTargetProps(+e.target.value)}
+              style={{ flex: 1, accentColor: '#6C63FF' }} />
+          </div>
+        </div>
+
+        {pathParts.length > 0 && (
+          <div style={{ background: 'rgba(108,99,255,0.05)', borderRadius: 8, padding: '8px 12px', marginBottom: '1rem', fontSize: '0.75rem', color: '#5A5A78' }}>
+            <span style={{ fontWeight: 700, color: '#6C63FF' }}>{isDE ? 'Günstigste Kombination: ' : 'Optimal: '}</span>
+            {isDE ? 'Basis' : 'Base'} + {pathParts.join(' + ')}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'rgba(108,99,255,0.05)', borderRadius: 8, marginBottom: '1.25rem', cursor: 'pointer' }}
+          onClick={() => setWhiteLabel(w => !w)}>
+          <div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1C1C2E' }}>
+              White-Label <span style={{ fontSize: '0.72rem', fontWeight: 400, color: '#888' }}>+€5/Monat</span>
+            </div>
+            <div style={{ fontSize: '0.72rem', color: '#888' }}>
+              {isDE ? 'Eigenes Logo, kein RankBrief-Branding' : 'Your logo, no RankBrief branding'}
+            </div>
+          </div>
+          <div style={{ width: 36, height: 20, borderRadius: 10, background: whiteLabel ? '#6C63FF' : '#E0E0E8', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+            <div style={{ width: 16, height: 16, borderRadius: 8, background: '#fff', position: 'absolute', top: 2, left: whiteLabel ? 18 : 2, transition: 'left 0.2s' }} />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: '1rem' }}>
+          <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#1C1C2E', letterSpacing: '-0.05em' }}>€{totalPrice}</div>
+          <div style={{ fontSize: '0.85rem', color: '#888' }}>{isDE ? '/Monat' : '/month'}</div>
+          {targetProps > 1 && <div style={{ fontSize: '0.72rem', color: '#10B981', fontWeight: 700, marginLeft: 4 }}>
+            {isDE ? `(€${(totalPrice/targetProps).toFixed(2)} pro Property)` : `(€${(totalPrice/targetProps).toFixed(2)} per property)`}
+          </div>}
+        </div>
+
+        <button
+          onClick={() => onCheckout(packages)}
+          disabled={upgrading}
+          style={{ width: '100%', padding: '12px', background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 10, fontSize: '0.95rem', fontWeight: 700, cursor: upgrading ? 'not-allowed' : 'pointer', opacity: upgrading ? 0.7 : 1 }}>
+          {upgrading ? (isDE ? 'Wird geladen...' : 'Loading...') : (isDE ? `Jetzt starten — €${totalPrice}/Monat →` : `Get started — €${totalPrice}/month →`)}
+        </button>
+        <div style={{ fontSize: '0.70rem', color: '#A0A0BC', textAlign: 'center', marginTop: 8 }}>
+          {isDE ? '1 Monat kostenlos testen · Danach automatische Verlängerung · Jederzeit kündbar' : '1 month free trial · Then auto-renews · Cancel anytime'}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FrozenWallView({ onUpgrade, upgrading, lang = 'de' }) {
+  const isDE = lang === 'de';
   return (
     <FrozenWall>
       <FrozenIcon>⏸️</FrozenIcon>
-      <FrozenTitle>Dein kostenloser Monat ist abgelaufen</FrozenTitle>
+      <FrozenTitle>{isDE ? 'Dein kostenloser Monat ist abgelaufen' : 'Your free month has ended'}</FrozenTitle>
       <FrozenSubtitle>
-        {t(lang, 'dash.trial_choose')}
-        Deine Daten sind sicher gespeichert.
+        {isDE ? 'Wähle dein Paket und starte direkt weiter. Deine Daten sind sicher gespeichert.' : 'Choose your plan and continue. Your data is safe.'}
       </FrozenSubtitle>
-
-      <PlanGrid>
-        {plans.map(plan => (
-          <PlanCard key={plan.key} $highlight={plan.highlight}>
-            {plan.highlight && <PlanBadge>{lang === 'de' ? 'Empfohlen' : 'Recommended'}</PlanBadge>}
-            <PlanName $highlight={plan.highlight}>{plan.name}</PlanName>
-            <PlanPrice $highlight={plan.highlight}>
-              €{plan.price}<span>/mo</span>
-            </PlanPrice>
-            {plan.features.map(f => (
-              <PlanFeature key={f} $highlight={plan.highlight}>{f}</PlanFeature>
-            ))}
-            <PlanBtn
-              $highlight={plan.highlight}
-              onClick={() => onUpgrade(plan.key)}
-              disabled={upgrading}
-            >
-              {upgrading ? 'Wird geladen...' : 'Jetzt starten →'}
-            </PlanBtn>
-          </PlanCard>
-        ))}
-      </PlanGrid>
+      <div style={{ marginBottom: '1.5rem', padding: '12px 16px', background: 'rgba(108,99,255,0.06)', borderRadius: 10, textAlign: 'center', fontSize: '0.82rem', color: '#5A5A78' }}>
+        ✓ {isDE ? 'Voller Report mit KI, Markt-Radar & Empfehlungen' : 'Full report with AI, market radar & recommendations'} &nbsp;·&nbsp;
+        ✓ {isDE ? 'GA4-Integration' : 'GA4 integration'} &nbsp;·&nbsp;
+        ✓ {isDE ? 'Automatischer Versand' : 'Automatic delivery'}
+      </div>
+      <PropertyConfigurator onCheckout={onUpgrade} upgrading={upgrading} lang={lang} />
     </FrozenWall>
   );
 }
@@ -1214,34 +1284,18 @@ function fmtMonth(dateStr) {
 
 // ── UpgradeModal ──────────────────────────────────────────────────────────────
 function UpgradeModal({ currentPlan, onUpgrade, onClose, upgrading, lang = 'de' }) {
-  const opts = currentPlan === 'pro'
-    ? [{ key: 'agency', name: 'Agency', price: '79', highlight: true, features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', lang === 'de' ? 'Endkunden-Email' : 'Client Email', 'Agency Branding'] }]
-    : [
-        { key: 'pro',    name: 'Pro',    price: '39', highlight: true, features: ['3 Domains', 'White-Label', lang === 'de' ? 'SEO-Empfehlungen' : 'SEO Recommendations', lang === 'de' ? 'Endkunden-Email' : 'Client Email'] },
-        { key: 'agency', name: 'Agency', price: '79', highlight: false, features: ['10 Domains', t(lang, 'dash.feature_all_pro'), 'Client Management', lang === 'de' ? 'Endkunden-Email' : 'Client Email'] },
-      ];
+  const isDE = lang === 'de';
   return (
     <ModalOverlay onClick={onClose}>
       <ModalBox onClick={e => e.stopPropagation()}>
         <ModalClose onClick={onClose}>✕</ModalClose>
-        <ModalTitle>{lang === 'de' ? 'Mehr Domains? Upgrade erforderlich' : 'Need more domains? Upgrade required'}</ModalTitle>
+        <ModalTitle>{isDE ? 'Mehr Properties hinzufügen' : 'Add more properties'}</ModalTitle>
         <ModalSub>
-          {lang === 'de'
-            ? 'Du hast das Domain-Limit deines aktuellen Plans erreicht. Upgrade um weitere Websites zu verbinden.'
-            : "You've reached the domain limit of your current plan. Upgrade to connect more websites."}
+          {isDE
+            ? 'Du hast das Property-Limit erreicht. Wähle wie viele weitere Websites du verwalten möchtest.'
+            : "You've reached your property limit. Choose how many more websites you'd like to manage."}
         </ModalSub>
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${opts.length}, 1fr)`, gap: '1rem' }}>
-          {opts.map(p => (
-            <PlanCard key={p.key} $highlight={p.highlight}>
-              <PlanName $highlight={p.highlight}>{p.name}</PlanName>
-              <PlanPrice $highlight={p.highlight}>€{p.price}<span>/mo</span></PlanPrice>
-              {p.features.map(f => <PlanFeature key={f} $highlight={p.highlight}>{f}</PlanFeature>)}
-              <PlanBtn $highlight={p.highlight} onClick={() => onUpgrade(p.key)} disabled={upgrading}>
-                {upgrading ? t(lang, 'dash.upgrade_loading') : lang === 'de' ? `Upgrade auf ${p.name} →` : `Upgrade to ${p.name} →`}
-              </PlanBtn>
-            </PlanCard>
-          ))}
-        </div>
+        <PropertyConfigurator onCheckout={(pkgs) => { onUpgrade(pkgs); onClose(); }} upgrading={upgrading} lang={lang} />
       </ModalBox>
     </ModalOverlay>
   );
@@ -1760,7 +1814,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
   };
 
 
-  const handleUpgrade = async (plan, billing = 'monthly') => {
+  const handleUpgrade = async (addons = []) => {
     setUpgrading(true);
     setShowUpgradeModal(false);
     try {
@@ -1772,10 +1826,11 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify({ plan, billing, user_id: user.id, email: user.email }),
+        body: JSON.stringify({ addons, user_id: user.id, email: user.email }),
       });
       const data = await res.json();
-      if (data.checkout_url) window.location.href = data.checkout_url;
+      if (data.url) window.location.href = data.url;
+      else console.error('No checkout URL:', data);
     } catch (err) {
       console.error('Checkout error:', err);
     }
@@ -1851,7 +1906,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
 
   const handleConnectGoogle = () => {
     const plan  = profile?.plan || 'free';
-    const limit = PLAN_LIMITS[plan] ?? 1;
+    const limit = profile?.property_limit ?? 1;
     const activeCount = properties.filter(p => p.status === 'active').length;
     if (activeCount >= limit) {
       setShowUpgradeModal(true);
@@ -1869,8 +1924,8 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
 
   const plan     = profile?.plan || 'free';
   const limit    = PLAN_LIMITS[plan] ?? 1;
-  const isAgency = plan === 'agency';
-  const isPro = ['pro', 'agency'].includes(plan);
+  const whiteLabelEnabled = profile?.white_label_enabled === true;
+  const propertyLimit = profile?.property_limit ?? 1;
   const activeProperties = properties.filter(p => p.status === 'active');
   const canAdd   = activeProperties.length < limit;
 
