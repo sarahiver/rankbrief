@@ -739,8 +739,8 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
     setPortalLoading(false);
   };
 
-  // ── Upgrade (Checkout) ────────────────────────────────────────────────────
-  const handleUpgrade = async (plan) => {
+  // ── Checkout ──────────────────────────────────────────────────────────────
+  const handleUpgrade = async (addons = []) => {
     try {
       const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
       const SUPABASE_ANON_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
@@ -750,13 +750,25 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify({ plan, user_id: user.id, email: user.email }),
+        body: JSON.stringify({ addons, user_id: user.id, email: user.email }),
       });
       const data = await res.json();
-      if (data.checkout_url) window.location.href = data.checkout_url;
+      if (data.url) window.location.href = data.url;
+      else showAlert('Fehler beim Laden des Checkouts.', 'error');
     } catch {
       showAlert('Fehler beim Laden des Checkouts.', 'error');
     }
+  };
+
+  // ── Property package calculator ───────────────────────────────────────────
+  const calcCheckoutPackages = (targetProps) => {
+    const extra = Math.max(0, targetProps - 1);
+    const pkgs = [];
+    let rem = extra;
+    while (rem >= 10) { pkgs.push('prop_10'); rem -= 10; }
+    if (rem >= 5) { pkgs.push('prop_5'); rem -= 5; }
+    if (rem >= 1) { pkgs.push('prop_3'); rem = 0; }
+    return pkgs;
   };
 
   // ── Downgrade with property selection ────────────────────────────────────
@@ -996,8 +1008,10 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
   const planInfo = PLAN_LIMITS[plan];
   const isFree = plan === 'free';
   const isPaid = ['basic', 'pro', 'agency'].includes(plan);
-  const isPro  = ['pro', 'agency'].includes(plan);
-  const isAgency = plan === 'agency';
+  const whiteLabelEnabled = profile?.white_label_enabled === true;
+  const propertyLimit = profile?.property_limit ?? 1;
+  const isPro  = profile?.subscription_status === 'active' || ['pro', 'agency', 'basic'].includes(plan);
+  const isAgency = whiteLabelEnabled;
   const activeFontFF = FONTS.find(f => f.key === branding.brand_font)?.ff || 'Inter, sans-serif';
 
   if (loading) return (
@@ -1160,74 +1174,85 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               </InfoRow>
             )}
 
-            {/* ── Primary Upsell CTA ── */}
-            {isFree && (
-              <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: '10px' }}>
-                <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>
-                  {lang === 'en' ? '🚀 Upgrade to Basic' : '🚀 Upgrade auf Basic'}
-                </div>
-                <div style={{ fontSize: '13px', color: 'var(--color-text-secondary, #666)', marginBottom: '0.75rem' }}>
-                  {lang === 'en'
-                    ? 'Get monthly SEO reports automatically – starting at €19/month.'
-                    : 'Monatliche SEO-Reports automatisch – ab €19/Monat.'}
-                </div>
-                <Btn $variant="primary" onClick={() => handleUpgrade('basic')}>
-                  {lang === 'en' ? 'Upgrade to Basic – €19/mo →' : 'Upgrade auf Basic – €19/mo →'}
-                </Btn>
-              </div>
-            )}
-            {plan === 'basic' && (
-              <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: '10px' }}>
-                <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>
-                  {lang === 'en' ? '⚡ Upgrade to Pro' : '⚡ Upgrade auf Pro'}
-                </div>
-                <div style={{ fontSize: '13px', color: 'var(--color-text-secondary, #666)', marginBottom: '0.75rem' }}>
-                  {lang === 'en'
-                    ? '3 domains + AI recommendations – €39/month.'
-                    : '3 Domains + KI-Empfehlungen – €39/Monat.'}
-                </div>
-                <Btn $variant="primary" onClick={() => handleUpgrade('pro')}>
-                  {lang === 'en' ? 'Upgrade to Pro – €39/mo →' : 'Upgrade auf Pro – €39/mo →'}
-                </Btn>
-              </div>
-            )}
-            {plan === 'pro' && (
-              <div style={{ marginTop: '1.25rem', padding: '1rem 1.25rem', background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: '10px' }}>
-                <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>
-                  {lang === 'en' ? '🏆 Upgrade to Agency' : '🏆 Upgrade auf Agency'}
-                </div>
-                <div style={{ fontSize: '13px', color: 'var(--color-text-secondary, #666)', marginBottom: '0.75rem' }}>
-                  {lang === 'en'
-                    ? '10 domains + white-label reports – €79/month.'
-                    : '10 Domains + White-Label Reports – €79/Monat.'}
-                </div>
-                <Btn $variant="primary" onClick={() => handleUpgrade('agency')}>
-                  {lang === 'en' ? 'Upgrade to Agency – €79/mo →' : 'Upgrade auf Agency – €79/mo →'}
-                </Btn>
-              </div>
-            )}
+            {/* ── Add-ons / Upgrade ── */}
+            {(() => {
+              const isDE = lang === 'de';
+              const hasActiveSub = profile?.subscription_status === 'active';
+              const currentProps = profile?.property_limit ?? 1;
+              const hasWL = profile?.white_label_enabled === true;
 
-            {/* ── Other Plans ── */}
-            <div style={{ marginTop: '1.25rem' }}>
-              <FieldHint style={{ marginBottom: '0.5rem' }}>
-                {t(lang, 'set.choose_plan')}
-              </FieldHint>
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                {plan !== 'basic' && (
-                  <Btn onClick={() => plan === 'free' ? handleUpgrade('basic') : handleDowngrade('basic')} style={{ fontSize: '13px', padding: '6px 14px' }}>
-                    Basic – €19/mo
-                  </Btn>
-                )}
-                {plan !== 'pro' && (
-                  <Btn onClick={() => ['free','basic'].includes(plan) ? handleUpgrade('pro') : handleDowngrade('pro')} style={{ fontSize: '13px', padding: '6px 14px' }}>
-                    Pro – €39/mo
-                  </Btn>
-                )}
-                {plan !== 'agency' && (
-                  <Btn onClick={() => plan === 'agency' ? handleDowngrade('agency') : handleUpgrade('agency')} style={{ fontSize: '13px', padding: '6px 14px' }}>
-                    Agency – €79/mo
-                  </Btn>
-                )}
+              if (!hasActiveSub) {
+                // Not subscribed yet — show configurator
+                const [targetProps, setTargetProps] = React.useState(1);
+                const [wlAddon, setWlAddon] = React.useState(false);
+
+                const calcPrice = (props, wl) => {
+                  let cost = 19, rem = Math.max(0, props - 1);
+                  while (rem >= 10) { cost += 50; rem -= 10; }
+                  if (rem >= 5) { cost += 30; rem -= 5; }
+                  if (rem >= 1) { cost += 24; rem = 0; }
+                  if (wl) cost += 5;
+                  return cost;
+                };
+
+                return (
+                  <div style={{ marginTop: '1.25rem', padding: '1.25rem', background: 'rgba(108,99,255,0.06)', border: '1px solid rgba(108,99,255,0.18)', borderRadius: 12 }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '1rem', color: 'var(--color-text)' }}>
+                      {isDE ? '🚀 Abo starten' : '🚀 Start subscription'}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '0.75rem' }}>
+                      <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{isDE ? 'Properties:' : 'Properties:'}</span>
+                      <button onClick={() => setTargetProps(p => Math.max(1,p-1))} style={{ width:28, height:28, borderRadius:6, border:'1px solid rgba(108,99,255,0.3)', background:'transparent', cursor:'pointer', color:'#6C63FF' }}>−</button>
+                      <strong style={{ minWidth:24, textAlign:'center' }}>{targetProps}</strong>
+                      <button onClick={() => setTargetProps(p => p+1)} style={{ width:28, height:28, borderRadius:6, border:'1px solid rgba(108,99,255,0.3)', background:'transparent', cursor:'pointer', color:'#6C63FF' }}>+</button>
+                      <input type="range" min="1" max="30" value={targetProps} onChange={e => setTargetProps(+e.target.value)} style={{ flex:1, accentColor:'#6C63FF' }} />
+                    </div>
+                    <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:'1rem', cursor:'pointer' }} onClick={() => setWlAddon(w => !w)}>
+                      <div style={{ width:32, height:18, borderRadius:9, background: wlAddon?'#6C63FF':'#E0E0E8', position:'relative', flexShrink:0 }}>
+                        <div style={{ width:14, height:14, borderRadius:7, background:'#fff', position:'absolute', top:2, left: wlAddon?16:2, transition:'left 0.15s' }} />
+                      </div>
+                      <span style={{ fontSize:'13px' }}>White-Label +€5/Monat</span>
+                    </div>
+                    <div style={{ display:'flex', alignItems:'baseline', gap:6, marginBottom:'0.75rem' }}>
+                      <span style={{ fontSize:'1.8rem', fontWeight:800, color:'#1C1C2E' }}>€{calcPrice(targetProps, wlAddon)}</span>
+                      <span style={{ fontSize:'13px', color:'#888' }}>{isDE ? '/Monat' : '/month'}</span>
+                    </div>
+                    <Btn $variant="primary" onClick={() => { const pkgs = calcCheckoutPackages(targetProps); if (wlAddon) pkgs.push('whitelabel'); handleUpgrade(pkgs); }}>
+                      {isDE ? 'Jetzt starten →' : 'Get started →'}
+                    </Btn>
+                  </div>
+                );
+              }
+
+              // Active subscription — show current status + Stripe portal
+              return (
+                <div style={{ marginTop: '1.25rem' }}>
+                  <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:'1rem' }}>
+                    <div style={{ padding:'8px 12px', background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.2)', borderRadius:8, fontSize:'13px' }}>
+                      ✓ {currentProps} {isDE ? `Property${currentProps > 1 ? 's' : ''}` : `propert${currentProps > 1 ? 'ies' : 'y'}`}
+                    </div>
+                    {hasWL && (
+                      <div style={{ padding:'8px 12px', background:'rgba(108,99,255,0.08)', border:'1px solid rgba(108,99,255,0.2)', borderRadius:8, fontSize:'13px' }}>
+                        ✓ White-Label
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                    <Btn $variant="primary" onClick={handlePortal}>
+                      {isDE ? 'Abo verwalten & Add-ons →' : 'Manage subscription & add-ons →'}
+                    </Btn>
+                    {!hasWL && (
+                      <Btn onClick={() => handleUpgrade(['whitelabel'])}>
+                        {isDE ? '+ White-Label (€5/Monat)' : '+ White-Label (€5/month)'}
+                      </Btn>
+                    )}
+                  </div>
+                  <FieldHint style={{ marginTop:'0.5rem' }}>
+                    {isDE ? 'Weitere Properties oder Add-ons über das Billing Portal hinzufügen.' : 'Add more properties or add-ons via the billing portal.'}
+                  </FieldHint>
+                </div>
+              );
+            })()}
                 {isPaid && (
                   <Btn onClick={handlePortal} disabled={portalLoading} style={{ fontSize: '13px', padding: '6px 14px' }}>
                     {portalLoading ? '...' : t(lang, 'set.billing_portal')}
