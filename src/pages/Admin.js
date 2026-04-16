@@ -81,7 +81,18 @@ const Alert     = styled.div`padding:.75rem 1rem;border-radius:${({theme})=>them
 const ADMIN_PW_KEY = 'rb_admin_unlocked';
 const ADMIN_PW     = process.env.REACT_APP_ADMIN_PW || 'rankbrief-admin';
 const PLANS = ['free','basic','pro','agency']; // legacy — kept for DB compat
-const PLAN_PRICES = { free: 0, basic: 19, pro: 39, agency: 79 }; // legacy
+// Calculate actual MRR from property_limit + white_label_enabled
+const calcUserMRR = (u) => {
+  if (!u) return 0;
+  const propLimit = u.property_limit ?? 1;
+  const wl = u.white_label_enabled === true;
+  const tierPrices = { 1:19, 4:43, 6:49, 11:69, 16:99, 21:119 };
+  // Find closest tier
+  const tiers = [1,4,6,11,16,21];
+  const tier = tiers.reduce((prev, curr) => Math.abs(curr - propLimit) < Math.abs(prev - propLimit) ? curr : prev);
+  return (tierPrices[tier] || 19) + (wl ? 5 : 0);
+};
+const PLAN_PRICES = { free: 0, basic: 19, pro: 43, agency: 74 }; // legacy fallback
 const isDemo = (u) => u.email?.includes('@rankbrief-demo.invalid');
 const isRealPaid = (u) => ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used && !isDemo(u);
 const COLS_USERS = '2fr 1fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr';
@@ -111,7 +122,8 @@ export default function Admin({ user }) {
   const [alert, setAlert]       = useState(null);
   const [modal, setModal]       = useState(null);
   const [saving, setSaving]     = useState(false);
-  const [newPlan, setNewPlan]   = useState('free');
+  const [newPlan, setNewPlan]   = useState('1props');
+  const [newWL,   setNewWL]    = useState(false);
   const [promoForm, setPromoForm] = useState({ code: '', property_limit: 1, white_label: false, max_uses: 50, report_limit: 3, notes: '' });
   const [exportingXlsx, setExportingXlsx] = useState(false);
   const [openUser, setOpenUser]   = useState(null);
@@ -360,8 +372,8 @@ export default function Admin({ user }) {
       const paidUsers = users.filter(u => isRealPaid(u));
       const promoUsers = users.filter(u => u.promo_code_used);
       const freeUsers = users.filter(u => u.plan === 'free');
-      const mrr = paidUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
-      const promoMrr = promoUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
+      const mrr = paidUsers.reduce((s, u) => s + calcUserMRR(u), 0);
+      const promoMrr = promoUsers.reduce((s, u) => s + calcUserMRR(u), 0);
 
       const overviewData = [
         ['RankBrief — Finanz-Dashboard', '', '', ''],
@@ -400,7 +412,7 @@ export default function Admin({ user }) {
       const userRows = users.map(u => {
         const promoLeft = u.promo_reports_limit ? Math.max(0, u.promo_reports_limit - (u.promo_reports_used||0)) : '∞';
         const promoPct = u.promo_reports_limit ? Math.round(((u.promo_reports_used||0)/u.promo_reports_limit)*100)+'%' : '–';
-        const moVal = PLAN_PRICES[u.plan] || 0;
+        const moVal = calcUserMRR(u);
         const isPaid = isRealPaid(u);
         return [
           u.email, u.plan, u.plan_status, u.promo_code_used||'–',
@@ -427,9 +439,9 @@ export default function Admin({ user }) {
       ];
       const promoRows = promos.map(p => {
         const activePromoUsers = users.filter(u => u.promo_code_used === p.code).length;
-        const expMrr = activePromoUsers * (PLAN_PRICES[p.plan]||0);
+        const expMrr = activePromoUsers * 19; // base estimate
         return [
-          p.code, p.plan, PLAN_PRICES[p.plan]||0,
+          p.code, `${p.property_limit || 1}P${p.white_label ? "+WL" : ""}`, p.property_limit >= 11 ? 69 : p.property_limit >= 6 ? 49 : p.property_limit >= 4 ? 43 : 19,
           p.max_uses, p.uses_count, p.max_uses - p.uses_count,
           Math.round((p.uses_count/p.max_uses)*100)+'%',
           p.report_limit||'∞', p.active?'Aktiv':'Inaktiv', p.notes||'–',
@@ -781,8 +793,8 @@ export default function Admin({ user }) {
               const paidUsers = users.filter(u => isRealPaid(u));
               const promoUsers = users.filter(u => u.promo_code_used);
               const freeUsers = users.filter(u => u.plan === 'free');
-              const mrr = paidUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
-              const promoMrr = promoUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
+              const mrr = paidUsers.reduce((s, u) => s + calcUserMRR(u), 0);
+              const promoMrr = promoUsers.reduce((s, u) => s + calcUserMRR(u), 0);
               return (
                 <div>
                   {/* Export Button */}
@@ -833,7 +845,7 @@ export default function Admin({ user }) {
                         const planMrr = paid * (PLAN_PRICES[plan] || 0);
                         return (
                           <TRow key={plan} $cols="1.5fr 1fr 1fr 1fr 1fr">
-                            <TCell><PlanBadge $plan={plan}>{u?.property_limit || plan}</PlanBadge></TCell>
+                            <TCell><PlanBadge $plan={plan}>{plan}</PlanBadge></TCell>
                             <TCell>€{PLAN_PRICES[plan]}/Mo</TCell>
                             <TCell style={{ fontWeight: paid > 0 ? 700 : 400 }}>{paid}</TCell>
                             <TCell style={{ color: promo > 0 ? '#F59E0B' : '#ccc' }}>{promo}</TCell>
@@ -864,7 +876,7 @@ export default function Admin({ user }) {
                         const promoLeft = u.promo_reports_limit
                           ? Math.max(0, u.promo_reports_limit - (u.promo_reports_used||0))
                           : '∞';
-                        const moVal = PLAN_PRICES[u.plan] || 0;
+                        const moVal = calcUserMRR(u);
                         return (
                           <TRow key={u.id} $cols="2fr 1fr 1fr 1fr 1fr 1fr 1fr">
                             <TCell style={{ fontWeight:500 }}>{u.email}</TCell>
@@ -960,7 +972,7 @@ export default function Admin({ user }) {
               </Select>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:'0.75rem', cursor:'pointer' }}
-              onClick={() => setNewWL && setNewWL(w => !w)}>
+              onClick={() => setNewWL(w => !w)}>
               <input type="checkbox" checked={newWL || false} readOnly />
               <span style={{ fontSize:'0.85rem' }}>White-Label (+€5/Monat)</span>
             </div>
