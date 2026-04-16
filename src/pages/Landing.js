@@ -685,12 +685,55 @@ const LightboxClose = styled.button`
   &:hover { color: #1a1a2e; background: #eee; }
 `;
 
-const LightboxFrame = styled.iframe`
+const LightboxFrame = styled.div`
   flex: 1;
   width: 100%;
   border: none;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 `;
+
+const LightboxFallback = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: #f4f4fa;
+  padding: 3rem;
+  text-align: center;
+`;
+
+const LightboxFallbackIcon = styled.div\`font-size: 4rem; line-height: 1;\`;
+
+const LightboxFallbackTitle = styled.div\`
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1C1C2E;
+\`;
+
+const LightboxFallbackSub = styled.div\`
+  font-size: 0.85rem;
+  color: #7A7A96;
+  max-width: 320px;
+  line-height: 1.6;
+\`;
+
+const LightboxOpenBtn = styled.a\`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #6C63FF;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  &:hover { background: #5a52e0; }
+\`;
 
 // ── Features ──────────────────────────────────────────────────────────────────
 const FeaturesGrid = styled.div`
@@ -1047,7 +1090,7 @@ const FaqA = styled.div`
   background: ${({ theme }) => theme.colors.bgCard};
 `;
 
-// ── i18n content ──────────────────────────────────────────────────────────────
+
 const i18n = {
   en: {
     badge: 'Automated SEO reporting for agencies & freelancers',
@@ -1524,10 +1567,22 @@ export default function Landing({ lang = 'de' }) {
                 <LightboxClose onClick={() => setSampleOpen(null)} aria-label={t.sampleClose}>✕</LightboxClose>
               </LightboxActions>
             </LightboxHeader>
-            <LightboxFrame
-              src={sampleOpen.file}
-              title={`${sampleOpen.plan} sample report`}
-            />
+            <LightboxFrame>
+              <LightboxFallback>
+                <LightboxFallbackIcon>📄</LightboxFallbackIcon>
+                <LightboxFallbackTitle>
+                  {lang === 'de' ? 'PDF-Vorschau im Browser öffnen' : 'Open PDF preview in browser'}
+                </LightboxFallbackTitle>
+                <LightboxFallbackSub>
+                  {lang === 'de'
+                    ? 'Der Report öffnet sich in einem neuen Tab. Du siehst genau, was deine Kunden erhalten.'
+                    : 'The report opens in a new tab. See exactly what your clients receive.'}
+                </LightboxFallbackSub>
+                <LightboxOpenBtn href={sampleOpen.file} target="_blank" rel="noopener noreferrer">
+                  {lang === 'de' ? '↗ Report öffnen' : '↗ Open report'}
+                </LightboxOpenBtn>
+              </LightboxFallback>
+            </LightboxFrame>
           </LightboxWrap>
         </Overlay>
       )}
