@@ -1282,7 +1282,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
             {/* ── Add-ons / Upgrade ── */}
             {(() => {
               const isDE = lang === 'de';
-              const hasActiveSub = profile?.subscription_status === 'active';
+              const hasActiveSub = ['active', 'past_due'].includes(profile?.subscription_status);
               const currentProps = profile?.property_limit ?? 1;
               const hasWL = profile?.white_label_enabled === true;
 
@@ -1295,7 +1295,9 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                 return (
                   <div style={{ marginTop: '1.25rem', padding: '1.25rem', background: 'rgba(108,99,255,0.06)', border: '1px solid rgba(108,99,255,0.18)', borderRadius: 12 }}>
                     <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '1rem', color: 'var(--color-text)' }}>
-                      {isDE ? '🚀 Abo starten' : '🚀 Start subscription'}
+                      {profile?.subscription_status === 'trial'
+                      ? (isDE ? '🚀 Abo wählen' : '🚀 Choose your plan')
+                      : (isDE ? '📦 Plan anpassen' : '📦 Adjust plan')}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '0.75rem' }}>
                       <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{isDE ? 'Properties:' : 'Properties:'}</span>
@@ -1322,12 +1324,12 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                 );
               }
 
-              // Active subscription — show current status + Stripe portal
+              // Active subscription — show status + tier selector to upgrade
               return (
                 <div style={{ marginTop: '1.25rem' }}>
-                  <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:'1rem' }}>
+                  <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:'1.25rem' }}>
                     <div style={{ padding:'8px 12px', background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.2)', borderRadius:8, fontSize:'13px' }}>
-                      ✓ {currentProps} {isDE ? `Property${currentProps > 1 ? 's' : ''}` : `propert${currentProps > 1 ? 'ies' : 'y'}`}
+                      ✓ {currentProps} {isDE ? `Property${currentProps > 1 ? 's' : ''}` : `propert${currentProps > 1 ? 'ies' : 'y'}`} {isDE ? 'gebucht' : 'booked'}
                     </div>
                     {hasWL && (
                       <div style={{ padding:'8px 12px', background:'rgba(108,99,255,0.08)', border:'1px solid rgba(108,99,255,0.2)', borderRadius:8, fontSize:'13px' }}>
@@ -1335,9 +1337,43 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                       </div>
                     )}
                   </div>
-                  <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+
+                  <div style={{ fontSize:'0.72rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em', color:'var(--color-text-secondary)', marginBottom:8 }}>
+                    {isDE ? 'Plan ändern oder erweitern' : 'Change or expand plan'}
+                  </div>
+                  <TierGrid>
+                    {[
+                      { props:1,  price:19,  addons:[],                   labelDE:'1 Webseite',    labelEN:'1 website',    subDE:'Basis inklusive',       subEN:'Base included' },
+                      { props:4,  price:43,  addons:['prop_3'],           labelDE:'4 Webseiten',   labelEN:'4 websites',   subDE:'Basis + 3er Paket',     subEN:'Base + 3 pack' },
+                      { props:6,  price:49,  addons:['prop_5'],           labelDE:'6 Webseiten',   labelEN:'6 websites',   subDE:'Basis + 5er Paket',     subEN:'Base + 5 pack' },
+                      { props:11, price:69,  addons:['prop_10'],          labelDE:'11 Webseiten',  labelEN:'11 websites',  subDE:'Basis + 10er Paket',    subEN:'Base + 10 pack' },
+                      { props:16, price:99,  addons:['prop_10','prop_5'], labelDE:'16 Webseiten',  labelEN:'16 websites',  subDE:'Basis + 10er + 5er',    subEN:'Base + 10 + 5 pack' },
+                      { props:21, price:119, addons:['prop_10','prop_10'],labelDE:'21 Webseiten',  labelEN:'21 websites',  subDE:'Basis + 2× 10er Paket', subEN:'Base + 2× 10 pack' },
+                    ].map(tier => {
+                      const sel = currentProps === tier.props;
+                      const ppp = (tier.price / tier.props).toFixed(2);
+                      return (
+                        <TierRow key={tier.props} $selected={sel} onClick={() => setTargetProps(tier.props)}
+                          style={{ opacity: sel ? 1 : 0.85 }}>
+                          <div>
+                            <TierLabel $selected={sel}>
+                              {isDE ? tier.labelDE : tier.labelEN}
+                              {sel && <span style={{ marginLeft:6, fontSize:'0.65rem', background:'rgba(16,185,129,0.15)', color:'#059669', borderRadius:4, padding:'1px 6px' }}>{isDE ? 'aktuell' : 'current'}</span>}
+                            </TierLabel>
+                            <TierSub>{isDE ? tier.subDE : tier.subEN}</TierSub>
+                          </div>
+                          <TierPrice>
+                            <TierPriceMain $selected={sel}>€{tier.price}<span style={{fontWeight:400,fontSize:'0.72rem',color:'#888'}}>/mo</span></TierPriceMain>
+                            <TierPricePer>€{ppp}/{isDE?'Seite':'site'}</TierPricePer>
+                          </TierPrice>
+                        </TierRow>
+                      );
+                    })}
+                  </TierGrid>
+
+                  <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginTop:'1rem' }}>
                     <Btn $variant="primary" onClick={handlePortal}>
-                      {isDE ? 'Abo verwalten & Add-ons →' : 'Manage subscription & add-ons →'}
+                      {isDE ? '💳 Abo verwalten →' : '💳 Manage subscription →'}
                     </Btn>
                     {!hasWL && (
                       <Btn onClick={() => handleUpgrade(['whitelabel'])}>
@@ -1346,7 +1382,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                     )}
                   </div>
                   <FieldHint style={{ marginTop:'0.5rem' }}>
-                    {isDE ? 'Weitere Properties oder Add-ons über das Billing Portal hinzufügen.' : 'Add more properties or add-ons via the billing portal.'}
+                    {isDE ? 'Plan-Änderungen über das Stripe Billing Portal vornehmen.' : 'Make plan changes via the Stripe billing portal.'}
                   </FieldHint>
                 </div>
               );
