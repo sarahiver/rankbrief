@@ -1561,7 +1561,6 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                 }
 
                 return (<>
-                <>
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
                     <input
                       type="text"
