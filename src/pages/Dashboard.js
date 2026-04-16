@@ -1383,7 +1383,7 @@ function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
 
       {open && (
         <PropertyBody>
-          {/* Endkunden-Email – nur Agency */}
+          {/* Endkunden-Email – mit White-Label */}
           {isAgency && (
             <>
               <RecipientRow>
@@ -1538,7 +1538,7 @@ function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
                   {plan === 'basic' && (
                     <UpgradeHint>
                       <UpgradeHintText>
-                        <h3>{lang === 'de' ? '🚀 Mit Pro bekommst du noch mehr' : '🚀 Get even more with Pro'}</h3>
+                        <h3>{lang === 'de' ? '🚀 Mehr Properties? Paket erweitern' : '🚀 Need more properties? Expand your plan'}</h3>
                         <ul>
                           <li><strong>3 Domains:</strong> {lang === 'de' ? 'Mehrere Websites in einem Account verwalten' : 'Manage multiple websites in one account'}</li>
                           <li><strong>{t(lang, 'dash.seo_recs')}</strong> {t(lang, 'dash.seo_recs_sub')}</li>
@@ -1661,7 +1661,7 @@ function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
                     </>
                   )}
 
-                  {/* Business-Empfehlungen – nur Pro/Agency */}
+                  {/* Business-Empfehlungen */}
                   {['pro', 'agency'].includes(plan) && selectedReport.recommendations?.length > 0 && (
                     <>
                       <SectionTitle>
@@ -2063,7 +2063,7 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
                 )}
 
                 {/* Button 2: Google-Konto verbinden — immer sichtbar wenn kein Konto oder Pro/Agency */}
-                {(googleAccounts.length === 0 || ['pro', 'agency'].includes(plan)) && canAdd && (
+                {(googleAccounts.length === 0 || propertyLimit > 1) && canAdd && (
                   <BtnConnect
                     onClick={startGoogleOAuth}
                     disabled={upgrading}

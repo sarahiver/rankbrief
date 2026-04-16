@@ -684,12 +684,7 @@ const ModalActions = styled.div`
 `;
 
 // ── Plan info ─────────────────────────────────────────────────────────────────
-const PLAN_LIMITS = {
-  free: { label: 'Free', domains: 1 },
-  basic: { label: 'Basic', domains: 1 },
-  pro: { label: 'Pro', domains: 3 },
-  agency: { label: 'Agency', domains: 15 },
-};
+// Plan limits now come from profiles.property_limit
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Settings({ user, lang = 'de', onLangChange }) {
@@ -988,7 +983,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
     const plan = profile?.plan || 'free';
     const planLimit = PLAN_LIMITS[plan]?.domains ?? 1;
     if (properties.length >= planLimit) {
-      showAlert(`Dein ${PLAN_LIMITS[plan]?.label || plan}-Plan erlaubt max. ${planLimit} Domain(s). Bitte upgraden.`, 'error');
+      showAlert(lang === 'de' ? `Du hast ${planLimit} Properties gebucht. Upgrade im Plan-Tab um mehr hinzuzufügen.` : `You have ${planLimit} properties booked. Upgrade in the plan tab to add more.`, 'error');
       return;
     }
     // Hat der User bereits Google-Konten? → Modal öffnen (keine neues OAuth nötig)
@@ -1096,7 +1091,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
   };
 
   const plan = profile?.plan || 'free';
-  const planInfo = PLAN_LIMITS[plan];
+
   const isFree = plan === 'free';
   const isPaid = ['basic', 'pro', 'agency'].includes(plan);
   const whiteLabelEnabled = profile?.white_label_enabled === true;
@@ -1189,7 +1184,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
             {['basic', 'pro', 'agency'].includes(profile?.plan) && profile?.plan_status === 'active' ? (
               <>
                 <ModalText style={{ color: '#ef4444' }}>
-                  ⚠️ Du hast noch ein aktives Abo ({profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1)}).
+                  ⚠️ {lang === 'de' ? `Du hast noch ein aktives Abo (${propertyLimit} Properties).` : `You have an active subscription (${propertyLimit} properties).`}
                   {lang === 'de' ? 'Bitte kündige es zuerst im Billing Portal – danach kannst du deinen Account löschen.' : 'Please cancel your subscription in the Billing Portal first, then you can delete your account.'}
                 </ModalText>
                 <ModalActions>
@@ -1256,15 +1251,20 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               <SectionTitle>{t(lang, 'set.plan_billing')}</SectionTitle>
               <SectionSub>{t(lang, 'set.plan_sub')}</SectionSub>
             </div>
-            <PlanBadge $plan={plan}>
+            <PlanBadge $plan={profile?.subscription_status === 'active' ? 'pro' : plan}>
               <StatusDot />
-              {planInfo?.label || 'Free'}
+              {profile?.subscription_status === 'active' || profile?.subscription_status === 'promo'
+                ? `${propertyLimit} ${propertyLimit === 1 ? 'Property' : 'Properties'}${whiteLabelEnabled ? ' · WL' : ''}`
+                : (lang === 'de' ? 'Kostenlos' : 'Free')}
             </PlanBadge>
           </SectionHead>
           <SectionBody>
             <InfoRow>
               <InfoLabel>{t(lang, 'set.current_plan')}</InfoLabel>
-              <InfoValue>{planInfo?.label} – {lang === 'de' ? `bis zu ${planInfo?.domains} Domain${planInfo?.domains > 1 ? 's' : ''}` : `up to ${planInfo?.domains} domain${planInfo?.domains > 1 ? 's' : ''}`}</InfoValue>
+              <InfoValue>
+                {propertyLimit} {propertyLimit === 1 ? 'Property' : 'Properties'}
+                {whiteLabelEnabled ? (lang === 'de' ? ' · White-Label ✓' : ' · White-label ✓') : ''}
+              </InfoValue>
             </InfoRow>
             <InfoRow>
               <InfoLabel>{t(lang, 'set.status')}</InfoLabel>
@@ -1451,16 +1451,16 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
             <div>
               <SectionTitle>Properties</SectionTitle>
               <SectionSub>
-                {properties.length} / {planInfo?.domains} {lang === 'de' ? 'Domains verbunden' : 'Domains connected'}
+                {properties.length} / {propertyLimit} {lang === 'de' ? 'Properties verbunden' : 'properties connected'}
               </SectionSub>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {googleAccounts.length > 0 && properties.length < (planInfo?.domains ?? 1) && (
+              {googleAccounts.length > 0 && properties.length < propertyLimit && (
                 <Btn $variant="secondary" onClick={handleConnectNew}>
                   {t(lang, 'set.add_property')}
                 </Btn>
               )}
-              {(googleAccounts.length === 0 || ['pro', 'agency'].includes(profile?.plan)) && properties.length < (planInfo?.domains ?? 1) && (
+              {(googleAccounts.length === 0 || ['pro', 'agency'].includes(profile?.plan)) && properties.length < propertyLimit && (
                 <Btn $variant="primary" onClick={startOAuth}>
                   {t(lang, 'set.connect_google')}
                 </Btn>
@@ -1587,7 +1587,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
               </PropertyCard>
             ))}
 
-            {properties.length >= (planInfo?.domains ?? 1) && properties.length > 0 && (
+            {properties.length >= propertyLimit && properties.length > 0 && (
               <FieldHint style={{ marginTop: '0.75rem' }}>
                 Limit erreicht. {plan !== 'agency' && (
                   <button
@@ -1607,7 +1607,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
           <Section>
           <SectionHead>
             <div>
-              <SectionTitle>Branding & White-Label <ProTag>Pro / Agency</ProTag></SectionTitle>
+              <SectionTitle>Branding & White-Label</SectionTitle>
               <SectionSub>{lang === 'de' ? 'Logo, Farben, Schriftart und Absendername im monatlichen PDF-Report' : 'Logo, colors, font and sender name in the monthly PDF report'}</SectionSub>
             </div>
           </SectionHead>
