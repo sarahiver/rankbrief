@@ -1910,12 +1910,12 @@ export default function Landing({ lang = 'de' }) {
                       : `${configProps} ${configProps === 1 ? 'property' : 'properties'} · Full report · ${configWL ? 'White-label included' : 'RankBrief branding'}`}
                   </ConfigTotalSub>
                   <ConfigCTA to={buildUrl()}>
-                    {isDE ? '30 Tage kostenlos testen →' : 'Start 30-day free trial →'}
+                    {isDE ? 'Ersten Report kostenlos →' : 'Get your first report free →'}
                   </ConfigCTA>
                   <ConfigTrust>
                     {isDE
-                      ? 'Testphase endet automatisch · Keine Kreditkarte · White-Label im Testmonat deaktiviert'
-                      : 'Trial ends automatically · No credit card · White-label inactive during trial'}
+                      ? 'Erster Report kostenlos · Kein Abo · Keine Kreditkarte erforderlich'
+                      : 'First report free · No subscription · No credit card required'}
                   </ConfigTrust>
                 </ConfigTotal>
               </ConfigRight>
