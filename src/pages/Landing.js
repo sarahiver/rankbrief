@@ -1819,29 +1819,38 @@ export default function Landing({ lang = 'de' }) {
           };
 
           const features = isDE ? [
-            'Vollständiger 6-Seiten Report',
-            'KI-Analyse & Zusammenfassung',
-            'Markt-Radar (Revier, Angriff, Potenzial)',
-            'GA4-Integration (Sessions & Engagement)',
-            'Strategische Prioritäten & Aufgaben',
-            'Automatischer monatlicher Versand',
+            'Professioneller 6-Seiten PDF-Report',
+            'KI-Zusammenfassung in verständlicher Sprache',
+            'Top Keywords & Seiten mit Klick-Daten',
+            'Markt-Radar: welche Keywords du besitzt, angreifen kannst & wo Potenzial schlummert',
+            'GA4: Besucher, Sessions & Engagement Rate',
+            'Strategische Empfehlungen mit konkreten Aufgaben',
+            'Business Impact — was SEO wirklich bringt',
+            'Automatisch am 1. des Monats per Email versendet',
+            'Kein manueller Aufwand — einmal einrichten, fertig',
           ] : [
-            'Complete 6-page report',
-            'AI analysis & summary',
-            'Market radar (territory, attack, potential)',
-            'GA4 integration (sessions & engagement)',
-            'Strategic priorities & tasks',
-            'Automatic monthly delivery',
+            'Professional 6-page PDF report',
+            'AI summary in plain language',
+            'Top keywords & pages with click data',
+            'Market radar: keywords you own, can attack & where potential hides',
+            'GA4: visitors, sessions & engagement rate',
+            'Strategic recommendations with concrete tasks',
+            'Business impact — what SEO actually delivers',
+            'Automatically sent on the 1st of every month',
+            'Zero manual effort — set up once, done',
           ];
 
           return (
             <ConfigWrap>
               {/* LEFT: What you always get */}
               <ConfigLeft>
-                <ConfigTitle>{isDE ? 'Basis-Plan — immer dabei' : 'Base plan — always included'}</ConfigTitle>
-                <ConfigPrice>€19<span>{isDE ? ' / Monat' : ' / month'}</span></ConfigPrice>
-                <div style={{ fontSize: '0.72rem', opacity: 0.65, marginBottom: '0.5rem' }}>
-                  {isDE ? '1 Property inklusive' : '1 property included'}
+                <div style={{ fontSize:'0.68rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.16em', opacity:0.55, marginBottom:6 }}>
+                  {isDE ? 'Ab €19 / Monat' : 'From €19 / month'}
+                </div>
+                <ConfigTitle>{isDE ? 'Der vollständige SEO-Report. Für jede Webseite.' : 'The complete SEO report. For every website.'}</ConfigTitle>
+                <ConfigPrice>€{basePrice}<span>{isDE ? ' / Monat' : ' / month'}</span></ConfigPrice>
+                <div style={{ fontSize: '0.72rem', opacity: 0.65, marginBottom: '1rem' }}>
+                  {isDE ? `${configProps} ${configProps === 1 ? 'Property' : 'Properties'} inklusive` : `${configProps} ${configProps === 1 ? 'property' : 'properties'} included`}
                 </div>
                 <ConfigFeatureList>
                   {features.map(f => <ConfigFeature key={f}>{f}</ConfigFeature>)}
@@ -1854,7 +1863,7 @@ export default function Landing({ lang = 'de' }) {
                   <ConfigLabel>{isDE ? 'Wie viele Webseiten betreust du?' : 'How many websites do you manage?'}</ConfigLabel>
                   <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:8 }}>
                     {[
-                      { props:1,  price:19,  addons:[],                     label:isDE?'1 Webseite':'1 website',         sub:isDE?'Basis inklusive':'Base included' },
+                      { props:1,  price:19,  addons:[],                     label:isDE?'1 Webseite':'1 website',         sub:isDE?'Perfekt zum Starten':'Perfect to start' },
                       { props:4,  price:43,  addons:['prop_3'],              label:isDE?'4 Webseiten':'4 websites',       sub:isDE?'Basis + 3er Paket':'Base + 3 pack' },
                       { props:6,  price:49,  addons:['prop_5'],              label:isDE?'6 Webseiten':'6 websites',       sub:isDE?'Basis + 5er Paket':'Base + 5 pack' },
                       { props:11, price:69,  addons:['prop_10'],             label:isDE?'11 Webseiten':'11 websites',     sub:isDE?'Basis + 10er Paket':'Base + 10 pack' },
@@ -1896,9 +1905,9 @@ export default function Landing({ lang = 'de' }) {
                 <ConfigTotal>
                   <ConfigTotalPrice>€{total}<span>{isDE ? ' / Monat' : ' / month'}</span></ConfigTotalPrice>
                   <ConfigTotalSub>
-                    {configProps > 1
-                      ? (isDE ? `Basis + ${configProps - 1} weitere Properties${configWL ? ' + White-Label' : ''}` : `Base + ${configProps - 1} extra properties${configWL ? ' + white-label' : ''}`)
-                      : (isDE ? `Basis-Plan${configWL ? ' + White-Label' : ''}` : `Base plan${configWL ? ' + white-label' : ''}`)}
+                    {isDE
+                      ? `${configProps} ${configProps === 1 ? 'Property' : 'Properties'} · Voller Report · ${configWL ? 'White-Label inklusive' : 'RankBrief-Branding'}`
+                      : `${configProps} ${configProps === 1 ? 'property' : 'properties'} · Full report · ${configWL ? 'White-label included' : 'RankBrief branding'}`}
                   </ConfigTotalSub>
                   <ConfigCTA to={buildUrl()}>
                     {isDE ? '30 Tage kostenlos testen →' : 'Start 30-day free trial →'}
