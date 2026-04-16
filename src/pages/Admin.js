@@ -94,7 +94,7 @@ const calcUserMRR = (u) => {
 };
 const PLAN_PRICES = { free: 0, basic: 19, pro: 43, agency: 74 }; // legacy fallback
 const isDemo = (u) => u.email?.includes('@rankbrief-demo.invalid');
-const isRealPaid = (u) => ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used && !isDemo(u);
+const isRealPaid = (u) => ['active','past_due'].includes(u.subscription_status) && !isDemo(u);
 const COLS_USERS = '2fr 1fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr';
 const COLS_REPORTS = '2fr 2fr 1fr 1fr 1fr 1fr';
 const COLS_PROPS = '2fr 1fr 1fr 1fr 1fr';
@@ -839,20 +839,29 @@ export default function Admin({ user }) {
                       <THead $cols="1.5fr 1fr 1fr 1fr 1fr">
                         <div>Plan</div><div>Preis/Mo</div><div>User (zahlend)</div><div>User (Promo)</div><div>MRR Anteil</div>
                       </THead>
-                      {['basic','pro','agency','free'].map(plan => {
-                        const paid = users.filter(u => isRealPaid(u) && u.plan === plan).length;
-                        const promo = users.filter(u => u.plan === plan && u.promo_code_used).length;
-                        const planMrr = paid * (PLAN_PRICES[plan] || 0);
+                      {[
+                        {props:1,  price:19,  label:'1 Property'},
+                        {props:4,  price:43,  label:'4 Properties'},
+                        {props:6,  price:49,  label:'6 Properties'},
+                        {props:11, price:69,  label:'11 Properties'},
+                        {props:16, price:99,  label:'16 Properties'},
+                        {props:21, price:119, label:'21 Properties'},
+                      ].map(tier => {
+                        const paid = users.filter(u => isRealPaid(u) && (u.property_limit ?? 1) === tier.props).length;
+                        const promo = users.filter(u => u.promo_code_used && (u.property_limit ?? 1) === tier.props).length;
+                        const wlUsers = users.filter(u => isRealPaid(u) && (u.property_limit ?? 1) === tier.props && u.white_label_enabled).length;
+                        const tierMrr = paid * tier.price + wlUsers * 5;
+                        if (paid === 0 && promo === 0) return null;
                         return (
-                          <TRow key={plan} $cols="1.5fr 1fr 1fr 1fr 1fr">
-                            <TCell><PlanBadge $plan={plan}>{plan}</PlanBadge></TCell>
-                            <TCell>€{PLAN_PRICES[plan]}/Mo</TCell>
+                          <TRow key={tier.props} $cols="1.5fr 1fr 1fr 1fr 1fr">
+                            <TCell><PlanBadge $plan="pro">{tier.label}</PlanBadge></TCell>
+                            <TCell>€{tier.price}/Mo</TCell>
                             <TCell style={{ fontWeight: paid > 0 ? 700 : 400 }}>{paid}</TCell>
                             <TCell style={{ color: promo > 0 ? '#F59E0B' : '#ccc' }}>{promo}</TCell>
-                            <TCell style={{ fontWeight: 600, color: '#10B981' }}>€{planMrr.toFixed(0)}</TCell>
+                            <TCell style={{ fontWeight: 600, color: '#10B981' }}>€{tierMrr.toFixed(0)}</TCell>
                           </TRow>
                         );
-                      })}
+                      }).filter(Boolean)}
                       <TRow $cols="1.5fr 1fr 1fr 1fr 1fr" style={{ borderTop:'2px solid #e8e8f0' }}>
                         <TCell style={{ fontWeight:700 }}>GESAMT</TCell>
                         <TCell>–</TCell>
