@@ -784,6 +784,168 @@ const LightboxOpenBtn = styled.a`
   &:hover { background: #5a52e0; }
 `;
 
+
+// ── Pricing Configurator ──────────────────────────────────────────────────────
+const ConfigWrap = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 860px;
+  margin: 0 auto;
+  @media (max-width: 760px) { grid-template-columns: 1fr; }
+`;
+
+const ConfigLeft = styled.div`
+  background: linear-gradient(135deg, #6C63FF 0%, #5a52e0 100%);
+  border-radius: 20px;
+  padding: 2rem;
+  color: #fff;
+`;
+
+const ConfigRight = styled.div`
+  background: ${({ theme }) => theme.colors.bgCard};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 20px;
+  padding: 2rem;
+`;
+
+const ConfigTitle = styled.div`
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+`;
+
+const ConfigPrice = styled.div`
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin: 0.75rem 0 0.25rem;
+  span { font-size: 1rem; font-weight: 400; opacity: 0.7; }
+`;
+
+const ConfigFeatureList = styled.ul`
+  list-style: none;
+  padding: 0; margin: 1rem 0 0;
+  display: flex; flex-direction: column; gap: 8px;
+`;
+
+const ConfigFeature = styled.li`
+  font-size: 0.85rem;
+  opacity: 0.92;
+  display: flex; align-items: center; gap: 8px;
+  &::before { content: '✓'; font-weight: 800; flex-shrink: 0; }
+`;
+
+const ConfigLabel = styled.div`
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: ${({ theme }) => theme.colors.textMuted};
+  margin-bottom: 10px;
+`;
+
+const SliderWrap = styled.div`
+  margin-bottom: 1.5rem;
+`;
+
+const SliderTrack = styled.input`
+  width: 100%;
+  margin: 6px 0 8px;
+  accent-color: #6C63FF;
+`;
+
+const SliderSteps = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+`;
+
+const SliderHint = styled.div`
+  font-size: 0.75rem;
+  color: #6C63FF;
+  font-weight: 600;
+  margin-top: 4px;
+  min-height: 18px;
+`;
+
+const WLToggleRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: ${({ theme }) => theme.colors.bgElevated};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  &:hover { border-color: rgba(108,99,255,0.3); }
+`;
+
+const WLToggleInfo = styled.div``;
+const WLToggleName = styled.div`font-size: 0.88rem; font-weight: 600; color: ${({ theme }) => theme.colors.text};`;
+const WLToggleSub = styled.div`font-size: 0.72rem; color: ${({ theme }) => theme.colors.textMuted}; margin-top: 2px;`;
+
+const ToggleSwitch = styled.div`
+  width: 38px; height: 22px; border-radius: 11px;
+  background: ${({ $on }) => $on ? '#6C63FF' : '#D0D0E0'};
+  position: relative; flex-shrink: 0; transition: background 0.2s;
+  &::after {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px; border-radius: 8px;
+    background: #fff; top: 3px;
+    left: ${({ $on }) => $on ? '19px' : '3px'};
+    transition: left 0.2s;
+  }
+`;
+
+const ConfigTotal = styled.div`
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
+  padding-top: 1.25rem;
+`;
+
+const ConfigTotalPrice = styled.div`
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: ${({ theme }) => theme.colors.text};
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin-bottom: 4px;
+  span { font-size: 0.9rem; font-weight: 400; color: ${({ theme }) => theme.colors.textMuted}; }
+`;
+
+const ConfigTotalSub = styled.div`
+  font-size: 0.72rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  margin-bottom: 1rem;
+  min-height: 18px;
+`;
+
+const ConfigCTA = styled(Link)`
+  display: block;
+  text-align: center;
+  background: #6C63FF;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 13px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.18s;
+  &:hover { background: #5a52e0; }
+`;
+
+const ConfigTrust = styled.div`
+  font-size: 0.68rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+  text-align: center;
+  margin-top: 8px;
+  line-height: 1.5;
+`;
+
 // ── Features ──────────────────────────────────────────────────────────────────
 const FeaturesGrid = styled.div`
   display: grid;
@@ -1279,6 +1441,8 @@ export default function Landing({ lang = 'de' }) {
   const [openFaq, setOpenFaq] = React.useState(null);
   const [annual, setAnnual] = React.useState(false);
   const [sampleOpen, setSampleOpen] = React.useState(null);
+  const [configProps, setConfigProps] = React.useState(1);
+  const [configWL, setConfigWL] = React.useState(false);
   const [pdfLoading, setPdfLoading] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 700);
   const [promoUsed, setPromoUsed] = React.useState(null);
@@ -1636,41 +1800,120 @@ export default function Landing({ lang = 'de' }) {
         <SectionTitle>{t.pricingTitle.split('\n').map((line, i) => <React.Fragment key={i}>{line}{i === 0 && <br />}</React.Fragment>)}</SectionTitle>
         <SectionSub>{t.pricingSub}</SectionSub>
 
-        <BillingToggleWrap>
-          <BillingToggleTrack>
-            <BillingToggleBtn $active={!annual} onClick={() => setAnnual(false)}>
-              {lang === 'de' ? 'Monatlich' : 'Monthly'}
-            </BillingToggleBtn>
-            <BillingToggleBtn $active={annual} onClick={() => setAnnual(true)}>
-              {lang === 'de' ? 'Jährlich' : 'Yearly'}
-            </BillingToggleBtn>
-          </BillingToggleTrack>
-          {annual && <AnnualBadge>{lang === 'de' ? '2 Monate gratis 🎉' : '2 months free 🎉'}</AnnualBadge>}
-        </BillingToggleWrap>
+        {(() => {
+          const isDE = lang === 'de';
+          // Price calculation
+          const calcTotal = (props, wl) => {
+            let cost = 19, rem = Math.max(0, props - 1);
+            while (rem >= 10) { cost += 50; rem -= 10; }
+            if (rem >= 5) { cost += 30; rem -= 5; }
+            if (rem >= 1) { cost += 24; rem = 0; }
+            if (wl) cost += 5;
+            return cost;
+          };
+          const pricePerProp = (props) => {
+            if (props <= 1) return null;
+            const addCost = calcTotal(props, false) - 19;
+            const extra = props - 1;
+            return (addCost / extra).toFixed(2);
+          };
+          const total = calcTotal(configProps, configWL);
+          const ppp = pricePerProp(configProps);
 
-        <PricingGrid>
-          {t.plans.map(p => (
-            <PricingCard key={p.name} $featured={p.featured}>
-              <PlanBadge $featured={p.featured}>{p.name}</PlanBadge>
-              <PlanPrice $featured={p.featured}>
-                {annual && <PriceStrike>€{p.price}</PriceStrike>}
-                <span className="amount">€{annual ? p.priceAnnual : p.price}</span>
-                <span className="period">{p.period}</span>
-              </PlanPrice>
-              {annual && (
-                <div style={{ fontSize: '0.75rem', color: p.featured ? 'rgba(255,255,255,0.7)' : '#10B981', marginBottom: '0.75rem', fontWeight: 600 }}>
-                  {lang === 'de' ? `€${parseInt(p.priceAnnual) * 12} / Jahr` : `€${parseInt(p.priceAnnual) * 12} / year`}
+          // Build register URL with config
+          const buildUrl = () => {
+            const pkgs = [];
+            let rem = Math.max(0, configProps - 1);
+            while (rem >= 10) { pkgs.push('prop_10'); rem -= 10; }
+            if (rem >= 5) { pkgs.push('prop_5'); rem -= 5; }
+            if (rem >= 1) { pkgs.push('prop_3'); rem = 0; }
+            if (configWL) pkgs.push('whitelabel');
+            return `/register?addons=${pkgs.join(',')}&props=${configProps}`;
+          };
+
+          const features = isDE ? [
+            'Vollständiger 6-Seiten Report',
+            'KI-Analyse & Zusammenfassung',
+            'Markt-Radar (Revier, Angriff, Potenzial)',
+            'GA4-Integration (Sessions & Engagement)',
+            'Strategische Prioritäten & Aufgaben',
+            'Automatischer monatlicher Versand',
+          ] : [
+            'Complete 6-page report',
+            'AI analysis & summary',
+            'Market radar (territory, attack, potential)',
+            'GA4 integration (sessions & engagement)',
+            'Strategic priorities & tasks',
+            'Automatic monthly delivery',
+          ];
+
+          return (
+            <ConfigWrap>
+              {/* LEFT: What you always get */}
+              <ConfigLeft>
+                <ConfigTitle>{isDE ? 'Basis-Plan — immer dabei' : 'Base plan — always included'}</ConfigTitle>
+                <ConfigPrice>€19<span>{isDE ? ' / Monat' : ' / month'}</span></ConfigPrice>
+                <div style={{ fontSize: '0.72rem', opacity: 0.65, marginBottom: '0.5rem' }}>
+                  {isDE ? '1 Property inklusive' : '1 property included'}
                 </div>
-              )}
-              <PlanFeatures>
-                {p.features.map(f => (
-                  <PlanFeature key={f} $featured={p.featured}>{f}</PlanFeature>
-                ))}
-              </PlanFeatures>
-              <PlanCTA to={`/register?plan=${p.name.toLowerCase()}&billing=${annual ? 'yearly' : 'monthly'}`} $featured={p.featured}>{t.planCta}</PlanCTA>
-            </PricingCard>
-          ))}
-        </PricingGrid>
+                <ConfigFeatureList>
+                  {features.map(f => <ConfigFeature key={f}>{f}</ConfigFeature>)}
+                </ConfigFeatureList>
+              </ConfigLeft>
+
+              {/* RIGHT: Configurator */}
+              <ConfigRight>
+                <SliderWrap>
+                  <ConfigLabel>{isDE ? 'Wie viele Webseiten betreust du?' : 'How many websites do you manage?'}</ConfigLabel>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+                    <button onClick={() => setConfigProps(p => Math.max(1, p-1))}
+                      style={{ width:28, height:28, borderRadius:6, border:'1px solid rgba(108,99,255,0.3)', background:'transparent', cursor:'pointer', fontSize:'1rem', color:'#6C63FF', display:'flex', alignItems:'center', justifyContent:'center' }}>−</button>
+                    <strong style={{ fontSize:'1.4rem', fontWeight:800, minWidth:32, textAlign:'center' }}>{configProps}</strong>
+                    <button onClick={() => setConfigProps(p => p+1)}
+                      style={{ width:28, height:28, borderRadius:6, border:'1px solid rgba(108,99,255,0.3)', background:'transparent', cursor:'pointer', fontSize:'1rem', color:'#6C63FF', display:'flex', alignItems:'center', justifyContent:'center' }}>+</button>
+                    <SliderTrack type="range" min="1" max="21" value={configProps} onChange={e => setConfigProps(+e.target.value)} />
+                  </div>
+                  <SliderSteps>
+                    <span>1</span><span>4</span><span>6</span><span>11</span><span>21</span>
+                  </SliderSteps>
+                  <SliderHint>
+                    {configProps > 1 && ppp ? (isDE ? `Nur ${ppp} € pro zusätzliche Webseite` : `Only €${ppp} per additional website`) : ''}
+                  </SliderHint>
+                </SliderWrap>
+
+                <WLToggleRow onClick={() => setConfigWL(w => !w)}>
+                  <WLToggleInfo>
+                    <WLToggleName>
+                      {isDE ? 'Professionelles Branding' : 'Professional branding'}
+                      <span style={{ marginLeft:8, fontSize:'0.72rem', fontWeight:600, color:'#6C63FF' }}>+ €5</span>
+                    </WLToggleName>
+                    <WLToggleSub>
+                      {isDE ? 'Eigenes Logo, kein RankBrief-Branding in Reports' : 'Your logo, no RankBrief branding in reports'}
+                    </WLToggleSub>
+                  </WLToggleInfo>
+                  <ToggleSwitch $on={configWL} />
+                </WLToggleRow>
+
+                <ConfigTotal>
+                  <ConfigTotalPrice>€{total}<span>{isDE ? ' / Monat' : ' / month'}</span></ConfigTotalPrice>
+                  <ConfigTotalSub>
+                    {configProps > 1
+                      ? (isDE ? `Basis + ${configProps - 1} weitere Properties${configWL ? ' + White-Label' : ''}` : `Base + ${configProps - 1} extra properties${configWL ? ' + white-label' : ''}`)
+                      : (isDE ? `Basis-Plan${configWL ? ' + White-Label' : ''}` : `Base plan${configWL ? ' + white-label' : ''}`)}
+                  </ConfigTotalSub>
+                  <ConfigCTA to={buildUrl()}>
+                    {isDE ? '30 Tage kostenlos testen →' : 'Start 30-day free trial →'}
+                  </ConfigCTA>
+                  <ConfigTrust>
+                    {isDE
+                      ? 'Testphase endet automatisch · Keine Kreditkarte · White-Label im Testmonat deaktiviert'
+                      : 'Trial ends automatically · No credit card · White-label inactive during trial'}
+                  </ConfigTrust>
+                </ConfigTotal>
+              </ConfigRight>
+            </ConfigWrap>
+          );
+        })()}
       </Section>
 
       {/* FAQ */}
