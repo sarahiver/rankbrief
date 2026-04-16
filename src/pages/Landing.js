@@ -1819,41 +1819,41 @@ export default function Landing({ lang = 'de' }) {
           };
 
           const features = isDE ? [
-            'Professioneller 6-Seiten PDF-Report',
-            'KI-Zusammenfassung in verständlicher Sprache',
-            'Top Keywords & Seiten mit Klick-Daten',
-            'Markt-Radar: welche Keywords du besitzt, angreifen kannst & wo Potenzial schlummert',
-            'GA4: Besucher, Sessions & Engagement Rate',
-            'Strategische Empfehlungen mit konkreten Aufgaben',
-            'Business Impact — was SEO wirklich bringt',
-            'Automatisch am 1. des Monats per Email versendet',
-            'Kein manueller Aufwand — einmal einrichten, fertig',
+            { title: 'Vollständiger 6-Seiten Strategie-Report', desc: 'Keine Lücken mehr – du erhältst sofort den vollen Einblick inkl. KI-Analyse.' },
+            { title: 'KI-Radar: Findet deine Goldgruben', desc: 'Die KI sortiert deine Keywords automatisch in Revier, Angriff und Potenzial.' },
+            { title: 'Echte Business-Insights (GA4)', desc: 'Wir zeigen dir nicht nur Rankings, sondern Klicks, Engagement und echten Impact.' },
+            { title: 'Konkrete Tasks statt Rätselraten', desc: 'Du bekommst klare Prioritäten für die nächsten 30 Tage – direkt umsetzbar.' },
+            { title: 'Vollautomatisch & Pünktlich', desc: 'Am 1. des Monats landet der Report in deinem Postfach. Einmal einrichten, fertig.' },
+            { title: 'White-Label Option (+€5)', desc: 'Entferne unser Branding und nutze dein eigenes Logo für alle Reports im Account.' },
           ] : [
-            'Professional 6-page PDF report',
-            'AI summary in plain language',
-            'Top keywords & pages with click data',
-            'Market radar: keywords you own, can attack & where potential hides',
-            'GA4: visitors, sessions & engagement rate',
-            'Strategic recommendations with concrete tasks',
-            'Business impact — what SEO actually delivers',
-            'Automatically sent on the 1st of every month',
-            'Zero manual effort — set up once, done',
+            { title: 'Complete 6-page strategy report', desc: 'No gaps — you get full insight immediately, including AI analysis.' },
+            { title: 'AI radar: finds your goldmines', desc: 'AI automatically sorts your keywords into territory, attack and potential.' },
+            { title: 'Real business insights (GA4)', desc: "We don't just show rankings — clicks, engagement and real impact." },
+            { title: 'Concrete tasks, not guesswork', desc: 'Clear priorities for the next 30 days — ready to act on immediately.' },
+            { title: 'Fully automated & on time', desc: 'Report lands in your inbox on the 1st. Set up once, done forever.' },
+            { title: 'White-label option (+€5)', desc: 'Remove our branding and use your own logo for all reports in your account.' },
           ];
 
           return (
             <ConfigWrap>
               {/* LEFT: What you always get */}
               <ConfigLeft>
-                <div style={{ fontSize:'0.68rem', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.16em', opacity:0.55, marginBottom:6 }}>
-                  {isDE ? 'Ab €19 / Monat' : 'From €19 / month'}
+                <ConfigTitle>{isDE ? 'Der ultimative SEO-Report. Für jede Webseite.' : 'The ultimate SEO report. For every website.'}</ConfigTitle>
+                <div style={{ display:'flex', alignItems:'baseline', gap:6, margin:'1rem 0 0.25rem' }}>
+                  <ConfigPrice style={{margin:0}}>€19<span>{isDE ? ' /Monat' : ' /month'}</span></ConfigPrice>
                 </div>
-                <ConfigTitle>{isDE ? 'Der vollständige SEO-Report. Für jede Webseite.' : 'The complete SEO report. For every website.'}</ConfigTitle>
-                <ConfigPrice>€{basePrice}<span>{isDE ? ' / Monat' : ' / month'}</span></ConfigPrice>
-                <div style={{ fontSize: '0.72rem', opacity: 0.65, marginBottom: '1rem' }}>
-                  {isDE ? `${configProps} ${configProps === 1 ? 'Property' : 'Properties'} inklusive` : `${configProps} ${configProps === 1 ? 'property' : 'properties'} included`}
+                <div style={{ fontSize:'0.75rem', opacity:0.7, marginBottom:'1.25rem', lineHeight:1.4 }}>
+                  {isDE ? '1 Property inklusive · Alle Features freigeschaltet.' : '1 property included · All features unlocked.'}
                 </div>
                 <ConfigFeatureList>
-                  {features.map(f => <ConfigFeature key={f}>{f}</ConfigFeature>)}
+                  {features.map(f => (
+                    <ConfigFeature key={f.title}>
+                      <div>
+                        <div style={{fontWeight:700, marginBottom:2}}>{f.title}</div>
+                        <div style={{opacity:0.72, fontSize:'0.78rem', lineHeight:1.45}}>{f.desc}</div>
+                      </div>
+                    </ConfigFeature>
+                  ))}
                 </ConfigFeatureList>
               </ConfigLeft>
 
