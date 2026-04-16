@@ -1253,7 +1253,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
             <PlanBadge $plan={profile?.subscription_status === 'active' ? 'pro' : plan}>
               <StatusDot />
               {profile?.subscription_status === 'active' || profile?.subscription_status === 'promo'
-                ? `${propertyLimit} ${propertyLimit === 1 ? 'Property' : 'Properties'}${whiteLabelEnabled ? ' · WL' : ''}`
+                ? `${propertyLimit} ${propertyLimit === 1 ? 'Property' : 'Properties'} ${whiteLabelEnabled ? '· WL' : ''}`
                 : (lang === 'de' ? 'Kostenlos' : 'Free')}
             </PlanBadge>
           </SectionHead>
@@ -1347,7 +1347,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
                 <div style={{ marginTop: '1.25rem' }}>
                   <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:'1.25rem' }}>
                     <div style={{ padding:'8px 12px', background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.2)', borderRadius:8, fontSize:'13px' }}>
-                      ✓ {currentProps} {isDE ? `Property${currentProps > 1 ? 's' : ''}` : `propert${currentProps > 1 ? 'ies' : 'y'}`} {isDE ? 'gebucht' : 'booked'}
+                      ✓ {currentProps} {currentProps === 1 ? 'Property' : 'Properties'} {isDE ? 'gebucht' : 'booked'}
                     </div>
                     {hasWL && (
                       <div style={{ padding:'8px 12px', background:'rgba(108,99,255,0.08)', border:'1px solid rgba(108,99,255,0.2)', borderRadius:8, fontSize:'13px' }}>
