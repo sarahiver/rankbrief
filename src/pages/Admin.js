@@ -80,8 +80,8 @@ const Alert     = styled.div`padding:.75rem 1rem;border-radius:${({theme})=>them
 
 const ADMIN_PW_KEY = 'rb_admin_unlocked';
 const ADMIN_PW     = process.env.REACT_APP_ADMIN_PW || 'rankbrief-admin';
-const PLANS = ['free','basic','pro','agency'];
-const PLAN_PRICES = { free: 0, basic: 19, pro: 39, agency: 79 };
+const PLANS = ['free','basic','pro','agency']; // legacy — kept for DB compat
+const PLAN_PRICES = { free: 0, basic: 19, pro: 39, agency: 79 }; // legacy
 const isDemo = (u) => u.email?.includes('@rankbrief-demo.invalid');
 const isRealPaid = (u) => ['basic','pro','agency'].includes(u.plan) && !u.promo_code_used && !isDemo(u);
 const COLS_USERS = '2fr 1fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr';
@@ -112,7 +112,7 @@ export default function Admin({ user }) {
   const [modal, setModal]       = useState(null);
   const [saving, setSaving]     = useState(false);
   const [newPlan, setNewPlan]   = useState('free');
-  const [promoForm, setPromoForm] = useState({ code: '', plan: 'pro', max_uses: 50, report_limit: 6, notes: '' });
+  const [promoForm, setPromoForm] = useState({ code: '', property_limit: 1, white_label: false, max_uses: 50, report_limit: 3, notes: '' });
   const [exportingXlsx, setExportingXlsx] = useState(false);
   const [openUser, setOpenUser]   = useState(null);
 
@@ -148,7 +148,7 @@ export default function Admin({ user }) {
       { data: allProps },
       { data: allPromos },
     ] = await Promise.all([
-      supabase.from('profiles').select('id, plan, plan_status, free_report_sent, promo_code_used, promo_reports_limit, promo_reports_used, trial_ends_at, created_at, report_language, email').order('created_at', { ascending: false }),
+      supabase.from('profiles').select('id, plan, plan_status, subscription_status, property_limit, white_label_enabled, free_report_sent, promo_code_used, promo_reports_limit, promo_reports_used, trial_ends_at, created_at, report_language, email').order('created_at', { ascending: false }),
       supabase.from('reports').select('id, property_id, report_month, clicks, status, pdf_url, summary_text, created_at').order('created_at', { ascending: false }).limit(200),
       supabase.from('properties').select('id, user_id, gsc_property_url, display_name, status, ga_property_id, created_at').order('created_at', { ascending: false }),
       supabase.from('promo_codes').select('*').order('created_at', { ascending: false }),
@@ -255,13 +255,21 @@ export default function Admin({ user }) {
   const handleChangePlan = async () => {
     if (!modal?.user) return;
     setSaving(true);
+    const propMap = { '1props':1, '4props':4, '6props':6, '11props':11, '16props':16, '21props':21 };
+    const propertyLimit = propMap[newPlan] || 1;
     const { error } = await supabase
       .from('profiles')
-      .update({ plan: newPlan, plan_status: newPlan === 'free' ? 'active' : 'active' })
+      .update({
+        property_limit: propertyLimit,
+        white_label_enabled: newWL,
+        plan: propertyLimit >= 11 ? 'agency' : propertyLimit >= 3 ? 'pro' : 'basic', // legacy compat
+        plan_status: 'active',
+        subscription_status: 'active',
+      })
       .eq('id', modal.user.id);
     setSaving(false);
     if (error) { showAlert('Fehler: ' + error.message, true); return; }
-    showAlert(`Plan geändert → ${newPlan}`);
+    showAlert(`Plan geändert → ${propertyLimit} Properties${newWL ? ' + WL' : ''}`);
     setModal(null);
     loadAll();
   };
@@ -486,16 +494,18 @@ export default function Admin({ user }) {
     if (!promoForm.code.trim()) return;
     setSaving(true);
     const { error } = await supabase.from('promo_codes').insert({
-      code:         promoForm.code.trim().toUpperCase(),
-      plan:         promoForm.plan,
-      max_uses:     parseInt(promoForm.max_uses) || 100,
-      report_limit: promoForm.report_limit ? parseInt(promoForm.report_limit) : null,
-      notes:        promoForm.notes || null,
+      code:           promoForm.code.trim().toUpperCase(),
+      plan:           promoForm.property_limit >= 11 ? 'agency' : promoForm.property_limit >= 3 ? 'pro' : 'basic',
+      property_limit: promoForm.property_limit || 1,
+      white_label:    promoForm.white_label || false,
+      max_uses:       parseInt(promoForm.max_uses) || 100,
+      report_limit:   promoForm.report_limit ? parseInt(promoForm.report_limit) : null,
+      notes:          promoForm.notes || null,
     });
     setSaving(false);
     if (error) { showAlert('Fehler: ' + error.message, true); return; }
     showAlert('Code erstellt ✓');
-    setPromoForm({ code: '', plan: 'pro', max_uses: 50, report_limit: 6, notes: '' });
+    setPromoForm({ code: '', property_limit: 1, white_label: false, max_uses: 50, report_limit: 3, notes: '' });
     setModal(null);
     loadAll();
   };
@@ -605,7 +615,9 @@ export default function Admin({ user }) {
                           </div>
                         </div>
                         <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', flexShrink:0 }}>
-                          <PlanBadge $plan={u.plan}>{u.plan}</PlanBadge>
+                          <PlanBadge $plan={u.subscription_status === 'active' ? 'pro' : u.plan}>
+                            {u.property_limit > 0 ? `${u.property_limit}P${u.white_label_enabled ? '+WL' : ''}` : (u.plan || 'free')}
+                          </PlanBadge>
                           {u.promo_code_used && (
                             <span style={{ fontSize:'.7rem', fontWeight:700, color:'#F59E0B', fontFamily:'monospace', background:'rgba(245,158,11,.1)', padding:'.15rem .5rem', borderRadius:99 }}>
                               🎟 {u.promo_code_used !== true ? u.promo_code_used : 'PROMO'}
@@ -821,7 +833,7 @@ export default function Admin({ user }) {
                         const planMrr = paid * (PLAN_PRICES[plan] || 0);
                         return (
                           <TRow key={plan} $cols="1.5fr 1fr 1fr 1fr 1fr">
-                            <TCell><PlanBadge $plan={plan}>{plan}</PlanBadge></TCell>
+                            <TCell><PlanBadge $plan={plan}>{u?.property_limit || plan}</PlanBadge></TCell>
                             <TCell>€{PLAN_PRICES[plan]}/Mo</TCell>
                             <TCell style={{ fontWeight: paid > 0 ? 700 : 400 }}>{paid}</TCell>
                             <TCell style={{ color: promo > 0 ? '#F59E0B' : '#ccc' }}>{promo}</TCell>
@@ -856,7 +868,7 @@ export default function Admin({ user }) {
                         return (
                           <TRow key={u.id} $cols="2fr 1fr 1fr 1fr 1fr 1fr 1fr">
                             <TCell style={{ fontWeight:500 }}>{u.email}</TCell>
-                            <TCell><PlanBadge $plan={u.plan}>{u.plan}</PlanBadge></TCell>
+                            <TCell><PlanBadge $plan={u.subscription_status === 'active' ? 'pro' : u.plan}>{u.property_limit || 1}P{u.white_label_enabled ? '+WL' : ''}</PlanBadge></TCell>
                             <TCell><StatusDot $status={u.plan_status} />{u.plan_status}</TCell>
                             <TCell>
                               {isPromo
@@ -907,7 +919,7 @@ export default function Admin({ user }) {
                   {promos.map(p => (
                     <TRow key={p.id} $cols="1.5fr 1fr 1fr 1fr 1fr 1fr 1.5fr">
                       <TCell style={{ fontWeight:700, fontFamily:'monospace', fontSize:'0.8rem' }}>{p.code}</TCell>
-                      <TCell><PlanBadge $plan={p.plan}>{p.plan}</PlanBadge></TCell>
+                      <TCell><PlanBadge $plan={p.plan}>{p.property_limit || '?'}P{p.white_label ? '+WL' : ''}</PlanBadge></TCell>
                       <TCell>{p.uses_count}</TCell>
                       <TCell>{p.max_uses}</TCell>
                       <TCell>{p.report_limit ?? <span style={{ color:'#10B981' }}>∞</span>}</TCell>
@@ -935,10 +947,23 @@ export default function Admin({ user }) {
         <Overlay onClick={() => setModal(null)}>
           <ModalBox onClick={e => e.stopPropagation()}>
             <ModalTitle>Plan ändern</ModalTitle>
-            <ModalSub>User: <strong>{modal.user.email}</strong><br />Aktuell: <PlanBadge $plan={modal.user.plan}>{modal.user.plan}</PlanBadge></ModalSub>
-            <Select value={newPlan} onChange={e => setNewPlan(e.target.value)}>
-              {PLANS.map(p => <option key={p} value={p}>{p}</option>)}
-            </Select>
+            <ModalSub>User: <strong>{modal.user.email}</strong><br />Aktuell: <PlanBadge $plan={modal.user.subscription_status === 'active' ? 'pro' : modal.user.plan}>{modal.user.property_limit || 1}P{modal.user.white_label_enabled ? ' + WL' : ''}</PlanBadge></ModalSub>
+            <div style={{ marginBottom:'0.75rem' }}>
+              <div style={{ fontSize:'0.8rem', fontWeight:600, marginBottom:6 }}>Properties</div>
+              <Select value={newPlan} onChange={e => setNewPlan(e.target.value)}>
+                <option value="1props">1 Property — €19/mo</option>
+                <option value="4props">4 Properties — €43/mo (Basis + 3er)</option>
+                <option value="6props">6 Properties — €49/mo (Basis + 5er)</option>
+                <option value="11props">11 Properties — €69/mo (Basis + 10er)</option>
+                <option value="16props">16 Properties — €99/mo (Basis + 10er + 5er)</option>
+                <option value="21props">21 Properties — €119/mo (Basis + 2x10er)</option>
+              </Select>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:'0.75rem', cursor:'pointer' }}
+              onClick={() => setNewWL && setNewWL(w => !w)}>
+              <input type="checkbox" checked={newWL || false} readOnly />
+              <span style={{ fontSize:'0.85rem' }}>White-Label (+€5/Monat)</span>
+            </div>
             <BtnRow>
               <BtnGhost onClick={() => setModal(null)}>Abbrechen</BtnGhost>
               <BtnPrimary onClick={handleChangePlan} disabled={saving}>{saving ? 'Speichert…' : 'Plan setzen'}</BtnPrimary>
@@ -995,9 +1020,14 @@ export default function Admin({ user }) {
             ))}
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.75rem', marginBottom:'0.75rem' }}>
               <div>
-                <div style={{ fontSize:'0.8rem', fontWeight:600, color:'var(--text-muted)', marginBottom:'0.375rem' }}>Plan</div>
-                <Select value={promoForm.plan} onChange={e => setPromoForm(f => ({ ...f, plan: e.target.value }))}>
-                  {PLANS.map(p => <option key={p} value={p}>{p}</option>)}
+                <div style={{ fontSize:'0.8rem', fontWeight:600, color:'var(--text-muted)', marginBottom:'0.375rem' }}>Properties</div>
+                <Select value={promoForm.property_limit} onChange={e => setPromoForm(f => ({ ...f, property_limit: +e.target.value }))}>
+                  <option value={1}>1 Property</option>
+                  <option value={4}>4 Properties</option>
+                  <option value={6}>6 Properties</option>
+                  <option value={11}>11 Properties</option>
+                  <option value={16}>16 Properties</option>
+                  <option value={21}>21 Properties</option>
                 </Select>
               </div>
               <div>
@@ -1007,6 +1037,11 @@ export default function Admin({ user }) {
                   onChange={e => setPromoForm(f => ({ ...f, max_uses: e.target.value }))}
                   style={{ marginBottom:0 }} />
               </div>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:'0.75rem', cursor:'pointer' }}
+              onClick={() => setPromoForm(f => ({ ...f, white_label: !f.white_label }))}>
+              <input type="checkbox" checked={promoForm.white_label} readOnly style={{ cursor:'pointer' }} />
+              <span style={{ fontSize:'0.85rem', fontWeight:600 }}>White-Label inklusive (+€5/Monat Wert)</span>
             </div>
             <div style={{ marginBottom:'1rem' }}>
               <div style={{ fontSize:'0.8rem', fontWeight:600, color:'var(--text-muted)', marginBottom:'0.375rem' }}>
