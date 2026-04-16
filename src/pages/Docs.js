@@ -590,19 +590,21 @@ const content = {
       label: 'Pricing',
       title: 'Plans explained',
       sub: 'All plans include automatic monthly PDF reports, AI summary and email delivery. The first month is free.',
-      headers: ['Feature', 'Base €19', '+Props add-on', 'White-Label +€5'],
+      note: 'Every plan includes the full report. You only pay for additional properties or white-label.',
+      headers: ['What you get', 'Included'],
       rows: [
-        ['Monthly PDF report', '✓', '✓', '✓'],
-        ['GSC data (clicks, rankings)', '✓', '✓', '✓'],
-        ['AI summary + market radar', '✓', '✓', '✓'],
-        ['SEO recommendations + priorities', '✓', '✓', '✓'],
-        ['Progress & business impact', '✓', '✓', '✓'],
-        ['GA4 data (sessions, users)', '✓', '✓', '✓'],
-        ['Automatic email delivery', '✓', '✓', '✓'],
-        ['Properties included', '1', '+3 / +5 / +10', 'all'],
-        ['RankBrief footer', 'yes', 'yes', 'removed'],
-        ['Custom logo + brand colors', '–', '–', '✓'],
-        ['First month free', '✓', '✓', '✓'],
+        ['Complete 6-page strategy report', '✓ always'],
+        ['AI analysis & market radar', '✓ always'],
+        ['Top keywords, pages & recommendations', '✓ always'],
+        ['GA4: sessions, users & engagement', '✓ always'],
+        ['Business impact & priorities', '✓ always'],
+        ['Automatic monthly email delivery', '✓ always'],
+        ['1 property', '€19 / month'],
+        ['+3 properties', '+€24 / month'],
+        ['+5 properties', '+€30 / month'],
+        ['+10 properties', '+€50 / month'],
+        ['White-label (your logo, no RankBrief footer)', '+€5 / month'],
+        ['First month free', '✓ always'],
       ],
     },
     cta: {
@@ -740,19 +742,21 @@ const content = {
       label: 'Preise',
       title: 'Tarife im Überblick',
       sub: 'Alle Tarife beinhalten automatische monatliche PDF-Reports, KI-Zusammenfassung und Email-Versand. Der erste Monat ist kostenlos.',
-      headers: ['Funktion', 'Basis €19', '+Properties Add-on', 'White-Label +€5'],
+      note: 'Jeder Plan enthält den vollständigen Report. Du zahlst nur für weitere Properties oder White-Label.',
+      headers: ['Was du bekommst', 'Inklusive'],
       rows: [
-        ['Monatlicher PDF-Report', '✓', '✓', '✓'],
-        ['GSC-Daten (Klicks, Rankings)', '✓', '✓', '✓'],
-        ['KI-Zusammenfassung + Markt-Radar', '✓', '✓', '✓'],
-        ['SEO-Empfehlungen + Prioritäten', '✓', '✓', '✓'],
-        ['Fortschritt & Business Impact', '✓', '✓', '✓'],
-        ['GA4-Daten (Sessions, Nutzer)', '✓', '✓', '✓'],
-        ['Automatischer Email-Versand', '✓', '✓', '✓'],
-        ['Enthaltene Properties', '1', '+3 / +5 / +10', 'alle'],
-        ['RankBrief-Fußzeile', 'ja', 'ja', 'entfernt'],
-        ['Eigenes Logo + Brandfarben', '–', '–', '✓'],
-        ['Erster Monat kostenlos', '✓', '✓', '✓'],
+        ['Vollständiger 6-Seiten Strategie-Report', '✓ immer'],
+        ['KI-Analyse & Markt-Radar', '✓ immer'],
+        ['Top Keywords, Seiten & Empfehlungen', '✓ immer'],
+        ['GA4: Sessions, Nutzer & Engagement', '✓ immer'],
+        ['Business Impact & Top Prioritäten', '✓ immer'],
+        ['Automatischer monatlicher Versand', '✓ immer'],
+        ['1 Property', '€19 / Monat'],
+        ['+3 Properties', '+€24 / Monat'],
+        ['+5 Properties', '+€30 / Monat'],
+        ['+10 Properties', '+€50 / Monat'],
+        ['White-Label (eigenes Logo, kein RankBrief-Footer)', '+€5 / Monat'],
+        ['Erster Monat kostenlos', '✓ immer'],
       ],
     },
     cta: {
@@ -899,17 +903,26 @@ export default function Docs() {
           <SectionTitle>{t.pricing.title}</SectionTitle>
           <SectionSub>{t.pricing.sub}</SectionSub>
 
+          {t.pricing.note && (
+            <div style={{ background:'rgba(108,99,255,0.06)', border:'1px solid rgba(108,99,255,0.15)', borderRadius:10, padding:'10px 14px', marginBottom:'1rem', fontSize:'0.82rem', color:'#5A5A78', fontStyle:'italic' }}>
+              {t.pricing.note}
+            </div>
+          )}
           <PricingTable>
             <PricingRow>
               {t.pricing.headers.map((h, i) => (
-                <PricingCell key={i} $header $highlight={i === 2}>{h}</PricingCell>
+                <PricingCell key={i} $header $highlight={i === 1}>{h}</PricingCell>
               ))}
             </PricingRow>
             {t.pricing.rows.map((row, i) => (
               <PricingRow key={i}>
                 {row.map((cell, j) => (
-                  <PricingCell key={j} $feature={j === 0} $highlight={j === 2}>
-                    {cell === '✓' ? <Check>✓</Check> : cell === '–' ? <Cross>–</Cross> : cell}
+                  <PricingCell key={j} $feature={j === 0} $highlight={j === 1}>
+                    {cell === '✓ immer' || cell === '✓ always'
+                      ? <span style={{color:'#10B981',fontWeight:700}}>✓</span>
+                      : cell === '✓' ? <Check>✓</Check>
+                      : cell === '–' ? <Cross>–</Cross>
+                      : cell}
                   </PricingCell>
                 ))}
               </PricingRow>

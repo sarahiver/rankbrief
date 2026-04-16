@@ -715,6 +715,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
   // Password change state
   const [pwCurrent, setPwCurrent] = useState('');
   const [pwNew, setPwNew] = useState('');
+  const [pwRepeat, setPwRepeat] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
 
   // GA4 edit state per property
@@ -1051,7 +1052,11 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
   // ── Passwort ändern ───────────────────────────────────────────────────────
   const handlePasswordChange = async () => {
     if (!pwNew || pwNew.length < 8) {
-      showAlert('Neues Passwort muss mindestens 8 Zeichen haben.', 'error');
+      showAlert(lang === 'de' ? 'Neues Passwort muss mindestens 8 Zeichen haben.' : 'New password must be at least 8 characters.', 'error');
+      return;
+    }
+    if (pwNew !== pwRepeat) {
+      showAlert(lang === 'de' ? 'Passwörter stimmen nicht überein.' : 'Passwords do not match.', 'error');
       return;
     }
     setPwLoading(true);
@@ -1862,19 +1867,35 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
             </Field>
 
             <Field>
-              <Label>Neues Passwort</Label>
+              <Label>{lang === 'de' ? 'Neues Passwort' : 'New password'}</Label>
               <Input
                 type="password"
-                placeholder="Mindestens 8 Zeichen"
+                placeholder={lang === 'de' ? 'Mindestens 8 Zeichen' : 'At least 8 characters'}
                 value={pwNew}
                 onChange={e => setPwNew(e.target.value)}
               />
             </Field>
 
+            <Field>
+              <Label>{lang === 'de' ? 'Passwort wiederholen' : 'Confirm password'}</Label>
+              <Input
+                type="password"
+                placeholder={lang === 'de' ? 'Passwort bestätigen' : 'Confirm your password'}
+                value={pwRepeat}
+                onChange={e => setPwRepeat(e.target.value)}
+                style={{ borderColor: pwRepeat && pwNew && pwRepeat !== pwNew ? '#EF4444' : undefined }}
+              />
+              {pwRepeat && pwNew && pwRepeat !== pwNew && (
+                <FieldHint style={{ color: '#EF4444', marginTop: 4 }}>
+                  {lang === 'de' ? 'Passwörter stimmen nicht überein' : 'Passwords do not match'}
+                </FieldHint>
+              )}
+            </Field>
+
             <Btn
               $variant="primary"
               onClick={handlePasswordChange}
-              disabled={pwLoading || !pwNew}
+              disabled={pwLoading || !pwNew || pwNew !== pwRepeat}
             >
               {pwLoading ? t(lang, 'saving') : t(lang, 'set.save_password')}
             </Btn>
