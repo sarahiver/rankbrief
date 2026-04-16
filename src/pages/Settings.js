@@ -855,7 +855,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
 
   // ── Downgrade with property selection ────────────────────────────────────
   const handleDowngrade = (targetPlan) => {
-    const maxDomains = PLAN_LIMITS[targetPlan]?.domains ?? 1;
+    const maxDomains = propertyLimit;
     const activeProps = properties.filter(p => p.is_active !== false);
     if (activeProps.length > maxDomains) {
       setSelectedProperties(activeProps.slice(0, maxDomains).map(p => p.id));
@@ -980,8 +980,7 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
   };
 
   const handleConnectNew = () => {
-    const plan = profile?.plan || 'free';
-    const planLimit = PLAN_LIMITS[plan]?.domains ?? 1;
+    const planLimit = propertyLimit;
     if (properties.length >= planLimit) {
       showAlert(lang === 'de' ? `Du hast ${planLimit} Properties gebucht. Upgrade im Plan-Tab um mehr hinzuzufügen.` : `You have ${planLimit} properties booked. Upgrade in the plan tab to add more.`, 'error');
       return;
@@ -1119,8 +1118,8 @@ export default function Settings({ user, lang = 'de', onLangChange }) {
           <ModalCard onClick={e => e.stopPropagation()} style={{ maxWidth: '480px' }}>
             <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.1rem', fontWeight: 800 }}>
               {lang === 'en'
-                ? `Downgrade to ${PLAN_LIMITS[downgradeModal.targetPlan]?.label}`
-                : `Wechsel zu ${PLAN_LIMITS[downgradeModal.targetPlan]?.label}`}
+                ? `Adjust properties`
+                : `Properties anpassen`}
             </h3>
             <p style={{ margin: '0 0 1rem', fontSize: '13px', color: '#666' }}>
               {lang === 'en'
