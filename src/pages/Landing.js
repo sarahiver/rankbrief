@@ -1197,14 +1197,19 @@ export default function Landing({ lang = 'de' }) {
   const [copied, setCopied] = React.useState(false);
 
   React.useEffect(() => {
-    supabase
-      .from('promo_codes')
-      .select('uses_count')
-      .eq('code', PROMO_CODE)
-      .single()
-      .then(({ data }) => {
-        if (data) setPromoUsed(data.uses_count ?? 0);
-      });
+    fetch(`${process.env.REACT_APP_SUPABASE_URL}/functions/v1/validate-promo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.REACT_APP_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({ code: PROMO_CODE }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.uses_count !== undefined) setPromoUsed(data.uses_count);
+      })
+      .catch(() => {});
   }, []);
 
   const handleCopy = () => {
