@@ -1,56 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
-
-  <!-- Landing Page -->
+  <!-- Landing Page (DE als Default, EN unter /en falls vorhanden) -->
   <url>
-    <loc>https://www.rankbrief.com/</loc>
-    <lastmod>2026-03-09</lastmod>
+    <loc>https://rankbrief.com/</loc>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://www.rankbrief.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rankbrief.com/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.rankbrief.com/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://rankbrief.com/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rankbrief.com/"/>
   </url>
-
-  <!-- Docs -->
+  <!-- Legal DE (Canonical) -->
   <url>
-    <loc>https://www.rankbrief.com/docs</loc>
-    <lastmod>2026-03-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Legal EN -->
-  <url>
-    <loc>https://www.rankbrief.com/privacy</loc>
-    <lastmod>2026-03-09</lastmod>
+    <loc>https://rankbrief.com/de/privacy</loc>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://www.rankbrief.com/terms</loc>
-    <lastmod>2026-03-09</lastmod>
+    <loc>https://rankbrief.com/de/terms</loc>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
-
-  <!-- Legal DE -->
+  <!-- Legal EN (Canonical) -->
   <url>
-    <loc>https://www.rankbrief.com/de/privacy</loc>
-    <lastmod>2026-03-09</lastmod>
+    <loc>https://rankbrief.com/privacy</loc>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://www.rankbrief.com/de/privacy"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rankbrief.com/privacy"/>
   </url>
   <url>
-    <loc>https://www.rankbrief.com/de/terms</loc>
-    <lastmod>2026-03-09</lastmod>
+    <loc>https://rankbrief.com/terms</loc>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://www.rankbrief.com/de/terms"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.rankbrief.com/terms"/>
   </url>
-
 </urlset>
