@@ -1306,16 +1306,16 @@ const i18n = {
   en: {
     badge: 'Automated SEO reporting for agencies & freelancers',
     heroTitle1: 'Client-ready SEO Reports',
-    heroTitle2: 'in 3 min, not 2 hours.',
-    heroSub: 'Stop spending 3 hours on monthly SEO reports. Connect Google Search Console once – RankBrief automatically generates a branded PDF report and delivers it to your inbox on the 1st of every month.',
-    heroCta: 'Get your first report free',
+    heroTitle2: 'in 60 seconds.',
+    heroSub: 'Stop spending 3 hours on monthly SEO reports. Connect Google Search Console once – your first PDF report lands in your inbox in 60 seconds, then automatically every 1st of the month.',
+    heroCta: 'Get my first report in 60s',
     heroSeeHow: '▶ See a real client report',
-    trust1: 'First report free',
+    trust1: 'First report in 60s',
     trust2: 'GDPR · EU servers',
     trust3: 'No credit card',
     howLabel: 'How it works',
     howTitle: 'Set it up once.\nReports run forever.',
-    howSub: 'Four steps between you and automated monthly SEO reporting.',
+    howSub: 'Four steps between you and your first SEO report — no waiting.',
     featLabel: 'Features',
     featTitle: 'Everything you need.\nNothing you don\'t.',
     featSub: 'No more time wasted on manual reports. Connect Google once, and RankBrief takes care of the rest.',
@@ -1329,19 +1329,19 @@ const i18n = {
     sampleHint: 'This is an automatically generated report — exactly what your clients receive every month.',
     pricingLabel: 'Pricing',
     pricingTitle: 'One plan. All features.\nPay only for more properties.',
-    pricingSub: 'First month free. No credit card required. Cancel anytime.',
+    pricingSub: 'First report instantly. No credit card required. Cancel anytime.',
     faqLabel: 'FAQ',
     faqTitle: 'Questions & answers',
     faqSub: 'Everything you need to know before signing up.',
     ctaTitle: 'Stop writing reports manually.',
     ctaSub: 'Join freelancers and agencies who automated their SEO reporting with RankBrief.',
-    ctaBtn: 'Get my first report free – no credit card →',
+    ctaBtn: 'Get my first report in 60s – no credit card →',
     planCta: 'Get started',
     steps: [
       { n: '01', title: 'Connect Google', text: 'Sign in with Google and select your Search Console and GA4 properties.' },
-      { n: '02', title: 'Choose a plan', text: 'Pick Basic, Pro, or Agency depending on how many domains you manage.' },
-      { n: '03', title: 'Receive your report', text: 'On the 1st of every month, your PDF report lands in your inbox automatically.' },
-      { n: '04', title: 'Share with clients', text: 'Forward or white-label the report. Your clients get professional insights without any effort.' },
+      { n: '02', title: 'Pick a property', text: 'Choose the domain you want to report on. That\'s it — no plan selection needed for your first report.' },
+      { n: '03', title: 'Get your first report in 60s', text: 'Your PDF report lands in your inbox right after property selection. Try it before deciding on a plan.' },
+      { n: '04', title: 'Stay automated', text: 'Choose a plan to keep receiving monthly reports on the 1st. Or just enjoy your free first report.' },
     ],
     features: [
       { icon: '⚡', title: 'Fully Automated', text: 'Connect once. Every month, your report is generated and delivered automatically – no manual work required.' },
@@ -1359,9 +1359,10 @@ const i18n = {
       { name: 'White-Label', price: '5', period: '/mo', featured: false, addon: true, features: ['Remove RankBrief footer', 'Your logo + brand colors', 'For your entire account'] },
     ],
     faqs: [
+      { q: 'How fast do I really get my first report?', a: 'Your first report is generated and emailed within ~60 seconds after you pick a property. You\'ll see a "report is being created" indicator in the dashboard, and the PDF arrives by email shortly after. No credit card needed.' },
       { q: 'Is my Google data safe?', a: 'Yes. We request read-only access to your Search Console and Analytics data. OAuth tokens are encrypted using AES-256-GCM and stored on EU servers (Frankfurt). We never access your data beyond what\'s needed to generate your report.' },
       { q: 'Can I cancel anytime?', a: 'Absolutely. Cancel from your dashboard at any time. Your subscription remains active until the end of the billing period. No questions asked, no hidden fees.' },
-      { q: 'Do I need to be technical to use RankBrief?', a: 'Not at all. Setup takes about 3 minutes: sign in with Google, select your website, choose a plan. After that, everything is automatic.' },
+      { q: 'Do I need to be technical to use RankBrief?', a: 'Not at all. Setup takes about 3 minutes: sign in with Google, select your website, then your first report is generated automatically.' },
       { q: 'What does the report include?', a: 'Each report covers clicks, impressions, CTR, average position, sessions, engagement rate, top 10 keywords, top 10 pages, month-over-month comparison, and an AI-written plain-language summary.' },
       { q: 'Can I use my own logo?', a: 'Yes — add the White-Label add-on for €5/month. This removes the RankBrief footer and lets you upload your own logo and brand colors for all reports.' },
       { q: 'Which Google properties are supported?', a: 'Any verified Google Search Console property. GA4 support is available for all standard properties. We support both domain and URL-prefix GSC properties.' },
@@ -1370,16 +1371,16 @@ const i18n = {
   de: {
     badge: 'Automatisches SEO-Reporting für Agenturen & Freelancer',
     heroTitle1: 'Client-ready SEO Reports',
-    heroTitle2: 'in 3 Min statt 2h.',
-    heroSub: 'Schluss mit 3 Stunden manuellem Reporting. Google Search Console einmal verbinden – RankBrief erstellt jeden 1. des Monats automatisch einen professionellen PDF-Report mit KI-Analyse – automatisch per Mail, ohne weiteres Zutun.',
-    heroCta: 'Ersten Report kostenlos erhalten',
+    heroTitle2: 'in 60 Sekunden.',
+    heroSub: 'Schluss mit 3 Stunden manuellem Reporting. Google Search Console einmal verbinden – dein erster PDF-Report landet in 60 Sekunden im Postfach, danach automatisch jeden 1. des Monats.',
+    heroCta: 'Ersten Report in 60s erhalten',
     heroSeeHow: '▶ Echten Kunden-Report sehen',
-    trust1: 'Erster Report kostenlos',
+    trust1: 'Erster Report in 60s',
     trust2: 'DSGVO · EU-Server',
     trust3: 'Keine Kreditkarte',
     howLabel: 'So funktioniert\'s',
     howTitle: 'Einmal einrichten.\nReports laufen automatisch.',
-    howSub: 'Vier Schritte bis zu deinem automatischen monatlichen SEO-Report.',
+    howSub: 'Vier Schritte zu deinem ersten SEO-Report — kein Warten.',
     featLabel: 'Features',
     featTitle: 'Alles was du brauchst.\nNichts was du nicht brauchst.',
     featSub: 'Schluss mit stundenlanger Report-Arbeit. Verbinde einmal Google, und RankBrief erledigt den Rest.',
@@ -1393,19 +1394,19 @@ const i18n = {
     sampleHint: 'Automatisch generiert — genau so kommt der Report jeden Monat bei deinen Kunden an.',
     pricingLabel: 'Preise',
     pricingTitle: 'Ein Plan. Alles drin.\nNur weitere Properties kosten extra.',
-    pricingSub: 'Erster Monat kostenlos. Keine Kreditkarte erforderlich. Jederzeit kündbar.',
+    pricingSub: 'Erster Report sofort. Keine Kreditkarte erforderlich. Jederzeit kündbar.',
     faqLabel: 'FAQ',
     faqTitle: 'Fragen & Antworten',
     faqSub: 'Alles was du vor der Anmeldung wissen musst.',
     ctaTitle: 'Hör auf, Reports manuell zu schreiben.',
     ctaSub: 'Schließ dich Freelancern und Agenturen an, die ihr SEO-Reporting mit RankBrief automatisiert haben.',
-    ctaBtn: 'Ersten Report kostenlos – ohne Kreditkarte →',
+    ctaBtn: 'Ersten Report in 60s – ohne Kreditkarte →',
     planCta: 'Jetzt starten',
     steps: [
       { n: '01', title: 'Google verbinden', text: 'Mit Google anmelden und Search Console sowie GA4-Properties auswählen.' },
-      { n: '02', title: 'Plan wählen', text: 'Basic, Pro oder Agency – je nachdem wie viele Domains du verwaltest.' },
-      { n: '03', title: 'Report erhalten', text: 'Am 1. jeden Monats landet dein PDF-Report automatisch im Postfach.' },
-      { n: '04', title: 'Mit Kunden teilen', text: 'Report weiterleiten oder white-label versenden. Deine Kunden erhalten professionelle Einblicke.' },
+      { n: '02', title: 'Property auswählen', text: 'Wähle die Domain für deinen Report. Mehr brauchst du für deinen ersten Report nicht.' },
+      { n: '03', title: 'Erster Report in 60s', text: 'Dein PDF-Report landet direkt nach der Property-Auswahl im Postfach. Teste alles bevor du dich für einen Plan entscheidest.' },
+      { n: '04', title: 'Automatisch weitermachen', text: 'Wähle einen Plan um weiterhin monatliche Reports am 1. zu erhalten. Oder bleib einfach beim ersten kostenlosen Report.' },
     ],
     features: [
       { icon: '⚡', title: 'Vollautomatisch', text: 'Einmal verbinden. Jeden Monat wird dein Report automatisch erstellt und geliefert – kein manueller Aufwand.' },
@@ -1423,9 +1424,10 @@ const i18n = {
       { name: 'White-Label', price: '5', period: '/Monat', featured: false, addon: true, features: ['RankBrief-Fußzeile entfernen', 'Eigenes Logo + Brandfarben', 'Für alle Properties im Account'] },
     ],
     faqs: [
+      { q: 'Wie schnell bekomme ich wirklich meinen ersten Report?', a: 'Dein erster Report wird ~60 Sekunden nach der Property-Auswahl generiert und per Mail versendet. Im Dashboard siehst du eine "Bericht wird erstellt"-Anzeige, kurz danach kommt die PDF per Mail. Keine Kreditkarte nötig.' },
       { q: 'Sind meine Google-Daten sicher?', a: 'Ja. Wir fordern nur lesenden Zugriff auf deine Search Console und Analytics-Daten. OAuth-Tokens werden mit AES-256-GCM verschlüsselt und auf EU-Servern (Frankfurt) gespeichert.' },
       { q: 'Kann ich jederzeit kündigen?', a: 'Ja. Jederzeit im Dashboard kündigen. Dein Abo bleibt bis Ende des Abrechnungszeitraums aktiv. Keine versteckten Gebühren.' },
-      { q: 'Muss ich technisches Wissen haben?', a: 'Nein. Die Einrichtung dauert ca. 3 Minuten: mit Google anmelden, Website auswählen, Plan wählen. Danach läuft alles automatisch.' },
+      { q: 'Muss ich technisches Wissen haben?', a: 'Nein. Die Einrichtung dauert ca. 3 Minuten: mit Google anmelden, Website auswählen, danach wird der erste Report automatisch generiert.' },
       { q: 'Was enthält der Report?', a: 'Klicks, Impressionen, CTR, durchschnittliche Position, Sessions, Engagement Rate, Top 10 Keywords, Top 10 Seiten, Vormonatsvergleich und eine KI-generierte Zusammenfassung.' },
       { q: 'Kann ich mein eigenes Logo verwenden?', a: 'Ja — füge das White-Label Add-on für €5/Monat hinzu. Das entfernt die RankBrief-Fußzeile und ermöglicht eigenes Logo und Brandfarben für alle Reports.' },
       { q: 'Welche Google-Properties werden unterstützt?', a: 'Jede verifizierte Google Search Console Property. GA4 wird für alle Standard-Properties unterstützt. Wir unterstützen Domain- und URL-Prefix-GSC-Properties.' },
@@ -1532,8 +1534,8 @@ export default function Landing({ lang = 'de' }) {
           <UrgencyTop>
             <span>⚡</span>
             {lang === 'de'
-              ? 'Early Access: Ersten Report + 3 Monate kostenlos'
-              : 'Early Access: First report + 3 months free'}
+              ? 'Early Access: Erster Report sofort + 2 weitere Monate gratis'
+              : 'Early Access: Instant first report + 2 more free months'}
           </UrgencyTop>
           {promoUsed !== null && (
             <UrgencySlots>
@@ -1910,12 +1912,12 @@ export default function Landing({ lang = 'de' }) {
                       : `${configProps} ${configProps === 1 ? 'property' : 'properties'} · Full report · ${configWL ? 'White-label included' : 'RankBrief branding'}`}
                   </ConfigTotalSub>
                   <ConfigCTA to={buildUrl()}>
-                    {isDE ? 'Ersten Report kostenlos →' : 'Get your first report free →'}
+                    {isDE ? 'Ersten Report in 60s erhalten →' : 'Get my first report in 60s →'}
                   </ConfigCTA>
                   <ConfigTrust>
                     {isDE
-                      ? 'Erster Report kostenlos · Kein Abo · Keine Kreditkarte erforderlich'
-                      : 'First report free · No subscription · No credit card required'}
+                      ? 'Erster Report in 60s · Kein Abo · Keine Kreditkarte erforderlich'
+                      : 'First report in 60s · No subscription · No credit card required'}
                   </ConfigTrust>
                 </ConfigTotal>
               </ConfigRight>
