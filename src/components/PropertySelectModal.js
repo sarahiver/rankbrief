@@ -214,7 +214,13 @@ const GoogleIcon = () => (
 );
 
 export default function PropertySelectModal({ user, onDone, onNewAccount, plan = 'free', activeCount = 0, lang = 'de' }) {
-  const limit = PLAN_LIMITS[plan] ?? 1;
+  // CHANGED 2026-05-13: limit ist jetzt State (geladen aus profiles.property_limit)
+  // statt hartkodierter PLAN_LIMITS-Konstante. Behebt Bug:
+  // - User mit Promo (z.B. EARLY2026 = plan:pro, property_limit:1) bekam
+  //   früher PLAN_LIMITS['pro']=3 zugewiesen → User konnte mehr selektieren als erlaubt.
+  // - Jetzt: Source of Truth aus DB.
+  // PLAN_LIMITS-Konstante (Zeile 205) bleibt vorerst als Fallback, falls property_limit null ist.
+  const [limit, setLimit] = useState(PLAN_LIMITS[plan] ?? 1);
   const isPro = ['pro', 'agency'].includes(plan);
 
   const [step, setStep] = useState(1);
@@ -240,7 +246,16 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
       const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
       const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
-      const [gscRes, { data: activeProps }] = await Promise.all([
+      // CHANGED 2026-05-13: Pending-Cleanup beim Modal-Open (Bug D Fix)
+      // Falls vorheriger Modal-Durchlauf abgebrochen wurde (Tab geschlossen, Browser-Crash),
+      // bleiben pending Properties in der DB hängen. Diese werden hier bereinigt.
+      // Sicher, weil pending Properties nie für Reports genutzt werden.
+      await supabase.from('properties').delete()
+        .eq('user_id', user.id).eq('status', 'pending');
+
+      // CHANGED 2026-05-13: property_limit aus profiles laden (Bug A Fix)
+      // Source of Truth ist profile.property_limit, nicht PLAN_LIMITS[plan]
+      const [gscRes, { data: activeProps }, { data: profile }] = await Promise.all([
         fetch(`${SUPABASE_URL}/functions/v1/get-gsc-properties`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON}` },
@@ -248,7 +263,12 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
         }),
         supabase.from('properties').select('id, gsc_property_url, google_account_id, ga_property_id')
           .eq('user_id', user.id).eq('status', 'active'),
+        supabase.from('profiles').select('property_limit').eq('id', user.id).single(),
       ]);
+
+      // CHANGED: limit aus DB übernehmen (mit PLAN_LIMITS-Fallback falls null)
+      const effectiveLimit = profile?.property_limit ?? PLAN_LIMITS[plan] ?? 1;
+      setLimit(effectiveLimit);
 
       const gscData = await gscRes.json();
       const accs = gscData.accounts ?? [];
@@ -259,9 +279,9 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
       accs.forEach(a => { openState[a.google_account_id] = true; });
       setOpenAccounts(openState);
 
-      // Echtes remaining
+      // Echtes remaining — nutzt jetzt effectiveLimit (nicht limit-State, der ist noch alt)
       const realActive = activeProps?.length ?? 0;
-      setRealRemaining(Math.max(0, limit - realActive));
+      setRealRemaining(Math.max(0, effectiveLimit - realActive));
 
       // Aktive Properties vorauswählen + GA4 pro Property prefill
       const preSelected = {};
@@ -413,6 +433,21 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
     }
     try {
       const selectedUrls = Object.keys(selected);
+
+      // CHANGED 2026-05-13: Server-Side Limit-Check (Bug B Fix)
+      // Verteidigungslinie falls Modal-State korrumpiert (Race Condition, mehrere Tabs etc.)
+      // Quelle: profiles.property_limit (Source of Truth, gleicher Wert wie in run-monthly-reports)
+      const { data: limitProfile } = await supabase
+        .from('profiles').select('property_limit').eq('id', user.id).single();
+      const maxAllowed = limitProfile?.property_limit ?? 1;
+
+      if (selectedUrls.length > maxAllowed) {
+        setError(lang === 'de'
+          ? `Du kannst maximal ${maxAllowed} ${maxAllowed === 1 ? 'Property' : 'Properties'} aktivieren. Bitte wähle weniger.`
+          : `You can activate a maximum of ${maxAllowed} ${maxAllowed === 1 ? 'property' : 'properties'}. Please select fewer.`);
+        setSaving(false);
+        return;
+      }
 
       // Aktuelle aktive Properties
       const { data: currentActive } = await supabase
