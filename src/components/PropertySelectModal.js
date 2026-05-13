@@ -179,6 +179,28 @@ const LoadSpinner = styled.div`
   border-top-color: ${({ theme }) => theme.colors.accent};
   border-radius: 50%; animation: ${spin} 0.7s linear infinite;
 `;
+// NEW: Erfolgs-State Container für Sofort-Report-Trigger
+const SuccessWrap = styled.div`
+  text-align: center; padding: 2rem 1rem;
+`;
+const SuccessIcon = styled.div`
+  font-size: 2.5rem; margin-bottom: 1rem;
+`;
+const SuccessTitle = styled.h3`
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-size: 1.125rem; font-weight: 800; letter-spacing: -0.02em;
+  margin-bottom: 0.5rem; color: ${({ theme }) => theme.colors.text};
+`;
+const SuccessText = styled.p`
+  font-size: 0.875rem; color: ${({ theme }) => theme.colors.textMuted};
+  font-weight: 300; line-height: 1.6; margin-bottom: 1.5rem;
+`;
+const SuccessSpinner = styled.div`
+  width: 20px; height: 20px; margin: 0 auto;
+  border: 2px solid ${({ theme }) => theme.colors.border};
+  border-top-color: ${({ theme }) => theme.colors.accent};
+  border-radius: 50%; animation: ${spin} 0.7s linear infinite;
+`;
 
 const PLAN_LIMITS = { free: 1, basic: 1, pro: 3, agency: 10 };
 
@@ -206,6 +228,9 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
   const [openAccounts, setOpenAccounts] = useState({});
   const [selected, setSelected] = useState({}); // { url: google_account_id }
   const [realRemaining, setRealRemaining] = useState(limit);
+  // NEW: State für Sofort-Report-Success-Anzeige (5s Loader)
+  const [showFirstReportSuccess, setShowFirstReportSuccess] = useState(false);
+  const [firstReportCount, setFirstReportCount] = useState(0);
 
   useEffect(() => { loadData(); }, []);
 
@@ -306,6 +331,63 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
     });
   };
 
+  // NEW: Hilfsfunktion - prüft ob User noch keinen Report jemals hatte
+  // Logik:
+  //   - Free Trial User: free_report_sent = false → qualifiziert
+  //   - Promo User mit Limit: promo_reports_used = 0 → qualifiziert
+  //   - Promo unlimited / Paying: immer qualifiziert für neue Properties ohne first_report_triggered_at
+  //   - Bestehender User mit Reports: hat Properties mit first_report_triggered_at gesetzt → diese skip
+  const checkUserEligibleForFirstReport = async () => {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('plan, free_report_sent, promo_code_used, promo_reports_used, promo_reports_limit, subscription_status')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile) return false;
+
+    // Frozen oder expired Trial: kein Sofort-Report
+    if (profile.subscription_status === 'expired') return false;
+
+    // Free Trial: Sofort-Report nur wenn noch kein free_report_sent
+    if (profile.plan === 'free' || profile.subscription_status === 'trial') {
+      return !profile.free_report_sent;
+    }
+
+    // Promo mit Limit: nur wenn noch nicht gestartet (0 used)
+    // Bei limit=null (unlimited Promo): immer qualifiziert
+    if (profile.promo_code_used) {
+      if (profile.promo_reports_limit == null) return true; // unlimited
+      return (profile.promo_reports_used ?? 0) === 0;
+    }
+
+    // Paying User: immer qualifiziert (für neue Properties)
+    if (profile.subscription_status === 'active') return true;
+
+    return false;
+  };
+
+  // NEW: Triggert Sofort-Report für eine einzelne Property
+  // Fire-and-forget — wartet nicht auf Vollendung (Edge Function läuft async)
+  const triggerFirstReport = async (propertyId) => {
+    try {
+      const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+      const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
+      // Fire and forget — kein await auf das Response
+      fetch(`${SUPABASE_URL}/functions/v1/run-monthly-reports`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON}`,
+          'apikey': SUPABASE_ANON,
+        },
+        body: JSON.stringify({ property_id: propertyId, force: true }),
+      }).catch(err => console.error('First-report trigger failed:', err));
+    } catch (err) {
+      console.error('triggerFirstReport error:', err);
+    }
+  };
+
   const handleSave = async (skipGa4 = false) => {
     setSaving(true); setError('');
 
@@ -338,11 +420,14 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
         .eq('user_id', user.id).eq('status', 'active');
       const currentActiveUrls = new Set((currentActive ?? []).map(p => p.gsc_property_url));
 
+      // NEW: Tracker für neu hinzugefügte / reaktivierte Properties (für Sofort-Report)
+      const newlyAddedPropertyIds = [];
+
       // Neu ausgewählte aktivieren
       for (const [url, accountId] of Object.entries(selected)) {
         // Prüfen ob Property bereits in DB existiert (egal welcher Status)
         const { data: existing } = await supabase
-          .from('properties').select('id, status')
+          .from('properties').select('id, status, first_report_triggered_at')
           .eq('user_id', user.id).eq('gsc_property_url', url)
           .maybeSingle();
 
@@ -351,13 +436,21 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
           const updates = { status: 'active', last_synced_at: new Date().toISOString() };
           if (ga4Value) updates.ga_property_id = ga4Value;
           await supabase.from('properties').update(updates).eq('id', existing.id);
+          // NEW: Bestehende Property, die noch nie einen Sofort-Report hatte
+          // (z.B. wurde damals als inactive markiert vor first_report_triggered_at-Feature)
+          if (!existing.first_report_triggered_at) {
+            newlyAddedPropertyIds.push(existing.id);
+          }
         } else {
-          await supabase.from('properties').insert({
+          const { data: inserted } = await supabase.from('properties').insert({
             user_id: user.id, google_account_id: accountId,
             gsc_property_url: url, display_name: url,
             status: 'active', ga_property_id: ga4Value,
             last_synced_at: new Date().toISOString(),
-          });
+          }).select('id').single();
+          if (inserted?.id) {
+            newlyAddedPropertyIds.push(inserted.id);
+          }
         }
       }
 
@@ -370,6 +463,28 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
       // Pending bereinigen
       await supabase.from('properties').delete().eq('user_id', user.id).eq('status', 'pending');
 
+      // NEW: Sofort-Report-Logik
+      // Prüfen ob User qualifiziert für Sofort-Report
+      // Wenn ja: für alle neu hinzugefügten Properties triggern
+      const isEligible = await checkUserEligibleForFirstReport();
+
+      if (isEligible && newlyAddedPropertyIds.length > 0) {
+        console.info(`Triggering first-report for ${newlyAddedPropertyIds.length} properties`);
+        // Fire-and-forget für alle qualifizierten Properties parallel
+        newlyAddedPropertyIds.forEach(id => triggerFirstReport(id));
+
+        // 5s Success-Loader anzeigen, dann Modal schließen
+        setFirstReportCount(newlyAddedPropertyIds.length);
+        setShowFirstReportSuccess(true);
+        setSaving(false);
+        setTimeout(() => {
+          setShowFirstReportSuccess(false);
+          onDone();
+        }, 5000);
+        return;
+      }
+
+      // Kein Sofort-Report → direkt schließen wie bisher
       onDone();
     } catch (err) {
       setError('Fehler beim Speichern.'); console.error(err);
@@ -378,6 +493,32 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
   };
 
   const selectedCount = Object.keys(selected).length;
+
+  // NEW: Success-State für Sofort-Report-Trigger
+  // Wird nach handleSave() für 5 Sekunden angezeigt, dann automatisch geschlossen
+  if (showFirstReportSuccess) {
+    return (
+      <Overlay>
+        <Box>
+          <Logo><LogoDot />Rank<span>Brief</span></Logo>
+          <SuccessWrap>
+            <SuccessIcon>✨</SuccessIcon>
+            <SuccessTitle>
+              {firstReportCount === 1
+                ? t(lang, 'modal.first_report_starting')
+                : t(lang, 'modal.first_report_starting_multi', { count: firstReportCount })}
+            </SuccessTitle>
+            <SuccessText>
+              {firstReportCount === 1
+                ? t(lang, 'modal.first_report_success_single')
+                : t(lang, 'modal.first_report_success_multi', { count: firstReportCount })}
+            </SuccessText>
+            <SuccessSpinner />
+          </SuccessWrap>
+        </Box>
+      </Overlay>
+    );
+  }
 
   return (
     <Overlay>
