@@ -1094,6 +1094,16 @@ const Spinner = styled.div`
   margin: 3rem auto;
 `;
 
+// NEW: Spinner für Sofort-Report-Loading-State auf Property-Card
+const FirstReportLoadingSpinner = styled.div`
+  width: 24px; height: 24px;
+  border: 2px solid rgba(108,99,255,0.25);
+  border-top-color: #6C63FF;
+  border-radius: 50%;
+  animation: ${spin} 0.8s linear infinite;
+  margin: 0 auto 0.75rem;
+`;
+
 const ReportPeriod = styled.div`
   font-size: 0.8125rem;
   color: ${({ theme }) => theme.colors.textDim};
@@ -1465,10 +1475,28 @@ function PropertyItem({ property, isAgency, plan, lang = 'de', onReauth }) {
                     : `Google Search Console hat für diese Domain noch keine Daten gesammelt. Neue Domains benötigen 2–4 Wochen. Du erhältst automatisch eine E-Mail sobald der erste Report verfügbar ist.`}
                 </div>
               </div>
+            ) : property?.first_report_triggered_at ? (
+              // NEW: Sofort-Report läuft gerade — Loading-State statt "kommt am 1."
+              // Triggert wenn first_report_triggered_at gesetzt aber noch kein Report da ist
+              <div style={{
+                padding:'1.25rem',
+                borderRadius:'10px',
+                background:'rgba(108,99,255,0.06)',
+                border:'1px solid rgba(108,99,255,0.20)',
+                textAlign:'center',
+              }}>
+                <FirstReportLoadingSpinner />
+                <div style={{ fontSize:'0.9375rem', fontWeight:700, marginBottom:'0.375rem' }}>
+                  {t(lang, 'dash.first_report_processing_title')}
+                </div>
+                <div style={{ fontSize:'0.8125rem', color:'#6b6b8a', lineHeight:1.6 }}>
+                  {t(lang, 'dash.first_report_processing')}
+                </div>
+              </div>
             ) : (
             <EmptyState>
               <EmptyIcon>📭</EmptyIcon>
-              <EmptyTitle>Noch kein Report vorhanden</EmptyTitle>
+              <EmptyTitle>{lang === 'de' ? 'Noch kein Report vorhanden' : 'No report yet'}</EmptyTitle>
               <EmptyText>{t(lang, 'dash.first_report')}</EmptyText>
             </EmptyState>
             )
