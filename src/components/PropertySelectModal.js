@@ -389,16 +389,22 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
 
   // NEW: Triggert Sofort-Report für eine einzelne Property
   // Fire-and-forget — wartet nicht auf Vollendung (Edge Function läuft async)
+  // CHANGED 2026-05-13: User-Session-Token statt ANON_KEY senden.
+  // Mit verify_jwt=on auf der Edge Function akzeptiert Supabase nur User-Session-Tokens.
+  // ANON_KEY würde 401 zurückgeben.
   const triggerFirstReport = async (propertyId) => {
     try {
       const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
       const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
+      // User-Session-Token holen
+      const { data: { session } } = await supabase.auth.getSession();
+      const userToken = session?.access_token || SUPABASE_ANON;
       // Fire and forget — kein await auf das Response
       fetch(`${SUPABASE_URL}/functions/v1/run-monthly-reports`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON}`,
+          'Authorization': `Bearer ${userToken}`,
           'apikey': SUPABASE_ANON,
         },
         body: JSON.stringify({ property_id: propertyId, force: true }),
