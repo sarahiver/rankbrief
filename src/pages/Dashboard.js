@@ -2128,8 +2128,8 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
                 lineHeight: 1.6,
               }}>
                 {lang === 'de'
-                  ? <>Verbinde dein Google-Konto um GSC-Properties auszuwählen und monatliche Reports zu erhalten. <strong>Der erste Monat ist kostenlos.</strong></>
-                  : <>Connect your Google account to select GSC properties and receive monthly reports. <strong>The first month is free.</strong></>
+                  ? <>Verbinde dein Google-Konto und wähle eine Property. <strong>Dein erster Report kommt in 60 Sekunden — keine Kreditkarte nötig.</strong></>
+                  : <>Connect your Google account and pick a property. <strong>Your first report arrives in 60 seconds — no credit card needed.</strong></>
                 }
               </div>
             )}
