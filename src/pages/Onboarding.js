@@ -517,11 +517,17 @@ export default function Onboarding({ user }) {
       const accounts = data.accounts ?? [];
 
       // Alle Properties flatten
+      // Edge Function get-gsc-properties gibt sites als [{url, active}] zurück (nicht Strings!)
       const allSites = [];
       for (const acc of accounts) {
         for (const site of (acc.sites ?? [])) {
+          // Defensive: site kann String oder {url, active} sein
+          const siteUrl = typeof site === 'string' ? site : site.url;
+          const isActive = typeof site === 'object' ? site.active : false;
+          if (!siteUrl) continue;
           allSites.push({
-            url: site,
+            url: siteUrl,
+            active: isActive,
             google_account_id: acc.google_account_id,
             google_email: acc.google_email,
           });
