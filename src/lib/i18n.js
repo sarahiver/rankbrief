@@ -45,6 +45,8 @@ export const translations = {
     'dash.connected': 'Connected {{date}}',
     'dash.settings_hint': 'Manage or remove properties → Settings',
     'dash.first_report': 'Your first report will be generated automatically on the 1st of next month.',
+    'dash.first_report_processing_title': '🔄 First report is being created',
+    'dash.first_report_processing': 'Should be ready in 2–3 minutes. You will get an email when it arrives.',
     'dash.no_summary': '🤖 No AI summary yet. Will be generated automatically with the next report.',
     'dash.seo_recs': 'SEO Recommendations:',
     'dash.seo_recs_sub': 'Concrete actions you can take this week',
@@ -170,6 +172,11 @@ export const translations = {
     'modal.checking': '⏳ Checking GA4…',
     'modal.skip_ga4': 'Continue without GA4',
     'modal.skip_ga4_invalid': 'Continue without GA4 (invalid ID)',
+    // First Report (Sofort-Report nach Property-Auswahl)
+    'modal.first_report_starting': 'Your first report is being created',
+    'modal.first_report_starting_multi': 'Your first {{count}} reports are being created',
+    'modal.first_report_success_single': "Should arrive in 2–3 minutes by email. You can already keep using the dashboard.",
+    'modal.first_report_success_multi': "Reports for {{count}} properties are being created — should arrive in 2–3 minutes by email.",
   },
 
   de: {
@@ -212,6 +219,8 @@ export const translations = {
     'dash.connected': 'Verbunden {{date}}',
     'dash.settings_hint': 'Properties verwalten oder entfernen → Einstellungen',
     'dash.first_report': 'Der erste Report wird automatisch am 1. des nächsten Monats generiert.',
+    'dash.first_report_processing_title': '🔄 Erster Bericht wird erstellt',
+    'dash.first_report_processing': 'Sollte in 2–3 Minuten fertig sein. Du bekommst eine Mail wenn er ankommt.',
     'dash.no_summary': '🤖 Noch keine KI-Zusammenfassung vorhanden. Wird automatisch beim nächsten Report generiert.',
     'dash.seo_recs': 'SEO-Empfehlungen:',
     'dash.seo_recs_sub': 'Konkrete Maßnahmen was du diese Woche tun kannst',
@@ -337,6 +346,11 @@ export const translations = {
     'modal.checking': '⏳ GA4 wird geprüft…',
     'modal.skip_ga4': 'Ohne GA4 fortfahren',
     'modal.skip_ga4_invalid': 'Ohne GA4 fortfahren (ID ungültig)',
+    // First Report (Sofort-Report nach Property-Auswahl)
+    'modal.first_report_starting': 'Dein erster Bericht wird erstellt',
+    'modal.first_report_starting_multi': 'Deine ersten {{count}} Berichte werden erstellt',
+    'modal.first_report_success_single': 'Sollte in 2–3 Minuten per Mail kommen. Du kannst das Dashboard schon weiter nutzen.',
+    'modal.first_report_success_multi': 'Berichte für {{count}} Properties werden erstellt — sollten in 2–3 Minuten per Mail kommen.',
   },
 };
 
