@@ -246,12 +246,12 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
       const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
       const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
-      // CHANGED 2026-05-13: Pending-Cleanup beim Modal-Open (Bug D Fix)
-      // Falls vorheriger Modal-Durchlauf abgebrochen wurde (Tab geschlossen, Browser-Crash),
-      // bleiben pending Properties in der DB hängen. Diese werden hier bereinigt.
-      // Sicher, weil pending Properties nie für Reports genutzt werden.
-      await supabase.from('properties').delete()
-        .eq('user_id', user.id).eq('status', 'pending');
+      // NOTE 2026-05-13: Pending-Cleanup beim Modal-Open wurde entfernt.
+      // Grund: Der OAuth-Callback legt frische Properties als pending mit Token an.
+      // Wenn wir die hier löschen, geht der Token verloren und handleSave müsste
+      // den Token vom google_accounts neu holen. Stattdessen: Pending bleibt liegen,
+      // wird durch handleSave aktiviert (UPDATE statt DELETE+INSERT).
+      // Verwaiste pending Properties werden am Ende von handleSave bereinigt.
 
       // CHANGED 2026-05-13: property_limit aus profiles laden (Bug A Fix)
       // Source of Truth ist profile.property_limit, nicht PLAN_LIMITS[plan]
@@ -458,11 +458,31 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
       // NEW: Tracker für neu hinzugefügte / reaktivierte Properties (für Sofort-Report)
       const newlyAddedPropertyIds = [];
 
+      // CHANGED 2026-05-13 (Bug E Fix): Token-Lookup vorbereiten
+      // Falls eine neue Property direkt inserted werden muss (kein pending vorhanden),
+      // brauchen wir refresh_token_encrypted + token_iv vom Google-Account.
+      // Ohne diese Felder kann fetch-report-data nicht den Token entschlüsseln
+      // → no_data mit reason 'token_error' → Reauth-Warnung im Dashboard.
+      const googleAccountIds = [...new Set(Object.values(selected))];
+      const { data: gaTokens } = await supabase
+        .from('google_accounts')
+        .select('id, refresh_token_encrypted, token_iv')
+        .in('id', googleAccountIds);
+      const tokenByAccountId = {};
+      for (const ga of (gaTokens ?? [])) {
+        tokenByAccountId[ga.id] = {
+          refresh_token_encrypted: ga.refresh_token_encrypted,
+          token_iv: ga.token_iv,
+        };
+      }
+
       // Neu ausgewählte aktivieren
       for (const [url, accountId] of Object.entries(selected)) {
         // Prüfen ob Property bereits in DB existiert (egal welcher Status)
+        // CHANGED 2026-05-13: refresh_token_encrypted + token_iv mit selecten,
+        // damit wir bei pending → active Übergang prüfen können ob Token da ist
         const { data: existing } = await supabase
-          .from('properties').select('id, status, first_report_triggered_at')
+          .from('properties').select('id, status, first_report_triggered_at, refresh_token_encrypted, token_iv')
           .eq('user_id', user.id).eq('gsc_property_url', url)
           .maybeSingle();
 
@@ -470,6 +490,13 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
         if (existing) {
           const updates = { status: 'active', last_synced_at: new Date().toISOString() };
           if (ga4Value) updates.ga_property_id = ga4Value;
+          // CHANGED 2026-05-13 (Bug E Fix): Falls Token in der bestehenden Property fehlt,
+          // ergänze ihn aus google_accounts. Defensive für alte Properties oder
+          // Properties die ohne Token erstellt wurden.
+          if (!existing.refresh_token_encrypted && tokenByAccountId[accountId]) {
+            updates.refresh_token_encrypted = tokenByAccountId[accountId].refresh_token_encrypted;
+            updates.token_iv = tokenByAccountId[accountId].token_iv;
+          }
           await supabase.from('properties').update(updates).eq('id', existing.id);
           // NEW: Bestehende Property, die noch nie einen Sofort-Report hatte
           // (z.B. wurde damals als inactive markiert vor first_report_triggered_at-Feature)
@@ -477,11 +504,16 @@ export default function PropertySelectModal({ user, onDone, onNewAccount, plan =
             newlyAddedPropertyIds.push(existing.id);
           }
         } else {
+          // CHANGED 2026-05-13 (Bug E/F Fix): Token MUSS beim INSERT mit übernommen werden
+          // (Property ohne Token kann später nicht für Reports genutzt werden)
+          const tokenData = tokenByAccountId[accountId] || {};
           const { data: inserted } = await supabase.from('properties').insert({
             user_id: user.id, google_account_id: accountId,
             gsc_property_url: url, display_name: url,
             status: 'active', ga_property_id: ga4Value,
             last_synced_at: new Date().toISOString(),
+            refresh_token_encrypted: tokenData.refresh_token_encrypted ?? null,
+            token_iv: tokenData.token_iv ?? null,
           }).select('id').single();
           if (inserted?.id) {
             newlyAddedPropertyIds.push(inserted.id);
