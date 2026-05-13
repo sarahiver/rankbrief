@@ -1883,6 +1883,15 @@ export default function Dashboard({ user, onOpenModal, lang = 'de', onLangChange
   };
 
   const startGoogleOAuth = () => {
+    // CHANGED 2026-05-13: Erst-Onboarding läuft jetzt über /onboarding-Wizard
+    // Wenn der User noch keine aktive Property hat → zum Wizard weiterleiten.
+    // Sonst (User hat schon Properties, will weiteres Google-Konto verbinden) → direkt OAuth wie bisher.
+    const hasNoProperties = properties.filter(p => p.status === 'active').length === 0;
+    if (hasNoProperties) {
+      navigate('/onboarding');
+      return;
+    }
+
     const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
     const REDIRECT_URI = 'https://ubexqxxkqjzhsgidsseh.supabase.co/functions/v1/google-oauth-callback';
     const SCOPES = [
