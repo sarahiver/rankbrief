@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import { supabase } from '../lib/supabase';
+import t from '../lib/i18n';
+import { trackEvent } from '../analytics';
 
 const fadeUp = keyframes`
   from { opacity: 0; transform: translateY(16px); }
@@ -212,13 +214,49 @@ const SuccessMsg = styled.div`
   color: ${({ theme }) => theme.colors.success};
 `;
 
-export default function Auth({ mode = 'login' }) {
+const PromoField = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: -0.25rem;
+`;
+
+const PromoInput = styled.input`
+  background: ${({ theme }) => theme.colors.bgElevated};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.md};
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  color: ${({ theme }) => theme.colors.text};
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: border-color 0.2s;
+  outline: none;
+  &:focus {
+    border-color: ${({ theme }) => theme.colors.accent};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.accentDim};
+  }
+  &::placeholder { color: ${({ theme }) => theme.colors.textDim}; text-transform: none; }
+`;
+
+const PromoLabel = styled.label`
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textMuted};
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+`;
+
+export default function Auth({ mode = 'login', lang = 'de' }) {
   const [isLogin, setIsLogin] = useState(mode === 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [promoCode, setPromoCode] = useState('');
+  const [promoStatus, setPromoStatus] = useState(null); // null | 'checking' | 'valid' | 'invalid'
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
@@ -231,9 +269,55 @@ export default function Auth({ mode = 'login' }) {
         if (error) throw error;
         navigate('/dashboard');
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data: signUpData, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        setSuccess('Check your email to confirm your account.');
+
+        // E-Mail in profiles speichern (für Admin-Dashboard)
+        // CHANGED 2026-05-13: explizit plan, plan_status, subscription_status, property_limit setzen
+        // Damit User unabhängig von DB-Defaults korrekt initialisiert sind.
+        // Verhindert Bug, dass neue Free-Trial-User auf plan_status='inactive' landen
+        // und damit von check-Trial-reminders ausgeschlossen werden.
+        if (signUpData?.user?.id) {
+          await supabase.from('profiles').upsert(
+            { 
+              id: signUpData.user.id, 
+              email,
+              plan: 'free',
+              plan_status: 'active',
+              subscription_status: 'trial',
+              property_limit: 1,
+              white_label_enabled: false,
+              report_language: lang || 'de',
+            },
+            { onConflict: 'id' }
+          );
+        }
+
+        // Track successful registration
+        trackEvent('register_success', { has_promo: !!promoCode.trim() });
+
+        // Promo code einloesen falls angegeben
+        if (promoCode.trim() && signUpData?.user?.id) {
+          const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+          const SUPABASE_ANON = process.env.REACT_APP_SUPABASE_ANON_KEY;
+          const res = await fetch(`${SUPABASE_URL}/functions/v1/redeem-promo`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${SUPABASE_ANON}`,
+              'apikey': SUPABASE_ANON,
+            },
+            body: JSON.stringify({ code: promoCode.trim(), user_id: signUpData.user.id }),
+          });
+          const promoResult = await res.json();
+          if (promoResult.success) {
+            setSuccess(`✅ Account created & promo code activated! Your ${promoResult.plan} plan is ready. Check your email to confirm your account.`);
+          } else {
+            setSuccess('Check your email to confirm your account. (Promo code could not be applied – please contact support.)');
+          }
+        } else {
+          setSuccess('Check your email to confirm your account.');
+        }
       }
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
@@ -245,7 +329,7 @@ export default function Auth({ mode = 'login' }) {
   const handleGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
+      options: { redirectTo: `${process.env.REACT_APP_SITE_URL || 'https://rankbrief.com'}/auth/callback` }
     });
   };
 
@@ -257,8 +341,8 @@ export default function Auth({ mode = 'login' }) {
       <Card>
         <Logo to="/"><LogoDot />Rank<span>Brief</span></Logo>
 
-        <Title>{isLogin ? 'Welcome back' : 'Create your account'}</Title>
-        <Sub>{isLogin ? 'Sign in to your RankBrief dashboard.' : 'Start for free – first month on us. No credit card required.'}</Sub>
+        <Title>{isLogin ? t(lang, 'auth.welcome_back') : t(lang, 'auth.create_account')}</Title>
+        <Sub>{isLogin ? t(lang, 'auth.sign_in_sub') : t(lang, 'auth.register_sub')}</Sub>
 
         <Form>
           {error && <ErrorMsg>{error}</ErrorMsg>}
@@ -272,6 +356,9 @@ export default function Auth({ mode = 'login' }) {
               value={email}
               onChange={e => setEmail(e.target.value)}
               onKeyDown={handleKey}
+              autoComplete={isLogin ? "email" : "email"}
+              name="email"
+              id="email"
             />
           </Field>
 
@@ -283,11 +370,38 @@ export default function Auth({ mode = 'login' }) {
               value={password}
               onChange={e => setPassword(e.target.value)}
               onKeyDown={handleKey}
+              autoComplete={isLogin ? "current-password" : "new-password"}
+              name="password"
+              id="password"
             />
           </Field>
 
+          {!isLogin && (
+            <PromoField>
+              <PromoLabel>
+                🎟️ Promo code <span style={{ fontWeight: 300, fontSize: '0.75rem', color: '#999' }}>(optional)</span>
+              </PromoLabel>
+              <PromoInput
+                type="text"
+                placeholder="e.g. AGENCY-SARAH"
+                value={promoCode}
+                onChange={e => setPromoCode(e.target.value.toUpperCase())}
+              />
+            </PromoField>
+          )}
+
+          {isLogin && (
+            <div style={{ textAlign: 'right', marginTop: '-0.25rem', marginBottom: '0.25rem' }}>
+              <a href="/forgot-password" style={{ fontSize: '0.8125rem', color: 'inherit', opacity: 0.6, textDecoration: 'none' }}
+                onMouseOver={e => e.target.style.opacity = 1}
+                onMouseOut={e => e.target.style.opacity = 0.6}>
+                Forgot password?
+              </a>
+            </div>
+          )}
+
           <BtnSubmit onClick={handleSubmit} disabled={loading}>
-            {loading ? 'Please wait…' : isLogin ? 'Sign in' : 'Create account'}
+            {loading ? t(lang, 'auth.waiting') : isLogin ? t(lang, 'auth.sign_in') : t(lang, 'auth.register')}
           </BtnSubmit>
 
           <Divider>or</Divider>
